@@ -1,0 +1,145 @@
+html * {
+    font-family: Georgia, sans-serif;
+}
+
+@media only screen and (max-width: 875px) {
+
+}
+
+.canvasimg {
+    display: none;
+}
+
+/* Main grid for webpage layout. */
+#wrapper {
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    column-gap: 1em;
+    row-gap: 1em
+}
+/* Manually place boxes for now. */
+#box1 {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 3;
+}
+#box2 {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 1;
+    grid-row-end: 2;
+}
+#trackTextBox {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 2;
+    grid-row-end: 3;
+}
+#box3 {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 4;
+}
+
+/* Add ability to style radio selector with images and animations. */
+.selector{
+    cursor: pointer;
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    transition: all 100ms ease-in;
+    filter: brightness(1.0) grayscale(0.2) opacity(0.5);
+}
+.selector:hover{
+    filter: brightness(1.0) grayscale(0.0) opacity(0.7);
+}
+/* Put radio checkbox on top of image. */
+#particle-selector input{
+    position:absolute;
+    z-index:999;
+}
+/* Images for radioactive sources would go here. */
+.alpha{
+    background-color: red;
+}
+.banana{
+    background-color:yellow;
+}
+.uranium{
+    background-color: greenyellow;
+}
+.NoSource{
+    background-color: white;
+}
+/* Image is opaque and no filters when selected. */
+#particle-selector input:active +.selector{
+    opacity:1.0;
+}
+#particle-selector input:checked +.selector{
+    filter: none;
+}
+
+/* Hide checkbox button on boxes. */
+.expand-input{
+    display: none;
+}
+/* Style information label. */
+.expand-label{ 
+    display: block;
+    font-size: 16px; 
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin: 0 0 10px;
+}
+/* Highlight information box on hover. */
+.expand-label:hover{
+    background: #e9e9e9;
+}
+/* Keep information hidden until clicked. */
+.expand-content{
+    max-height: 0; 
+    overflow: hidden;
+    padding: 0 20px;
+    transition: max-height 100ms;
+}
+/* Expand content on click. */
+.expand-input:checked ~ .expand-content{
+max-height: 1000px;
+}
+.slider{
+    -webkit-appearance: none;
+    width: 80%;
+    height: 10px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: 200s;
+    transition: opacity 200ms;
+}
+
+.slider:hover {
+    opacity: 1.0;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%; 
+    background: #04AA6D;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #04AA6D;
+    cursor: pointer;
+}
