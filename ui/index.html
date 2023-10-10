@@ -23,86 +23,10 @@
         <div id="header">
             <h1>Cloud Chamber</h1>
         </div>
-        <div id="wrapper">
-            <div id="box1">
-            <canvas class="emscripten" id="canvas" height="512" width="512" oncontextmenu="event.preventDefault()"></canvas>
-                <script type='text/javascript'>
-
-                    var Module =
-                        {
-                            canvas: (function() {
-                                var canvas = document.getElementById('canvas');
-                                canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
-
-                                return canvas;
-                            })()
-                        };
-
-                </script>
-            <p>Framerate: <span id="fps"></span>fps</p>
-            <p>Double-click to create track, single-click to highlight</p>
-            <p>
-                <button type="button" name="PlayPause" id="PlayPause">Pause</button>
-                <div>
-                    <h3>Simulation speed</h3>
-                    <form name="speedSlider" oninput="speedValue.value = speed.valueAsNumber">
-                        <input type="range" min="-10" max="10" step="0.1" value="1" class="slider" name="speedSlider" id="speed">
-                        <output name="speedValue" for="speed" id="speedBox">1</output>
-                    </form>
-                </div>
-                <button type="button" id="SlowDown">0.5x speed</button>
-                <button type="button" id="Speedup">2x speed</button>
-                <button type="button" id="ResetSpeed">Reset speed</button>
-            </p>
+	    <div id="trackerBox">
+	        <h2>Particles</h2>
+	        <p id="trackTextBoxContent">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tincidunt risus eu molestie varius. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aenean sagittis sapien in efficitur blandit. Donec eu orci auctor, mollis lorem vestibulum, posuere felis. Ut in semper arcu. Etiam sodales cursus dapibus. Aliquam in pretium mi. </p>
             </div>
-            <div id="box2">
-                <h2>About the cloud chamber simulation</h2>
-                <p>Large chunk of explanatory text goes here</p>
-            </div>
-	    <div id="trackTextBox">
-	        <h2>Track Information</h2>
-	        <p id="trackTextBoxContent">Some text here</p>
-            </div>
-            <div id="box3">
-                <h2>Select a radioactive source</h2>
-                <form id="particle-selector">
-                    <input type="radio" id="alpha" name="particle" value="alpha"/>
-                    <label class="selector alpha" for="alpha">Alpha particle</label>
-
-                    <input type="radio" id="banana" name="particle" value="banana"/>
-                    <label class="selector banana" for="banana">Banana</label>
-
-                    <input type="radio" id="uranium" name="particle" value="uranium"/>
-                    <label class="selector uranium" for="uranium">Uranium</label>
-
-                    <input type="radio" id="NoSource" name="particle" value="No source"/>
-                    <label class="selector NoSource" for="NoSource">No source</label>
-                </form>
                 
-                <h2>Information about sources</h2>
-                <div class="expand-wrapper">
-                    <input type="checkbox" id="alphaInfo" class="expand-input"/>
-                    <label class="expand-label" for="alphaInfo">Alpha particle</label>
-                    <div class="expand-content">
-                        Information about alpha particle here
-                    </div>
-                </div>
-                <div class="expand-wrapper">
-                    <input type="checkbox" id="bananaInfo" class="expand-input"/>
-                    <label class="expand-label" for="bananaInfo">Banana</label>
-                    <div class="expand-content">
-                        Information about bananas
-                    </div>
-                </div>
-                <div class="expand-wrapper">
-                    <input type="checkbox" id="uraniumInfo" class="expand-input"/>
-                    <label class="expand-label" for="uraniumInfo">Uranium</label>
-                    <div class="expand-content">
-                        Information about uranium here
-                    </div>
-                </div>
-            </div>
-        </div>
-        <img class="canvasimg" id="radioactive.png" src="radioactive.png">
     </body>
 </html>
