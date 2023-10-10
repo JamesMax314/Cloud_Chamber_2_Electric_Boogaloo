@@ -7,6 +7,7 @@ include_directories(include)
 
 file(GLOB SOURCES src/*.cpp)
 
+file(COPY "${CMAKE_SOURCE_DIR}/ui/" DESTINATION "${CMAKE_SOURCE_DIR}/public")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/public")
 add_executable(a ${SOURCES})
 
