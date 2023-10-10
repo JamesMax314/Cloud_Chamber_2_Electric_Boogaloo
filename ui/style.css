@@ -12,12 +12,12 @@ body {
     text-align: center;
 }
 
-#canvas {
+#canvas{
     background-color: #36213E;
 
 }
 
-#wrapper {
+#floating_wrapper {
     position: fixed;
     top: 100px;
     right: 10px;
@@ -57,6 +57,7 @@ body {
 
 .TrackTableData:hover {
     background-color: #CF5C36; 
+    color: #36213E;
 }
 
 #infoBox {
