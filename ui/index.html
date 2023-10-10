@@ -53,10 +53,39 @@
             </div>
         </div>
 
-
+	<div id="floating_wrapper">
 	    <div id="trackerBox">
-	        <h2>Particles</h2>
-	        <p id="trackTextBoxContent">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tincidunt risus eu molestie varius. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aenean sagittis sapien in efficitur blandit. Donec eu orci auctor, mollis lorem vestibulum, posuere felis. Ut in semper arcu. Etiam sodales cursus dapibus. Aliquam in pretium mi. </p>
+	    	<h2 id="trackerBoxHeader">Particles</h2>
+		<div>
+	    	    <table id="TrackTable">
+			<tr id="TrackTableHeader"> <th>Particle</th> <th> Energy</th> </tr>
+	    	    	<tr class="TrackTableData" onclick="selectRow(0)"> <th>Muon</th> <th> 3 GeV</th> </tr>
+	    	    	<tr class="TrackTableData" onclick="selectRow(1)"> <th>Alpha</th> <th> 1 GeV</th> </tr>
+	    	    	<tr class="TrackTableData" onclick="selectRow(2)" > <th>Electron</th> <th> 3 GeV</th> </tr>
+	    	    	<tr class="TrackTableData" onclick="selectRow(3)" > <th>Electron</th> <th> 3 GeV</th> </tr>
+	    	    	<tr class="TrackTableData" onclick="selectRow(4)" > <th>Electron</th> <th> 3 GeV</th> </tr>
+	    	    	<tr class="TrackTableData" onclick="selectRow(5)" > <th>Electron</th> <th> 3 GeV</th> </tr>
+	    	    	<tr class="TrackTableData" onclick="selectRow(6)" > <th></th> <th></th> </tr>
+	    	    	<tr class="TrackTableData" onclick="selectRow(7)" > <th></th> <th></th> </tr>
+	    	    	<tr class="TrackTableData" onclick="selectRow(8)" > <th></th> <th></th> </tr>
+	    	    	<tr class="TrackTableData" onclick="selectRow(9)" > <th></th> <th></th> </tr>
+	    	    </table>
+	    	</div>
             </div>    
+
+	    <div id="infoBox">
+		<h2 id="infoBoxHeader">Info</h2>
+		<p id="infoText">Select a track for information about that particle!</p>
+
+	    </div> 
+	    
+	    <script> 
+		function selectRow(info){
+		    document.getElementById("infoText").innerText = "You clicked on row "+info+" !"
+	    }
+
+	    </script>
+
+	</div>
     </body>
 </html>
