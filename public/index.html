@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Cloud chamber 2</title>
+        <link rel="stylesheet" href="style.css" type="text/css" />
+        <style>
+            body
+            {
+                font-family: arial;
+                margin: 0;
+                padding: none;
+            }
+
+            .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
+            div.emscripten { text-align: center; }
+            div.emscripten_border { border: 1px solid black; }
+            canvas.emscripten { border: 0px none; background-color: #d84f14; }
+
+        </style>
+    </head>
+    <body>
+        <script async type="text/javascript" src="a.wasm.js"></script>
+
+        <div id="header">
+            <h1>Cloud Chamber</h1>
+        </div>
+
+        <div id="wrapper">
+            <div id="box1">
+            <canvas class="emscripten" id="canvas" height="10" width="10" oncontextmenu="event.preventDefault()"></canvas>
+                <script type='text/javascript'>
+
+                    var Module =
+                        {
+                            canvas: (function() {
+                                var canvas = document.getElementById('canvas');
+                                canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+
+                                return canvas;
+                            })()
+                        };
+
+                    function resizeCanvas() {
+                        canvas.width = window.innerWidth;
+                        canvas.height = window.innerHeight;
+                    }
+                    // Initial canvas sizing
+                    resizeCanvas();
+
+                    // Listen for window resize events and update canvas size accordingly
+                    window.addEventListener("resize", resizeCanvas);
+                </script>
+            </div>
+        </div>
+
+
+	    <div id="trackerBox">
+	        <h2>Particles</h2>
+	        <p id="trackTextBoxContent">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tincidunt risus eu molestie varius. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aenean sagittis sapien in efficitur blandit. Donec eu orci auctor, mollis lorem vestibulum, posuere felis. Ut in semper arcu. Etiam sodales cursus dapibus. Aliquam in pretium mi. </p>
+            </div>    
+    </body>
+</html>
