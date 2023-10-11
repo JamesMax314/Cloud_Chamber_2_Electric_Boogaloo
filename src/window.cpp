@@ -36,8 +36,6 @@ GLFWwindow* window::setupWindow() {
 window::Window::Window()
 {
     win = setupWindow();
-    glGenBuffers(1, &lightUBO);
-    bufferLights();
 }
 
 void window::Window::renderFrame()
@@ -55,7 +53,7 @@ void window::Window::renderFrame()
     glfwSwapBuffers(win);
 }
 
-void window::Window::addMesh(drawable::GroundMesh *mesh)
+void window::Window::addMesh(drawable::Drawable *mesh)
 {
     meshes.emplace_back(mesh);
 }

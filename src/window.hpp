@@ -37,7 +37,7 @@ namespace window {
 
         void renderFrame();
 
-        void addMesh(drawable::GroundMesh *mesh);
+        void addMesh(drawable::Drawable *mesh);
 
         GLFWwindow* getContext();
     };
