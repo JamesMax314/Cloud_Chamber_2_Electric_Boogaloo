@@ -1,7 +1,8 @@
 #include "window.hpp"
 
-GLFWwindow* window::setupWindow() {
+GLFWwindow* window::setupWindow(int width, int height) {
         // Initialize GLFW and create a window
+
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
     }
@@ -15,7 +16,7 @@ GLFWwindow* window::setupWindow() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL 3D Cube", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(width, height, "Clouds", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -30,12 +31,16 @@ GLFWwindow* window::setupWindow() {
         glfwTerminate();
     }
 
+    printf("Initialising WEBGL context!\n");
+
     return window;
 }
 
 window::Window::Window()
 {
-    win = setupWindow();
+    width = EM_ASM_INT({return document.getElementById("canvas").width}, 100);
+    height = EM_ASM_INT({return document.getElementById("canvas").height}, 100);
+    win = setupWindow(width/2, height/2);
 }
 
 void window::Window::renderFrame()

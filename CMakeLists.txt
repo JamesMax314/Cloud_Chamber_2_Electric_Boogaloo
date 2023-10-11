@@ -8,22 +8,25 @@ include_directories(include)
 file(GLOB SOURCES src/*.cpp)
 file(GLOB HEADDERS src/*.hpp)
 
-
 # find_package(OpenGL REQUIRED)
 add_subdirectory(lib/glm EXCLUDE_FROM_ALL)
 
+set(OBJECT_DEPENDS ../shaders)
+
 file(COPY "${CMAKE_SOURCE_DIR}/ui/" DESTINATION "${CMAKE_SOURCE_DIR}/public")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/public")
+# set(EMCC_LINKER_FLAGS "--preload-file ${CMAKE_SOURCE_DIR}/src/shaders")
 add_executable(ccSim ${HEADDERS} ${SOURCES})
+set_source_files_properties(main.cpp OBJECT_DEPENDS ${CMAKE_SOURCE_DIR}/shaders)
 
 if(JS_ONLY)
 	message(STATUS "Setting compilation target to native JavaScript")
 	set(CMAKE_EXECUTABLE_SUFFIX ".js")
-	set_target_properties(ccSim PROPERTIES LINK_FLAGS "-s WASM=0 -s EXPORTED_FUNCTIONS='[_main]' --bind -s USE_GLFW=3 -s USE_WEBGL2=1")
+	set_target_properties(ccSim PROPERTIES LINK_FLAGS "-s WASM=0 -s EXPORTED_FUNCTIONS='[_main]' --bind -s USE_GLFW=3 -s USE_WEBGL2=1 --preload-file ../shaders")
     target_link_libraries(ccSim PRIVATE glm)
 else(JS_ONLY)
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
-	set_target_properties(ccSim PROPERTIES LINK_FLAGS "-s WASM=3 -s EXPORTED_FUNCTIONS='[_main]' --bind -s USE_GLFW=3 -s USE_WEBGL2=1")
+	set_target_properties(ccSim PROPERTIES LINK_FLAGS "-s WASM=3 -s EXPORTED_FUNCTIONS='[_main]' --bind -s USE_GLFW=3 -s USE_WEBGL2=1 --preload-file ../shaders")
     target_link_libraries(ccSim PRIVATE glm)
 endif(JS_ONLY)

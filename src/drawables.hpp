@@ -43,6 +43,7 @@ namespace drawable {
 
         Drawable();
         Drawable(shaders::Shader *shader);
+        Drawable(shaders::Shader *shader, std::vector<glm::vec3> vertices, std::vector<unsigned int> indices);
 
         void fillBuffers();
         void loadUniforms();

@@ -28,6 +28,7 @@ std::string shaders::ReadShaderFile(const char* filePath) {
 }
 
 GLuint shaders::genShaderProgram(const char* vertexShaderFile, const char* fragmentShaderFile) {
+    printf("Compiling Shaders:\n");
     std::string vertexShaderSource = shaders::ReadShaderFile(vertexShaderFile);
     std::string fragmentShaderSource = shaders::ReadShaderFile(fragmentShaderFile);
 
@@ -47,6 +48,8 @@ GLuint shaders::genShaderProgram(const char* vertexShaderFile, const char* fragm
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    } else {
+        printf("- Vertex Shader Compiled; \n");
     }
 
 
@@ -60,6 +63,8 @@ GLuint shaders::genShaderProgram(const char* vertexShaderFile, const char* fragm
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    } else {
+        printf("- Fragment Shader Compiled; \n");
     }
 
     // Create a shader program and link the shaders
@@ -81,14 +86,14 @@ GLuint shaders::genShaderProgram(const char* vertexShaderFile, const char* fragm
             // Print or log the error message
             std::cout << "ERROR::SHADER::LINKING_FAILED\n" << log.data() << std::endl;
         }
+    } else {
+        printf("- Shaders Linked. \n");
     }
 
     // Clean up
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     glUseProgram(shaderProgram);
-
-    printf("Shader Compiled\n");
 
     return shaderProgram;
 }

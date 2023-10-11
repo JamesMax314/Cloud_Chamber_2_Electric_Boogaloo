@@ -6,6 +6,9 @@
 #include <vector>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <emscripten/val.h>
+#include <emscripten/html5.h>
+#include <emscripten/bind.h>
 #define GLM_FORCE_PURE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -15,12 +18,12 @@
 #include "shaders.hpp"
 
 namespace window {
-    GLFWwindow* setupWindow();
-    void setFullScreen(GLFWwindow* window);
-    void setSmallScreen(GLFWwindow* window);
+    GLFWwindow* setupWindow(int width, int height);
 
     class Window {
         public:
+
+        int height, width;
 
         GLFWwindow* win;
         GLuint lightUBO;
