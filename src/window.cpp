@@ -36,11 +36,19 @@ GLFWwindow* window::setupWindow(int width, int height) {
     return window;
 }
 
+void window::framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
+
 window::Window::Window()
 {
     width = EM_ASM_INT({return document.getElementById("canvas").width}, 100);
     height = EM_ASM_INT({return document.getElementById("canvas").height}, 100);
-    win = setupWindow(width/2, height/2);
+    win = setupWindow(width, height);
+    glfwSetFramebufferSizeCallback(win, framebuffer_size_callback);
 }
 
 void window::Window::renderFrame()

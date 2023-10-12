@@ -43,7 +43,7 @@ int main()
 
     glfwMakeContextCurrent(w.getContext());
 
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    // glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
 
@@ -51,8 +51,6 @@ int main()
     drawable::Drawable square(&triangleShader, vertices, indices);
     square.draw(w.getContext());
     glfwSwapBuffers(w.getContext());
-
-    std::cout << glGetError() << std::endl;
 
     emscripten_set_main_loop(draw, 0, 1);
 

@@ -17,7 +17,6 @@ drawable::Drawable::Drawable(shaders::Shader *shader, std::vector<glm::vec3> ver
     mShader = shader;
     mVertices = vertices;
     mIndices = indices;
-    printf("vertices %f \n", mVertices[0][0]);
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);

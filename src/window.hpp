@@ -20,6 +20,8 @@
 namespace window {
     GLFWwindow* setupWindow(int width, int height);
 
+    void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
     class Window {
         public:
 
