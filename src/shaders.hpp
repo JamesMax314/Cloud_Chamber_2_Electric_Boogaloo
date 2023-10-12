@@ -61,4 +61,12 @@ namespace shaders {
 
         ~Shader();
     };
+
+    GLuint genCompProgram(const char *compShaderFile);
+
+    class Compute : public Shader {
+        public:
+        Compute();
+        Compute(const char* computeShader);
+    };
 }
