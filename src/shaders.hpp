@@ -11,10 +11,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
+
 namespace shaders {
+    
     std::string ReadShaderFile(const char* filePath);
 
     GLuint genShaderProgram(const char* vertexShader, const char* fragmentShader);
+    GLuint genShaderProgram(const char* vertexShader);
 
     class Shader {
         public:
@@ -22,6 +26,7 @@ namespace shaders {
 
         Shader();
         Shader(const char* vertexShader, const char* fragmentShader);
+        Shader(const char* vertexShader);
 
         void activate();
 

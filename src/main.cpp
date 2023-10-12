@@ -41,11 +41,55 @@ int main()
     const char* vertexShaderFile = "../shaders/triangleVert.glsl";
     const char* fragmentShaderFile = "../shaders/triangleFrag.glsl";
 
+    const char* sqrtShaderFile = "../shaders/sqrtVert.glsl";
+
     glfwMakeContextCurrent(w.getContext());
 
     // glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    shaders::Shader sqrtShader(sqrtShaderFile);
+    GLuint program = sqrtShader.mProgram;
+
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    GLfloat data[] = { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f };
+
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+
+    GLint inputAttrib = glGetAttribLocation(program, "inValue");
+    glEnableVertexAttribArray(inputAttrib);
+    glVertexAttribPointer(inputAttrib, 1, GL_FLOAT, GL_FALSE, 0, 0);
+
+    GLuint tbo;
+    glGenBuffers(1, &tbo);
+    glBindBuffer(GL_ARRAY_BUFFER, tbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data), nullptr, GL_STATIC_READ);
+    
+    glEnable(GL_RASTERIZER_DISCARD);
+
+    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbo);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glBeginTransformFeedback(GL_POINTS);
+
+    glDrawArrays(GL_POINTS, 0, 5);
+
+    glEndTransformFeedback();
+
+    glFlush();
+
+    GLfloat feedback[5];
+    glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
+
+    printf("%f %f %f %f %f\n", feedback[0], feedback[1], feedback[2], feedback[3], feedback[4]);
+
+    glDisable(GL_RASTERIZER_DISCARD);
 
     shaders::Shader triangleShader(vertexShaderFile, fragmentShaderFile);
     drawable::Drawable square(&triangleShader, vertices, indices);
