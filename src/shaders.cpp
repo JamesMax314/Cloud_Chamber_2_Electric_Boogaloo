@@ -294,3 +294,8 @@ shaders::Compute::Compute(const char *computeShader)
 {
     mProgram = genCompProgram(computeShader);
 }
+
+void shaders::Compute::init(const char *computeShader)
+{
+    mProgram = genCompProgram(computeShader);
+}

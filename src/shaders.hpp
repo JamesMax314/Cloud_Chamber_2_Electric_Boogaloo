@@ -68,5 +68,6 @@ namespace shaders {
         public:
         Compute();
         Compute(const char* computeShader);
+        void init(const char* computeShader);
     };
 }

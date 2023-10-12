@@ -15,22 +15,22 @@
 
 #include "window.hpp"
 #include "shaders.hpp"
-#include "app.hpp"
-
-app::App application;
 
 
-void draw() {
-    application.mainLoop();
-}
+namespace app {
+    class App {
+        public:
+        window::Window w;
+        GLuint ParticleBufferA, ParticleBufferB;
+        const int ParticleCount = 50;
+        shaders::Compute fancyShader;
 
 
+        App();
+
+        void init();
+        void mainLoop();
 
 
-int main()
-{
-    application.init();
-    emscripten_set_main_loop(draw, 0, 1);
-
-    return 0;
+    };
 }
