@@ -39,8 +39,11 @@ void app::App::init()
     fancyShader.init(fancyShaderFile);
     quadShader.init(quadVert, quadFrag);
 
+    std::vector<simulation::Position> randParticles = utils::genRandomPoints(10);
+    printf("RandPos %f %f %f \n", randParticles[0][0], randParticles[0][1], randParticles[0][2]);
+
     std::vector<simulation::Position> sParticles(1, drawable::Vertex(0, 0, 0));
-    sim.init(&fancyShader, &quadShader, sParticles);
+    sim.init(&fancyShader, &quadShader, randParticles);
 }
 
 void app::App::mainLoop()
