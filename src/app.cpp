@@ -23,6 +23,25 @@ app::App::App()
 {
 }
 
+double prevMouseX = 0.0;
+double prevMouseY = 0.0;
+double deltaX;
+double deltaY;
+
+// Mouse cursor position callback function
+void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
+    // Calculate the change in mouse cursor position
+    deltaX = xpos - prevMouseX;
+    deltaY = ypos - prevMouseY;
+
+    // Update the previous mouse cursor position
+    prevMouseX = xpos;
+    prevMouseY = ypos;
+
+    // Use deltaX and deltaY to respond to mouse movement
+    // Your code here
+}
+
 void app::App::init()
 {
     const char* vertexShaderFile = "../shaders/triangleVert.glsl";
@@ -35,11 +54,13 @@ void app::App::init()
     const char* quadVert = "../shaders/quadVert.glsl";
 
     glfwMakeContextCurrent(w.getContext());
+    glfwSetCursorPosCallback(w.getContext(), cursorPosCallback);
+    glfwSetInputMode(w.getContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     fancyShader.init(fancyShaderFile);
     quadShader.init(quadVert, quadFrag);
 
-    std::vector<simulation::Position> randParticles = utils::genRandomPoints(10000);
+    std::vector<simulation::Position> randParticles = utils::genRandomPoints(1);
     printf("RandPos %f %f %f \n", randParticles[0][0], randParticles[0][1], randParticles[0][2]);
 
     std::vector<simulation::Position> sParticles(1, drawable::Vertex(0, 0, 0));
@@ -53,8 +74,39 @@ void app::App::mainLoop()
 
     glClear(GL_COLOR_BUFFER_BIT);
 
+    float dt = 1;
+
+    if (keys[GLFW_KEY_W]) {
+        cam.move(0.0f, 0.0f, motionSpeed*dt);
+    }
+    if (keys[GLFW_KEY_S]) {
+        cam.move(0.0f, 0.0f, -motionSpeed*dt);
+    }
+    if (keys[GLFW_KEY_A]) {
+        cam.move(motionSpeed*dt, 0.0f, 0.0f);
+    }
+    if (keys[GLFW_KEY_D]) {
+        cam.move(-motionSpeed*dt, 0.0f, 0.0f);
+    }
+    if (keys[GLFW_KEY_SPACE]) {
+        cam.move(0.0f, motionSpeed*dt, 0.0f);
+    }
+    if (keys[GLFW_KEY_LEFT_SHIFT]) {
+        cam.move(0.0f, -motionSpeed*dt, 0.0f);
+    }
+
+    if (deltaX != 0.0 || deltaY != 0.0) {
+        cam.rotate(deltaX, deltaY);
+        deltaX = 0;
+        deltaY = 0;
+    }
+
+
     time += 0.1;
+    // cam.setViewMat(glm::mat4( 1.0f ));
+    printf("View:\n %f %f %f %f\n %f %f %f %f\n %f %f %f %f\n %f %f %f %f\n ", cam.viewMatrix[0][0], cam.viewMatrix[0][1], cam.viewMatrix[0][2], cam.viewMatrix[0][3], cam.viewMatrix[1][0], cam.viewMatrix[1][1], cam.viewMatrix[1][2], cam.viewMatrix[1][3], cam.viewMatrix[2][0], cam.viewMatrix[2][1], cam.viewMatrix[2][2], cam.viewMatrix[2][3], cam.viewMatrix[3][0], cam.viewMatrix[3][1], cam.viewMatrix[3][2], cam.viewMatrix[3][3]);
     sim.mCompShader->setUniform("time", time);
+    sim.mRenderShader->setUniformVec("view", cam.viewMatrix);
 
     sim.draw(&w);
 
