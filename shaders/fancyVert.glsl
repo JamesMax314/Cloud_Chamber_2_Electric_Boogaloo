@@ -224,10 +224,17 @@ vec3 curlnoise(vec3 pos, float alpha)
 
 }
 
+vec3 normalise(vec3 vector){
+    float norm = sqrt(vector.x*vector.x + vector.y*vector.y + vector.z*vector.z);
+    return vec3(vector.x/norm, vector.y/norm, vector.z/norm);
+}
+
 void main()
 {
     vec3 velocity = curlnoise(Position, 0.0);
-    vPosition = Position + 0.01*velocity;
+    //velocity = normalise(velocity);
+    vec3 drift = vec3(0.01, 0.0, 0.0);
+    vPosition = Position + 0.005*velocity + drift;
     gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);
     gl_PointSize = 10.0;
 }
