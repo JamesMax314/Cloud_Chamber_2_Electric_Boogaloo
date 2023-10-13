@@ -1,3 +1,5 @@
+#pragma once
+
 #include <emscripten.h>
 #include <emscripten/val.h>
 #include <emscripten/html5.h>
@@ -16,6 +18,7 @@
 #include "window.hpp"
 #include "shaders.hpp"
 #include "simulation.hpp"
+#include "utils.hpp"
 
 
 namespace app {

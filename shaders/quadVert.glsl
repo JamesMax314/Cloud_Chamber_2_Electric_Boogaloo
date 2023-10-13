@@ -8,7 +8,7 @@ vec3 aPos;
 
 void main()
 {
-    aPos = quad + particlePos;
+    aPos = 0.1*quad+0.1*particlePos;
     gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
     fragPos = vec3(1.0,1.0,1.0);//particlePos;
 }
