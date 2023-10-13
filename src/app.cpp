@@ -48,9 +48,11 @@ void app::App::init()
 
 void app::App::mainLoop()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
 
     sim.update(&w);
+
+    glClear(GL_COLOR_BUFFER_BIT);
+
     sim.draw(&w);
 
     glfwSwapBuffers(w.getContext());
