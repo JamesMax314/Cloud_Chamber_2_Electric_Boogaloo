@@ -19,6 +19,7 @@
 #include "shaders.hpp"
 #include "simulation.hpp"
 #include "utils.hpp"
+#include "camera.hpp"
 
 
 namespace app {
@@ -31,9 +32,14 @@ namespace app {
         drawable::Drawable square;
         shaders::Compute fancyShader;
         shaders::Shader quadShader;
+        camera::Camera cam;
         simulation::Sim sim;
 
-	float time = 0.0;
+        bool keys[GLFW_KEY_LAST] = { false };
+
+        float motionSpeed = 1;
+
+	    float time = 0.0;
 
         App();
 

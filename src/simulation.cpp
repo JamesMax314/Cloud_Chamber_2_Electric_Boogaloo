@@ -83,7 +83,7 @@ void simulation::Sim::fillBuffers()
 
     // Bind rendering buffers
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_cube), g_vertex_buffer_data_cube, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -119,7 +119,7 @@ void simulation::Sim::draw(window::Window* w)
     glVertexAttribDivisor(0, 0);
     glVertexAttribDivisor(1, 1);
 
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, mStartPos.size());
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 36, mStartPos.size());
 
     glBindVertexArray(0);
 }

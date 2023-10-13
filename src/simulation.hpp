@@ -36,6 +36,45 @@ namespace simulation {
             0.5f, 0.5f, 0.0f,
         };
 
+        const GLfloat g_vertex_buffer_data_cube[112] = {
+            -1.0f,-1.0f,-1.0f, // triangle 1 : begin
+            -1.0f,-1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f, // triangle 1 : end
+            1.0f, 1.0f,-1.0f, // triangle 2 : begin
+            -1.0f,-1.0f,-1.0f,
+            -1.0f, 1.0f,-1.0f, // triangle 2 : end
+            1.0f,-1.0f, 1.0f,
+            -1.0f,-1.0f,-1.0f,
+            1.0f,-1.0f,-1.0f,
+            1.0f, 1.0f,-1.0f,
+            1.0f,-1.0f,-1.0f,
+            -1.0f,-1.0f,-1.0f,
+            -1.0f,-1.0f,-1.0f,
+            -1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f,-1.0f,
+            1.0f,-1.0f, 1.0f,
+            -1.0f,-1.0f, 1.0f,
+            -1.0f,-1.0f,-1.0f,
+            -1.0f, 1.0f, 1.0f,
+            -1.0f,-1.0f, 1.0f,
+            1.0f,-1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f,-1.0f,-1.0f,
+            1.0f, 1.0f,-1.0f,
+            1.0f,-1.0f,-1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f,-1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f,-1.0f,
+            -1.0f, 1.0f,-1.0f,
+            1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f,-1.0f,
+            -1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f,
+            1.0f,-1.0f, 1.0f
+        };
+
         unsigned int shaderProgramIndex;
         shaders::Shader* mCompShader;
         shaders::Shader* mRenderShader;
