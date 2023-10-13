@@ -41,7 +41,7 @@ void simulation::Sim::update(window::Window* w)
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
     // Specify input format
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     // Set output buffer
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, ParticleBufferB);
@@ -75,11 +75,11 @@ void simulation::Sim::fillBuffers()
     glBufferData(GL_ARRAY_BUFFER, mStartPos.size()*sizeof(simulation::Position), &mStartPos.front(), GL_STREAM_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     // Create VBO for output on even-numbered frames and input on odd-numbered frames:
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferB);
-    glBufferData(GL_ARRAY_BUFFER, mStartPos.size()*sizeof(simulation::Position), nullptr, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, mStartPos.size()*sizeof(simulation::Position), (void*)0, GL_STREAM_DRAW);
 
     // Bind rendering buffers
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
@@ -109,6 +109,11 @@ void simulation::Sim::draw(window::Window* w)
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // float feedbackVec[6];
+    // glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(feedbackVec), feedbackVec);
+
+    // printf("%f %f %f %f %f %f\n", feedbackVec[0], feedbackVec[1], feedbackVec[2], feedbackVec[3], feedbackVec[4], feedbackVec[5]);
     
     //  Draw 1 quad (4 vertices) for every position
     glVertexAttribDivisor(0, 0);
