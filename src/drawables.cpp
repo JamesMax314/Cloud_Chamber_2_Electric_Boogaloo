@@ -23,6 +23,17 @@ drawable::Drawable::Drawable(shaders::Shader *shader, std::vector<glm::vec3> ver
     fillBuffers();
 }
 
+void drawable::Drawable::init(shaders::Shader *shader, std::vector<glm::vec3> vertices, std::vector<unsigned int> indices)
+{
+    mShader = shader;
+    mVertices = vertices;
+    mIndices = indices;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+    fillBuffers();
+}
+
 void drawable::Drawable::fillBuffers()
 {
     // Bind all the model arrays to the appropriate buffers
@@ -58,7 +69,8 @@ void drawable::Drawable::draw(GLFWwindow* w)
     glBindVertexArray(VAO);
     // glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
+    // glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 4);
     // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

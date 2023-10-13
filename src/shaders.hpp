@@ -27,6 +27,7 @@ namespace shaders {
         Shader();
         Shader(const char* vertexShader, const char* fragmentShader);
         Shader(const char* vertexShader);
+        void init(const char* vertexShader, const char* fragmentShader);
 
         void activate();
 
@@ -60,5 +61,14 @@ namespace shaders {
         }
 
         ~Shader();
+    };
+
+    GLuint genCompProgram(const char *compShaderFile);
+
+    class Compute : public Shader {
+        public:
+        Compute();
+        Compute(const char* computeShader);
+        void init(const char* computeShader);
     };
 }

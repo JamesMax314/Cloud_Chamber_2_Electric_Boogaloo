@@ -43,3 +43,6 @@ classDiagram
     App :+draw()
     App :+random(double mi, ma)
 ```
+
+# TODO:
+- [ ] Need to make shader loader adapt to different types of input and output variables
