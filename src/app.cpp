@@ -39,7 +39,7 @@ void app::App::init()
     fancyShader.init(fancyShaderFile);
     quadShader.init(quadVert, quadFrag);
 
-    std::vector<simulation::Position> randParticles = utils::genRandomPoints(10);
+    std::vector<simulation::Position> randParticles = utils::genRandomPoints(10000);
     printf("RandPos %f %f %f \n", randParticles[0][0], randParticles[0][1], randParticles[0][2]);
 
     std::vector<simulation::Position> sParticles(1, drawable::Vertex(0, 0, 0));
@@ -52,6 +52,9 @@ void app::App::mainLoop()
     sim.update(&w);
 
     glClear(GL_COLOR_BUFFER_BIT);
+
+    time += 0.1;
+    sim.mCompShader->setUniform("time", time);
 
     sim.draw(&w);
 

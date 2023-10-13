@@ -2,6 +2,7 @@
 
 in vec3 Position;
 out vec3 vPosition;
+uniform float time;
 
 vec4 permute(vec4 x) {
      vec4 xm = mod(x, 289.0);
@@ -214,9 +215,9 @@ vec3 curlnoise(vec3 pos, float alpha)
     vec3 grad1;
     vec3 grad2;
     vec3 grad3;
-    psrdnoise(pos, p1, 0.0, grad1);
-    psrdnoise(pos, p1, 0.0, grad2);
-    psrdnoise(pos, p1, 0.0, grad3);
+    psrdnoise(pos, p1, alpha, grad1);
+    psrdnoise(pos, p1, alpha, grad2);
+    psrdnoise(pos, p1, alpha, grad3);
 
     vec3 velocity = vec3(grad3.y-grad2.z,grad1.z-grad3.x,grad2.x-grad1.y);
 
@@ -229,12 +230,14 @@ vec3 normalise(vec3 vector){
     return vec3(vector.x/norm, vector.y/norm, vector.z/norm);
 }
 
+
 void main()
 {
-    vec3 velocity = curlnoise(Position, 0.0);
+    vec3 velocity = curlnoise(Position, time);
     //velocity = normalise(velocity);
     vec3 drift = vec3(0.001, 0.0, 0.0);
-    vPosition = Position + 0.0005*velocity + drift;
+    vPosition = Position + 0.002*velocity + drift;
+
     gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);
     gl_PointSize = 10.0;
 }

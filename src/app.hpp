@@ -33,6 +33,7 @@ namespace app {
         shaders::Shader quadShader;
         simulation::Sim sim;
 
+	float time = 0.0;
 
         App();
 
