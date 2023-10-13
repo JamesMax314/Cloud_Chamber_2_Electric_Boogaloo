@@ -37,7 +37,7 @@ namespace app {
 
         bool keys[GLFW_KEY_LAST] = { false };
 
-        float motionSpeed = 0.1;
+        float motionSpeed = 1;
 
 	    float time = 0.0;
 

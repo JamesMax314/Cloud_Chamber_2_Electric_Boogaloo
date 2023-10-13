@@ -10,6 +10,6 @@ void main()
     float sig = 0.5;
     float luminocity = 1.0 /(sig * sqrt(2.0 * pi)) * exp(-0.5 * pow(fragPos.z/sig, 2.0));
 
-    // FragColor = vec4(luminocity, luminocity, luminocity, luminocity);
-    FragColor = vec4(fragPos, luminocity);
+    FragColor = vec4(luminocity, luminocity, luminocity, luminocity);
+    // FragColor = vec4(fragPos, luminocity);
 }

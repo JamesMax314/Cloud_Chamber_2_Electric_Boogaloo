@@ -12,9 +12,10 @@ vec3 aPos;
 
 void main()
 {
-    aPos = quad*0.3+particlePos;
+    aPos = quad*0.03+particlePos;
     gl_Position = view*vec4(aPos, 1.0);
 
     // gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-    fragPos = vec3(abs(view[0][0]), abs(view[1][1]), abs(view[2][2]));//particlePos;
+    // fragPos = vec3(abs(view[0][0]), abs(view[1][1]), abs(view[2][2]));//particlePos;
+    fragPos = particlePos;//particlePos;
 }

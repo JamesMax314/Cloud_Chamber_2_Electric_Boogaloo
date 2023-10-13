@@ -60,7 +60,7 @@ void app::App::init()
     fancyShader.init(fancyShaderFile);
     quadShader.init(quadVert, quadFrag);
 
-    std::vector<simulation::Position> randParticles = utils::genRandomPoints(1);
+    std::vector<simulation::Position> randParticles = utils::genRandomPoints(100);
     printf("RandPos %f %f %f \n", randParticles[0][0], randParticles[0][1], randParticles[0][2]);
 
     std::vector<simulation::Position> sParticles(1, drawable::Vertex(0, 0, 0));
@@ -77,6 +77,7 @@ void app::App::mainLoop()
     float dt = 1;
 
     if (keys[GLFW_KEY_W]) {
+        printf("w\n");
         cam.move(0.0f, 0.0f, motionSpeed*dt);
     }
     if (keys[GLFW_KEY_S]) {
@@ -103,8 +104,6 @@ void app::App::mainLoop()
 
 
     time += 0.1;
-    // cam.setViewMat(glm::mat4( 1.0f ));
-    printf("View:\n %f %f %f %f\n %f %f %f %f\n %f %f %f %f\n %f %f %f %f\n ", cam.viewMatrix[0][0], cam.viewMatrix[0][1], cam.viewMatrix[0][2], cam.viewMatrix[0][3], cam.viewMatrix[1][0], cam.viewMatrix[1][1], cam.viewMatrix[1][2], cam.viewMatrix[1][3], cam.viewMatrix[2][0], cam.viewMatrix[2][1], cam.viewMatrix[2][2], cam.viewMatrix[2][3], cam.viewMatrix[3][0], cam.viewMatrix[3][1], cam.viewMatrix[3][2], cam.viewMatrix[3][3]);
     sim.mCompShader->setUniform("time", time);
     sim.mRenderShader->setUniformVec("view", cam.viewMatrix);
 
