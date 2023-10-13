@@ -53,7 +53,7 @@ void app::App::mainLoop()
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    time += 0.1;
+    time += 0.001;
     sim.mCompShader->setUniform("time", time);
 
     sim.draw(&w);

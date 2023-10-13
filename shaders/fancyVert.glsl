@@ -216,8 +216,8 @@ vec3 curlnoise(vec3 pos, float alpha)
     vec3 grad2;
     vec3 grad3;
     psrdnoise(pos, p1, alpha, grad1);
-    psrdnoise(pos, p1, alpha, grad2);
-    psrdnoise(pos, p1, alpha, grad3);
+    psrdnoise(pos, p2, alpha, grad2);
+    psrdnoise(pos, p3, alpha, grad3);
 
     vec3 velocity = vec3(grad3.y-grad2.z,grad1.z-grad3.x,grad2.x-grad1.y);
 
@@ -225,18 +225,42 @@ vec3 curlnoise(vec3 pos, float alpha)
 
 }
 
-vec3 normalise(vec3 vector){
-    float norm = sqrt(vector.x*vector.x + vector.y*vector.y + vector.z*vector.z);
-    return vec3(vector.x/norm, vector.y/norm, vector.z/norm);
+uint lowbias32(uint x)
+{
+    x ^= x >> 16;
+    x *= 0x7feb352dU;
+    x ^= x >> 15;
+    x *= 0x846ca68bU;
+    x ^= x >> 16;
+    return x;
 }
 
+vec2 random(vec3 pos)
+{
+    uint x = uint(pos.x*100.0);
+    uint y = uint(pos.y*100.0);
+    
+    x = lowbias32(x);
+    y = lowbias32(y);
+
+    float xr = float(x)/(2e32-1.0);
+    float yr = float(y)/(2e32-1.0);
+    
+    return vec2(xr, yr);
+}
 
 void main()
 {
-    vec3 velocity = curlnoise(Position, time);
+    float alpha = 0.1*time;
+    vec3 velocity = curlnoise(Position, alpha);
     //velocity = normalise(velocity);
-    vec3 drift = vec3(0.001, 0.0, 0.0);
-    vPosition = Position + 0.002*velocity + drift;
+    vec3 drift = vec3(0.0, 0.0, 0.0);
+    vPosition = Position + 0.001*velocity + drift;
+    
+    if(abs(vPosition.x)>1.0 || abs(vPosition.y)>1.0 || abs(vPosition.z)>1.0){
+	vec2 randxy = random(vPosition);
+	vPosition = vec3(sign(vPosition.x)*randxy.x, sign(vPosition.y)*randxy.y, 1.0);
+    }
 
     gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);
     gl_PointSize = 10.0;
