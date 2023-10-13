@@ -12,7 +12,7 @@ vec3 aPos;
 
 void main()
 {
-    aPos = quad*0.03+particlePos;
+    aPos = quad*0.002+particlePos;
     gl_Position = view*vec4(aPos, 1.0);
 
     // gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);

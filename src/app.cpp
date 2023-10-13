@@ -60,7 +60,7 @@ void app::App::init()
     fancyShader.init(fancyShaderFile);
     quadShader.init(quadVert, quadFrag);
 
-    std::vector<simulation::Position> randParticles = utils::genRandomPoints(100);
+    std::vector<simulation::Position> randParticles = utils::genRandomPoints(50000);
     printf("RandPos %f %f %f \n", randParticles[0][0], randParticles[0][1], randParticles[0][2]);
 
     std::vector<simulation::Position> sParticles(1, drawable::Vertex(0, 0, 0));
@@ -73,35 +73,6 @@ void app::App::mainLoop()
     sim.update(&w);
 
     glClear(GL_COLOR_BUFFER_BIT);
-
-    float dt = 1;
-
-    if (keys[GLFW_KEY_W]) {
-        printf("w\n");
-        cam.move(0.0f, 0.0f, motionSpeed*dt);
-    }
-    if (keys[GLFW_KEY_S]) {
-        cam.move(0.0f, 0.0f, -motionSpeed*dt);
-    }
-    if (keys[GLFW_KEY_A]) {
-        cam.move(motionSpeed*dt, 0.0f, 0.0f);
-    }
-    if (keys[GLFW_KEY_D]) {
-        cam.move(-motionSpeed*dt, 0.0f, 0.0f);
-    }
-    if (keys[GLFW_KEY_SPACE]) {
-        cam.move(0.0f, motionSpeed*dt, 0.0f);
-    }
-    if (keys[GLFW_KEY_LEFT_SHIFT]) {
-        cam.move(0.0f, -motionSpeed*dt, 0.0f);
-    }
-
-    if (deltaX != 0.0 || deltaY != 0.0) {
-        cam.rotate(deltaX, deltaY);
-        deltaX = 0;
-        deltaY = 0;
-    }
-
 
     float dt = 1;
 
