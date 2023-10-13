@@ -15,6 +15,7 @@
 
 #include "window.hpp"
 #include "shaders.hpp"
+#include "simulation.hpp"
 
 
 namespace app {
@@ -27,6 +28,7 @@ namespace app {
         drawable::Drawable square;
         shaders::Compute fancyShader;
         shaders::Shader quadShader;
+        simulation::Sim sim;
 
 
         App();
