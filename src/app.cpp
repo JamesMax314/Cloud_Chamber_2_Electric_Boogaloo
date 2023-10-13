@@ -53,6 +53,9 @@ void app::App::mainLoop()
 
     glClear(GL_COLOR_BUFFER_BIT);
 
+    float time = 0;
+    sim.mCompShader->setUniform("time", time);
+
     sim.draw(&w);
 
     glfwSwapBuffers(w.getContext());
