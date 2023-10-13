@@ -15,6 +15,7 @@
 
 #include "window.hpp"
 #include "shaders.hpp"
+#include "simulation.hpp"
 
 
 namespace app {
