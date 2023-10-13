@@ -17,6 +17,7 @@ void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderS
     glGenBuffers(1, &ParticleBufferA);
     glGenBuffers(1, &ParticleBufferB);
     glGenBuffers(1, &billboard_vertex_buffer);
+    fillBuffers();
 }
 
 simulation::Sim::Sim(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos)
@@ -92,30 +93,28 @@ void simulation::Sim::loadUniforms()
 {
 }
 
-void simulation::Sim::draw(GLFWwindow *w)
+void simulation::Sim::draw(window::Window* w)
 {
+    glfwMakeContextCurrent(w->getContext());
     mRenderShader->activate();
 
     glBindVertexArray(VAO);
 
+    // Bind quad to render
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
+    // Bind positions
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     
-    // glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
-    // glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(feedbackVec), feedbackVec);
-
-    // printf("%f %f %f\n", feedbackVec[0], feedbackVec[1], feedbackVec[2]);
-
-    //  Draw a square for each bubble
+    //  Draw 1 quad (4 vertices) for every position
     glVertexAttribDivisor(0, 0);
     glVertexAttribDivisor(1, 1);
 
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, mStartPos.size());
 
     glBindVertexArray(0);
 }

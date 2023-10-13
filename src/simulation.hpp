@@ -51,10 +51,10 @@ namespace simulation {
         Sim(shaders::Shader *shader);
         Sim(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos);
         void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos);
-        
+
         void update(window::Window* w);
         void fillBuffers();
         void loadUniforms();
-        void draw(GLFWwindow* w);
+        void draw(window::Window* w);
     };
 }

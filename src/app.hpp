@@ -28,6 +28,7 @@ namespace app {
         drawable::Drawable square;
         shaders::Compute fancyShader;
         shaders::Shader quadShader;
+        simulation::Sim sim;
 
 
         App();
