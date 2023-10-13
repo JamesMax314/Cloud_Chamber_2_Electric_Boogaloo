@@ -232,9 +232,9 @@ vec3 normalise(vec3 vector){
 void main()
 {
     vec3 velocity = curlnoise(Position, 0.0);
-    velocity = normalise(velocity);
+    //velocity = normalise(velocity);
     vec3 drift = vec3(0.001, 0.0, 0.0);
-    vPosition = Position + 0.005*velocity + drift;
+    vPosition = Position + 0.0005*velocity + drift;
     gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);
     gl_PointSize = 10.0;
 }
