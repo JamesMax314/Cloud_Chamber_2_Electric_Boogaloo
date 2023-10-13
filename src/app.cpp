@@ -106,7 +106,7 @@ void app::App::init()
     // glDrawArrays(GL_TRIANGLES, 0, 4);
 
     shaders::Shader triangleShader(vertexShaderFile, fragmentShaderFile);
-    square.init(&quadShader, vertices, indices);
+    square.init(&triangleShader, vertices, indices);
     square.draw(w.getContext());
 
     glfwSwapBuffers(w.getContext());
