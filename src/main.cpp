@@ -25,8 +25,6 @@ void draw() {
 }
 
 
-
-
 int main()
 {
     application.init();

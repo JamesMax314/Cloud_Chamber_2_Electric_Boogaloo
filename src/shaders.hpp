@@ -27,6 +27,7 @@ namespace shaders {
         Shader();
         Shader(const char* vertexShader, const char* fragmentShader);
         Shader(const char* vertexShader);
+        void init(const char* vertexShader, const char* fragmentShader);
 
         void activate();
 

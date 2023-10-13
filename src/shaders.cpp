@@ -273,6 +273,11 @@ shaders::Shader::Shader(const char *vertexShader)
     mProgram = genShaderProgram(vertexShader);
 }
 
+void shaders::Shader::init(const char *vertexShader, const char *fragmentShader)
+{
+    mProgram = genShaderProgram(vertexShader, fragmentShader);
+}
+
 void shaders::Shader::activate() {
     GLuint currentProgram;
     glGetIntegerv(GL_CURRENT_PROGRAM, (GLint*)&currentProgram);

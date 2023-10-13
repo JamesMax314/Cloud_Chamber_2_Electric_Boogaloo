@@ -21,9 +21,12 @@ namespace app {
     class App {
         public:
         window::Window w;
-        GLuint ParticleBufferA, ParticleBufferB;
-        const int ParticleCount = 50;
+        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer;
+        const int ParticleCount = 4;
+        GLuint vao;
+        drawable::Drawable square;
         shaders::Compute fancyShader;
+        shaders::Shader quadShader;
 
 
         App();
