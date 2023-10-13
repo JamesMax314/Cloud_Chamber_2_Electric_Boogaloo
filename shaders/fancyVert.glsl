@@ -225,41 +225,23 @@ vec3 curlnoise(vec3 pos, float alpha)
 
 }
 
-uint lowbias32(uint x)
+float random(vec2 st)
 {
-    x ^= x >> 16;
-    x *= 0x7feb352dU;
-    x ^= x >> 15;
-    x *= 0x846ca68bU;
-    x ^= x >> 16;
-    return x;
-}
-
-vec2 random(vec3 pos)
-{
-    uint x = uint(pos.x*100.0);
-    uint y = uint(pos.y*100.0);
-    
-    x = lowbias32(x);
-    y = lowbias32(y);
-
-    float xr = float(x)/(2e32-1.0);
-    float yr = float(y)/(2e32-1.0);
-    
-    return vec2(xr, yr);
-}
+    return 2.0*fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123)-1.0;
+} 
 
 void main()
 {
     float alpha = 0.1*time;
     vec3 velocity = curlnoise(Position, alpha);
     //velocity = normalise(velocity);
-    vec3 drift = vec3(0.0, 0.0, 0.0);
-    vPosition = Position + 0.001*velocity + drift;
+    vec3 drift = vec3(0.0, 0.0, -0.001);
+    vPosition = Position + 0.0002*velocity + drift;
     
     if(abs(vPosition.x)>1.0 || abs(vPosition.y)>1.0 || abs(vPosition.z)>1.0){
-	vec2 randxy = random(vPosition);
-	vPosition = vec3(sign(vPosition.x)*randxy.x, sign(vPosition.y)*randxy.y, 1.0);
+	float randx = random(vec2(drift.y, vPosition.z));
+	float randy = random(vec2(drift.z, vPosition.x));
+	vPosition = vec3(randx, randy, 1.0);
     }
 
     gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);
