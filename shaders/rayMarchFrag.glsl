@@ -125,6 +125,10 @@ float texture(in vec3 pos)
 
 float stepSize = 0.02;
 
+float random(vec2 st) {
+    return max(0.0, fract(sin(dot(st, vec2(12.9898, 78.233)) * 43758.5453)))/10.0 + 0.9;
+}
+
 float lightMarch(in vec3 rayPosition) {
     vec3 lightDir = lightPos-rayPosition;
     lightDir = lightDir / length(lightDir);
@@ -137,7 +141,7 @@ float lightMarch(in vec3 rayPosition) {
 
     for (int j=0; j<numSamples; j++) {
         position += lightDir*stepSize;
-        subDen += texture(position)*stepSize;
+        subDen += texture(position)*stepSize*random(rayPosition.xy);
     }
 
     float transmittance = exp(-subDen);
@@ -165,7 +169,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             break;
         }
 
-        rayPosition += rd*stepSize;
+        rayPosition += rd*stepSize*random(rd.xy);
         
     }
 
