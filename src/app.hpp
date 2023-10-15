@@ -34,6 +34,9 @@ namespace app {
         shaders::Shader quadShader;
         camera::Camera cam;
         simulation::Sim sim;
+        double t = 0;
+        double now;
+        int drawFPS = 0;
 
         bool keys[GLFW_KEY_LAST] = { false };
 

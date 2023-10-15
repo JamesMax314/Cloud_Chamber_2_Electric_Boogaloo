@@ -60,7 +60,7 @@ void app::App::init()
     fancyShader.init(fancyShaderFile);
     quadShader.init(quadVert, quadFrag);
 
-    std::vector<simulation::Position> randParticles = utils::genRandomPoints(50000);
+    std::vector<simulation::Position> randParticles = utils::genRandomPoints(100000);
     printf("RandPos %f %f %f \n", randParticles[0][0], randParticles[0][1], randParticles[0][2]);
 
     std::vector<simulation::Position> sParticles(1, drawable::Vertex(0, 0, 0));
@@ -110,4 +110,12 @@ void app::App::mainLoop()
     sim.draw(&w);
 
     glfwSwapBuffers(w.getContext());
+
+    if(drawFPS % 10 == 0)
+    {
+        now = emscripten_performance_now() / 1000;
+        EM_ASM(document.getElementById("FPSVal").innerHTML = $0;, (int)(10/(now-t)));
+        t = now;
+    }
+    drawFPS++;
 }

@@ -72,3 +72,19 @@ body {
 #infoBoxHeader {
     text-align: center;
 }
+
+#floating_fps {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 80px;
+}
+
+#FPSBox {
+    color: #70B77E;
+    background-color: #554971;
+    z-index: 2;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+}
