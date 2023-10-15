@@ -36,6 +36,8 @@ namespace window {
         int lightingMode;
         int colourMode;
 
+        float aspect;
+
         std::vector<drawable::Drawable*> meshes;
 
         Window();
@@ -43,6 +45,7 @@ namespace window {
         void renderFrame();
 
         void addMesh(drawable::Drawable *mesh);
+        float getAspect();
 
         GLFWwindow* getContext();
     };

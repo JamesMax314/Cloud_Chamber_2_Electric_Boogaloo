@@ -49,28 +49,35 @@ void app::App::init()
 
     const char* sqrtShaderFile = "../shaders/sqrtVert.glsl";
     const char* fancyShaderFile = "../shaders/fancyVert.glsl";
+    const char* statcVert = "../shaders/staticVert.glsl";
 
     const char* quadFrag = "../shaders/quadFrag.glsl";
     const char* quadVert = "../shaders/quadVert.glsl";
+
+    const char* rayMarchFrag = "../shaders/rayMarchFrag.glsl";
+    const char* rayMarchVert = "../shaders/rayMarchVert.glsl";
 
     glfwMakeContextCurrent(w.getContext());
     glfwSetCursorPosCallback(w.getContext(), cursorPosCallback);
     glfwSetInputMode(w.getContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    fancyShader.init(fancyShaderFile);
+    // fancyShader.init(fancyShaderFile);
+    fancyShader.init(statcVert);
     quadShader.init(quadVert, quadFrag);
+    rayShader.init(rayMarchVert, rayMarchFrag);
 
-    std::vector<simulation::Position> randParticles = utils::genRandomPoints(100000);
-    printf("RandPos %f %f %f \n", randParticles[0][0], randParticles[0][1], randParticles[0][2]);
 
-    std::vector<simulation::Position> sParticles(1, drawable::Vertex(0, 0, 0));
-    sim.init(&fancyShader, &quadShader, randParticles);
+    std::vector<simulation::Position> randParticles = utils::genRandomPoints(1);
+
+    // sim.init(&fancyShader, &quadShader, randParticles);
+    sim.init(&fancyShader, &rayShader, randParticles);
+    ray.init(&fancyShader, &rayShader, randParticles);
 }
 
 void app::App::mainLoop()
 {
 
-    sim.update(&w);
+    // sim.update(&w);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -104,10 +111,17 @@ void app::App::mainLoop()
 
 
     time += 0.001;
-    sim.mCompShader->setUniform("time", time);
-    sim.mRenderShader->setUniformVec("view", cam.viewMatrix);
+    pos += 0.1;
+    // sim.mCompShader->setUniform("time", time);
+    // sim.mRenderShader->setUniformVec("view", cam.viewMatrix);
+    // Need to do this with a callback
+    float aspectRatio = w.getAspect();
+    ray.mRenderShader->setUniform("aspect", aspectRatio);
+    glm::vec3 position = pos*glm::vec3(0.0, 0.0, 0.1);
+    ray.mRenderShader->setUniformVec("position", position);
 
-    sim.draw(&w);
+    // sim.draw(&w);
+    ray.draw(&w);
 
     glfwSwapBuffers(w.getContext());
 

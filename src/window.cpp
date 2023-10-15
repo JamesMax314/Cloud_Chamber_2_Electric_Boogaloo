@@ -71,6 +71,15 @@ void window::Window::addMesh(drawable::Drawable *mesh)
     meshes.emplace_back(mesh);
 }
 
+float window::Window::getAspect()
+{
+    width = EM_ASM_INT({return document.getElementById("canvas").width}, 100);
+    height = EM_ASM_INT({return document.getElementById("canvas").height}, 100);
+    glViewport(0, 0, width, height);
+    float aspect = (float)width / (float)height;
+    return aspect;
+}
+
 GLFWwindow *window::Window::getContext()
 {
     return win;

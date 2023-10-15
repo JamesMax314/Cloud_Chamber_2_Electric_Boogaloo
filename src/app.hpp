@@ -20,6 +20,7 @@
 #include "simulation.hpp"
 #include "utils.hpp"
 #include "camera.hpp"
+#include "rays.hpp"
 
 
 namespace app {
@@ -32,8 +33,15 @@ namespace app {
         drawable::Drawable square;
         shaders::Compute fancyShader;
         shaders::Shader quadShader;
+        shaders::Shader rayShader;
+
+        float pos = 0;
+
         camera::Camera cam;
+
         simulation::Sim sim;
+        rayMarch::RayMarch ray;
+
         double t = 0;
         double now;
         int drawFPS = 0;
