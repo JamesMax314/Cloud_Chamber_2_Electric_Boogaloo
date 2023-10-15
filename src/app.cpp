@@ -117,8 +117,13 @@ void app::App::mainLoop()
     // Need to do this with a callback
     float aspectRatio = w.getAspect();
     ray.mRenderShader->setUniform("aspect", aspectRatio);
-    glm::vec3 position = pos*glm::vec3(0.0, 0.0, 0.1);
+    glm::vec3 position = pos*glm::vec3(0.0, 0.0, 0.0);
     ray.mRenderShader->setUniformVec("position", position);
+    glm::vec3 lightPos = glm::vec3(2.0, 0.0, 0.0);
+    glm::vec3 lightColour = glm::vec3(1.0, 1.0, 1.0);
+
+    ray.mRenderShader->setUniformVec("lightPos", lightPos);
+    ray.mRenderShader->setUniformVec("lightColour", lightColour);
 
     // sim.draw(&w);
     ray.draw(&w);
