@@ -152,7 +152,7 @@ float lightMarch(in vec3 rayPosition) {
     vec3 lightDir = lightPos-rayPosition;
     lightDir = lightDir / length(lightDir);
 
-    int numSamples = 100;
+    int numSamples = 50;
 
     float subDen = 0.0;
 
@@ -169,7 +169,7 @@ float lightMarch(in vec3 rayPosition) {
 
 vec4 ray_march(in vec3 ro, in vec3 rd)
 {
-    int maxIterations = 100;
+    int maxIterations = 50;
     vec3 rayPosition = ro;
 
     float transmittance = 1.0;
