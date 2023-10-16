@@ -7,6 +7,7 @@ out vec4 FragColor;
 uniform vec3 position;
 uniform vec3 lightPos;
 uniform vec3 lightColour;
+uniform float time;
 
 const float PI = 3.14159265359;
 
@@ -17,8 +18,9 @@ float distance_from_sphere(in vec3 p, in vec3 c, float r)
 
 bool rayIntersectsCube(vec3 rayOrigin, vec3 rayDirection) {
     float tmin, tmax, tymin, tymax, tzmin, tzmax;
-    vec3 cubeMin = -1.0*vec3(0.5, 0.5, 0.5);
-    vec3 cubeMax = vec3(0.5, 0.5, 0.5);
+    float scale = 2.0;
+    vec3 cubeMin = -1.0*vec3(1.0);
+    vec3 cubeMax = vec3(1.0);
 
     vec3 inverseDirection = 1.0 / rayDirection;
 
@@ -73,7 +75,7 @@ bool rayIntersectsCube(vec3 rayOrigin, vec3 rayDirection) {
 
 
 float sdCube(vec3 p, float s) {
-    vec3 d = abs(p) - s * 0.5; // Calculate the distance from the point to the center of the cube
+    vec3 d = abs(p) - s * 1.0; // Calculate the distance from the point to the center of the cube
     return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0)); // Return the signed distance
 }
 
@@ -82,9 +84,9 @@ float texture(in vec3 pos)
 {
     vec3 centre = vec3(0.0, 0.0, 0.0);
     float rad = 0.5;
-    float displacement = sin(10.0 * pos.x) * sin(10.0 * pos.y) * sin(10.0 * pos.z) * 0.25;
+    float displacement = sin(8.0 * pos.x) * sin(8.0 * pos.y) * sin(8.0 * pos.z) * 0.25;
     float sphere_0 = distance_from_sphere(pos, vec3(0.0), rad);
-    if (sphere_0 + displacement < 0.0) {
+    if (sphere_0 + displacement*sin(time*10.0) < 0.0) {
         // return snoise(pos*5.0)*2.0;
         return 2.0;
     }
@@ -188,7 +190,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
     }
 
     vec3 cloudCol = lightEnergy * lightColour;
-    vec3 backGroundCol = vec3(0.53, 0.81, 0.92);
+    vec3 backGroundCol = vec3(0.0, 0.0, 0.0);
     col = backGroundCol * transmittance + cloudCol;
     return vec4(col, 0.0);
 }

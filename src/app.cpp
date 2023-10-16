@@ -168,6 +168,7 @@ void app::App::mainLoop()
     glm::vec3 lightColour = glm::vec3(1.0, 1.0, 1.0);
     ray.mRenderShader->setUniformVec("lightPos", lightPos);
     ray.mRenderShader->setUniformVec("lightColour", lightColour);
+    ray.mRenderShader->setUniform("time", time);
 
     // sim.draw(&w);
     ray.draw(&w);
