@@ -15,6 +15,63 @@ float distance_from_sphere(in vec3 p, in vec3 c, float r)
 	return length(p - c) - r;
 }
 
+bool rayIntersectsCube(vec3 rayOrigin, vec3 rayDirection) {
+    float tmin, tmax, tymin, tymax, tzmin, tzmax;
+    vec3 cubeMin = -1.0*vec3(0.5, 0.5, 0.5);
+    vec3 cubeMax = vec3(0.5, 0.5, 0.5);
+
+    vec3 inverseDirection = 1.0 / rayDirection;
+
+    // Calculate the intersection with X planes
+    if (inverseDirection.x >= 0.0) {
+        tmin = (cubeMin.x - rayOrigin.x) * inverseDirection.x;
+        tmax = (cubeMax.x - rayOrigin.x) * inverseDirection.x;
+    } else {
+        tmin = (cubeMax.x - rayOrigin.x) * inverseDirection.x;
+        tmax = (cubeMin.x - rayOrigin.x) * inverseDirection.x;
+    }
+
+    // Calculate the intersection with Y planes
+    if (inverseDirection.y >= 0.0) {
+        tymin = (cubeMin.y - rayOrigin.y) * inverseDirection.y;
+        tymax = (cubeMax.y - rayOrigin.y) * inverseDirection.y;
+    } else {
+        tymin = (cubeMax.y - rayOrigin.y) * inverseDirection.y;
+        tymax = (cubeMin.y - rayOrigin.y) * inverseDirection.y;
+    }
+
+    // Check if the ray misses the cube in the XY plane
+    if ((tmin > tymax) || (tymin > tmax)) {
+        return false;
+    }
+
+    // Update tmin and tmax for the XY intersection
+    tmin = max(tmin, tymin);
+    tmax = min(tmax, tymax);
+
+    // Calculate the intersection with Z planes
+    if (inverseDirection.z >= 0.0) {
+        tzmin = (cubeMin.z - rayOrigin.z) * inverseDirection.z;
+        tzmax = (cubeMax.z - rayOrigin.z) * inverseDirection.z;
+    } else {
+        tzmin = (cubeMax.z - rayOrigin.z) * inverseDirection.z;
+        tzmax = (cubeMin.z - rayOrigin.z) * inverseDirection.z;
+    }
+
+    // Check if the ray misses the cube in the XZ plane
+    if ((tmin > tzmax) || (tzmin > tmax)) {
+        return false;
+    }
+
+    // Update tmin and tmax for the final intersection
+    tmin = max(tmin, tzmin);
+    tmax = min(tmax, tzmax);
+
+    // Check if there is a valid intersection
+    return tmax >= 0.0;
+}
+
+
 float sdCube(vec3 p, float s) {
     vec3 d = abs(p) - s * 0.5; // Calculate the distance from the point to the center of the cube
     return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0)); // Return the signed distance
@@ -24,7 +81,7 @@ float sdCube(vec3 p, float s) {
 float texture(in vec3 pos) 
 {
     vec3 centre = vec3(0.0, 0.0, 0.0);
-    float rad = 0.5;
+    float rad = 1.0;
     float cenRad = 0.3;
     float dist = length(pos - centre);
     if (dist < rad && dist > cenRad) {
@@ -88,49 +145,54 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
     float lightEnergy = 0.0;
 
     bool eneteredCube = false;
+    vec3 col;
 
-    for (int i = 0; i < maxIterations; i++) {
-        float sdf = distance_from_sphere(rayPosition, vec3(0.0, 0.0, 0.0), 0.5);
-        float step = 0.0;
-        if (sdf > stepSize) {
-            step = sdf;
-        } else {
-            step = stepSize;
-        }
+    if (rayIntersectsCube(ro, rd)) {
+        for (int i = 0; i < maxIterations; i++) {
+            float sdf = distance_from_sphere(rayPosition, vec3(0.0, 0.0, 0.0), 0.5);
+            float step = 0.0;
+            if (sdf > stepSize) {
+                step = sdf;
+            } else {
+                step = stepSize;
+            }
 
-        float sdfCube = sdCube(rayPosition, 0.5);
-        if (!eneteredCube && sdfCube > 0.0) {
-            eneteredCube = true;
-        } else if (eneteredCube && sdfCube < 0.0) {
-            break;
-        }
-
-
-        rayPosition += rd*step*random(rd.xy);
-
-        float density = texture(rayPosition);
-
-        vec3 lightDir = lightPos-rayPosition;
-        float theta =  angleBetween(lightDir, rd) ;
-        float phase = phaseFun(theta);
-
-        if (density > 0.0) {
-            float lightTransmittance = lightMarch(rayPosition);
+            float sdfCube = sdCube(rayPosition, 1.0);
             
-            lightEnergy += density * stepSize * transmittance * lightTransmittance * phase;
-            transmittance *= exp(-density * stepSize);
-        }
+            if (!eneteredCube && sdfCube < 0.0) {
+                eneteredCube = true;
+            } else if (eneteredCube && sdfCube > 0.0) {
+                break;
+            }
 
-        if (transmittance < 0.01) {
-            break;
-        }
 
-        
+            rayPosition += rd*step*random(rd.xy);
+
+            float density = texture(rayPosition);
+
+            vec3 lightDir = lightPos-rayPosition;
+            float theta =  angleBetween(lightDir, rd) ;
+            float phase = phaseFun(theta);
+
+            if (density > 0.0) {
+                float lightTransmittance = lightMarch(rayPosition);
+                
+                lightEnergy += density * stepSize * transmittance * lightTransmittance * phase;
+                transmittance *= exp(-density * stepSize);
+            }
+
+            if (transmittance < 0.01) {
+                break;
+            }
+        }
+        vec3 cloudCol = lightEnergy * lightColour;
+        vec3 backGroundCol = vec3(0.53, 0.81, 0.92);
+        col = backGroundCol * transmittance + cloudCol;
+    } else {
+        col = vec3(0.0, 0.0, 0.0);
     }
 
-    vec3 cloudCol = lightEnergy * lightColour;
-    vec3 backGroundCol = vec3(0.53, 0.81, 0.92);
-    vec3 col = backGroundCol * transmittance + cloudCol;
+
     return vec4(col, 0.0);
 }
 
