@@ -8,6 +8,8 @@ uniform vec3 position;
 uniform vec3 lightPos;
 uniform vec3 lightColour;
 
+const float PI = 3.14159265359;
+
 float distance_from_sphere(in vec3 p, in vec3 c, float r)
 {
 	return length(p - c) - r;
@@ -113,7 +115,7 @@ float texture(in vec3 pos)
     float rad = 0.5;
     float cenRad = 0.3;
     float dist = length(pos - centre);
-    if (dist < rad) {
+    if (dist < rad && dist > cenRad) {
         // return snoise(pos*5.0)*2.0;
         return 2.0;
     }
@@ -127,6 +129,23 @@ float stepSize = 0.02;
 
 float random(vec2 st) {
     return max(0.0, fract(sin(dot(st, vec2(12.9898, 78.233)) * 43758.5453)))/10.0 + 0.9;
+}
+
+float angleBetween(vec3 vectorA, vec3 vectorB) {
+    vec3 normalizedA = normalize(vectorA);
+    vec3 normalizedB = normalize(vectorB);
+    float dotProduct = dot(normalizedA, normalizedB);
+    
+    // Use acos to find the angle in radians
+    float angle = acos(clamp(dotProduct, -1.0, 1.0));
+
+    return angle;
+}
+
+float phaseFun(in float theta) {
+    float g = 0.3;
+    float phase = (1.0-pow(g, 2.0)) / pow(1.0 + pow(g, 2.0) - 2.0*g*cos(theta), 3.0/2.0);
+    return phase;
 }
 
 float lightMarch(in vec3 rayPosition) {
@@ -159,9 +178,14 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
     for (int i = 0; i < maxIterations; i++) {
         float density = texture(rayPosition);
 
+        vec3 lightDir = lightPos-rayPosition;
+        float theta =  angleBetween(lightDir, rd) ;
+        float phase = phaseFun(theta);
+
         if (density > 0.0) {
             float lightTransmittance = lightMarch(rayPosition);
-            lightEnergy += density * stepSize * transmittance * lightTransmittance;
+            
+            lightEnergy += density * stepSize * transmittance * lightTransmittance * phase;
             transmittance *= exp(-density * stepSize);
         }
 

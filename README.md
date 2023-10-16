@@ -27,6 +27,10 @@ python -m http.server
 
 - https://open.gl/feedback
 
+Ray Marching
+- https://www.vertexfragment.com/ramblings/volumetric-cloud-banding/#raymarch-offset
+- https://www.scratchapixel.com/lessons/3d-basic-rendering/volume-rendering-for-developers/ray-marching-get-it-right.html
+
 ## Class Structure
 
 ```mermaid

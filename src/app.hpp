@@ -36,6 +36,7 @@ namespace app {
         shaders::Shader rayShader;
 
         float pos = 0;
+        glm::vec3 position = glm::vec3(0.0, 0.0, 0.0);
 
         camera::Camera cam;
 
@@ -48,7 +49,7 @@ namespace app {
 
         bool keys[GLFW_KEY_LAST] = { false };
 
-        float motionSpeed = 1;
+        float motionSpeed = 0.01;
 
 	    float time = 0.0;
 

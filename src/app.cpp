@@ -23,10 +23,18 @@ app::App::App()
 {
 }
 
+bool keys[GLFW_KEY_LAST] = { false };
+
+int lr = 0;
+int ud = 0;
+int fb = 0;
+
 double prevMouseX = 0.0;
 double prevMouseY = 0.0;
 double deltaX;
 double deltaY;
+
+int forward = 0;
 
 // Mouse cursor position callback function
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
@@ -40,6 +48,52 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 
     // Use deltaX and deltaY to respond to mouse movement
     // Your code here
+}
+
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (action == GLFW_PRESS) {
+        keys[key] = true;
+        printf("Keys: %i\n", key);
+        forward = 1;
+        if (key == GLFW_KEY_W) {
+            fb = 1;
+        }
+        if (key == GLFW_KEY_S) {
+            fb = -1;
+        }
+        if (key == GLFW_KEY_A) {
+            lr = 1;
+        }
+        if (key == GLFW_KEY_D) {
+            lr = -1;
+        }
+        if (key == GLFW_KEY_SPACE) {
+            ud = 1;
+        }
+        if (key == GLFW_KEY_LEFT_SHIFT) {
+            ud = -1;
+        }
+
+    } else if (action == GLFW_RELEASE) {
+        if (key == GLFW_KEY_W) {
+            fb = 0;
+        }
+        if (key == GLFW_KEY_S) {
+            fb = 0;
+        }
+        if (key == GLFW_KEY_A) {
+            lr = 0;
+        }
+        if (key == GLFW_KEY_D) {
+            lr = 0;
+        }
+        if (key == GLFW_KEY_SPACE) {
+            ud = 0;
+        }
+        if (key == GLFW_KEY_LEFT_SHIFT) {
+            ud = 0;
+        }
+    }
 }
 
 void app::App::init()
@@ -60,6 +114,7 @@ void app::App::init()
     glfwMakeContextCurrent(w.getContext());
     glfwSetCursorPosCallback(w.getContext(), cursorPosCallback);
     glfwSetInputMode(w.getContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetKeyCallback(w.getContext(), keyCallback);
 
     // fancyShader.init(fancyShaderFile);
     fancyShader.init(statcVert);
@@ -83,24 +138,15 @@ void app::App::mainLoop()
 
     float dt = 1;
 
-    if (keys[GLFW_KEY_W]) {
-        printf("w\n");
-        cam.move(0.0f, 0.0f, motionSpeed*dt);
+    if (fb != 0) {
+        printf("w %i\n", fb);
+        position += glm::vec3(0.0f, 0.0f, fb*motionSpeed*dt);
     }
-    if (keys[GLFW_KEY_S]) {
-        cam.move(0.0f, 0.0f, -motionSpeed*dt);
+    if (lr != 0) {
+        position += glm::vec3(-lr*motionSpeed*dt, 0.0f, 0.0f);
     }
-    if (keys[GLFW_KEY_A]) {
-        cam.move(motionSpeed*dt, 0.0f, 0.0f);
-    }
-    if (keys[GLFW_KEY_D]) {
-        cam.move(-motionSpeed*dt, 0.0f, 0.0f);
-    }
-    if (keys[GLFW_KEY_SPACE]) {
-        cam.move(0.0f, motionSpeed*dt, 0.0f);
-    }
-    if (keys[GLFW_KEY_LEFT_SHIFT]) {
-        cam.move(0.0f, -motionSpeed*dt, 0.0f);
+    if (ud != 0) {
+        position += glm::vec3(0.0f, ud*motionSpeed*dt, 0.0f);
     }
 
     if (deltaX != 0.0 || deltaY != 0.0) {
@@ -111,17 +157,15 @@ void app::App::mainLoop()
 
 
     time += 0.001;
-    pos += 0.1;
     // sim.mCompShader->setUniform("time", time);
     // sim.mRenderShader->setUniformVec("view", cam.viewMatrix);
     // Need to do this with a callback
     float aspectRatio = w.getAspect();
     ray.mRenderShader->setUniform("aspect", aspectRatio);
-    glm::vec3 position = pos*glm::vec3(0.0, 0.0, 0.0);
     ray.mRenderShader->setUniformVec("position", position);
+
     glm::vec3 lightPos = glm::vec3(2.0, 0.0, 0.0);
     glm::vec3 lightColour = glm::vec3(1.0, 1.0, 1.0);
-
     ray.mRenderShader->setUniformVec("lightPos", lightPos);
     ray.mRenderShader->setUniformVec("lightColour", lightColour);
 
