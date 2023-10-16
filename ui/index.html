@@ -35,14 +35,6 @@
                     window.addEventListener("resize", resizeCanvas);
 
                     var canvas = document.getElementById("canvas");
-
-                    canvas.addEventListener("keydown", function (event) {
-                        Module.ccall('processKeyPress', 'null', ['number'], [event.keyCode]);
-                    });
-
-                    canvas.addEventListener("keyup", function (event) {
-                        Module.ccall('processKeyRelease', 'null', ['number'], [event.keyCode]);
-                    });
                 </script>
             </div>
             <script src="ccSim.wasm.js"></script>
