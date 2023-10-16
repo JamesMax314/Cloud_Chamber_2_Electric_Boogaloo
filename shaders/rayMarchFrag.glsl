@@ -15,6 +15,12 @@ float distance_from_sphere(in vec3 p, in vec3 c, float r)
 	return length(p - c) - r;
 }
 
+float sdCube(vec3 p, float s) {
+    vec3 d = abs(p) - s * 0.5; // Calculate the distance from the point to the center of the cube
+    return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0)); // Return the signed distance
+}
+
+
 float texture(in vec3 pos) 
 {
     vec3 centre = vec3(0.0, 0.0, 0.0);
@@ -81,6 +87,8 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
     float transmittance = 1.0;
     float lightEnergy = 0.0;
 
+    bool eneteredCube = false;
+
     for (int i = 0; i < maxIterations; i++) {
         float sdf = distance_from_sphere(rayPosition, vec3(0.0, 0.0, 0.0), 0.5);
         float step = 0.0;
@@ -89,6 +97,14 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
         } else {
             step = stepSize;
         }
+
+        float sdfCube = sdCube(rayPosition, 0.5);
+        if (!eneteredCube && sdfCube > 0.0) {
+            eneteredCube = true;
+        } else if (eneteredCube && sdfCube < 0.0) {
+            break;
+        }
+
 
         rayPosition += rd*step*random(rd.xy);
 
@@ -122,7 +138,7 @@ void main()
 {
     vec2 uv = fragPos.xy * 2.0 - 1.0;
 
-    vec3 camera_position = vec3(0.0, 0.0, -1.0);
+    vec3 camera_position = vec3(0.0, 0.0, -2.0);
     vec3 ro = camera_position + position;
     vec3 rd = fragPos - camera_position;
     float modulus = length(rd);
