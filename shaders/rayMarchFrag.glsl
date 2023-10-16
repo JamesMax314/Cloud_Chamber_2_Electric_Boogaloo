@@ -81,10 +81,10 @@ float sdCube(vec3 p, float s) {
 float texture(in vec3 pos) 
 {
     vec3 centre = vec3(0.0, 0.0, 0.0);
-    float rad = 1.0;
-    float cenRad = 0.3;
-    float dist = length(pos - centre);
-    if (dist < rad && dist > cenRad) {
+    float rad = 0.5;
+    float displacement = sin(10.0 * pos.x) * sin(10.0 * pos.y) * sin(10.0 * pos.z) * 0.25;
+    float sphere_0 = distance_from_sphere(pos, vec3(0.0), rad);
+    if (sphere_0 + displacement < 0.0) {
         // return snoise(pos*5.0)*2.0;
         return 2.0;
     }
@@ -184,15 +184,12 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             if (transmittance < 0.01) {
                 break;
             }
-        }
-        vec3 cloudCol = lightEnergy * lightColour;
-        vec3 backGroundCol = vec3(0.53, 0.81, 0.92);
-        col = backGroundCol * transmittance + cloudCol;
-    } else {
-        col = vec3(0.0, 0.0, 0.0);
+        }   
     }
 
-
+    vec3 cloudCol = lightEnergy * lightColour;
+    vec3 backGroundCol = vec3(0.53, 0.81, 0.92);
+    col = backGroundCol * transmittance + cloudCol;
     return vec4(col, 0.0);
 }
 
