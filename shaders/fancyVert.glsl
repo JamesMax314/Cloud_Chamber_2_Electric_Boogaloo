@@ -240,8 +240,8 @@ void main()
     float alpha = 0.1*time;
     vec3 velocity = curlnoise(Position, alpha);
     //velocity = normalise(velocity);
-    vec3 drift = vec3(0.0, 0.0, -0.001);
-    vPosition = Position + 0.0002*velocity + drift;
+    vec3 drift = vec3(0.0, 0.0, -0.0005);
+    vPosition = Position + 0.00005*velocity + drift;
     
     if(is_track_vert==0){
         if(abs(vPosition.x)>1.0 || abs(vPosition.y)>1.0 || abs(vPosition.z)>1.0){
