@@ -85,11 +85,13 @@ namespace simulation {
         // Intagers that are used to reference buffer arrays in gpu ram
         GLuint VAO;
         GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer;
+	
+	int isTrack;
 
         Sim();
         Sim(shaders::Shader *shader);
-        Sim(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos);
-        void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos);
+        Sim(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
+        void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
 
         void update(window::Window* w);
         void fillBuffers();

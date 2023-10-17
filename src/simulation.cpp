@@ -8,8 +8,9 @@ simulation::Sim::Sim(shaders::Shader *shader)
 {
 }
 
-void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos)
+void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
 {
+    this->isTrack = isTrack;
     mCompShader = compShader;
     mRenderShader = renderShader;
     mStartPos = startPos;
@@ -20,9 +21,9 @@ void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderS
     fillBuffers();
 }
 
-simulation::Sim::Sim(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos)
+simulation::Sim::Sim(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
 {
-    init(compShader, renderShader, startPos);
+    init(compShader, renderShader, startPos, isTrack);
 }
 
 void simulation::Sim::update(window::Window* w)
@@ -31,6 +32,7 @@ void simulation::Sim::update(window::Window* w)
 
     // Set up the advection shader:
     mCompShader->activate();
+    mCompShader->setUniform("is_track_vert", this->isTrack);
 
     glBindVertexArray(VAO);
 
