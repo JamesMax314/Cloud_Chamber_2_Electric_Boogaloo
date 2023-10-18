@@ -112,8 +112,8 @@ void simulation::Sim::draw(window::Window* w)
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    // float feedbackVec[6];
-    // glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(feedbackVec), feedbackVec);
+    float feedbackVec[sizeof(simulation::Position)*mStartPos.size()];
+    glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(feedbackVec), feedbackVec);
 
     // printf("%f %f %f %f %f %f\n", feedbackVec[0], feedbackVec[1], feedbackVec[2], feedbackVec[3], feedbackVec[4], feedbackVec[5]);
     
