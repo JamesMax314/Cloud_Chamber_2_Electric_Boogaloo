@@ -210,6 +210,30 @@ vec3 p1 = vec3(0.0, 0.0, 0.0);
 vec3 p2 = vec3(0.0, 0.0, 0.0);
 vec3 p3 = vec3(0.0, 0.0, 0.0);    
 
+float fbm(vec3 pos, float alpha, out vec3 grad)
+{
+    int N = 3;
+
+    vec3 p = vec3(0.0);
+    float w = 1.0; //Weight of noise
+    float s = 1.0; //Scale of noise
+    float n = 0.0; //Output noise value
+
+    vec3 g;
+    vec3 gsum = vec3(0.0);
+
+    for(int i = 0; i<N ; i++){
+        n += w * psrdnoise(s*pos + 0.13*gsum, p, s*alpha, g);
+        gsum += w*g;
+        w *= 0.5;
+        s *= 2.0;
+    }
+
+    grad = gsum;
+    return n;
+
+}
+
 vec3 offset2 = vec3(1000.0, 0.0, 0.0);
 vec3 offset3 = vec3(0.0, 0.0, 1000.0);
 
@@ -220,11 +244,13 @@ vec3 curlnoise(vec3 pos, float alpha)
     vec3 grad1;
     vec3 grad2;
     vec3 grad3;
-    psrdnoise(pos, p1, alpha, grad1);
-    psrdnoise(pos+offset2, p2, alpha, grad2);
-    psrdnoise(pos+offset3, p3, alpha, grad3);
+    float n1 = fbm(pos, alpha, grad1);
+    float n2 = fbm(pos+offset2, alpha, grad2);
+    float n3 = fbm(pos+offset3, alpha, grad3);
 
-    vec3 velocity = vec3(grad3.y-grad2.z,grad1.z-grad3.x,grad2.x-grad1.y);
+    float w = sqrt(n1*n1 + n2*n2 + n3*n3);
+
+    vec3 velocity = w*vec3((grad3.y-grad2.z),(grad1.z-grad3.x),(grad2.x-grad1.y));
 
     return velocity;
 
