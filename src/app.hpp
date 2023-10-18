@@ -21,6 +21,7 @@
 #include "utils.hpp"
 #include "camera.hpp"
 #include "rays.hpp"
+#include "track.hpp"
 
 
 namespace app {
@@ -41,6 +42,7 @@ namespace app {
         camera::Camera cam;
 
         simulation::Sim sim;
+        simulation::Sim track_sim;
         rayMarch::RayMarch ray;
 
         double t = 0;

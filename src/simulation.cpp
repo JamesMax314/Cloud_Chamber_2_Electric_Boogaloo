@@ -8,8 +8,9 @@ simulation::Sim::Sim(shaders::Shader *shader)
 {
 }
 
-void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos)
+void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
 {
+    this->isTrack = isTrack;
     mCompShader = compShader;
     mRenderShader = renderShader;
     mStartPos = startPos;
@@ -20,9 +21,9 @@ void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderS
     fillBuffers();
 }
 
-simulation::Sim::Sim(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos)
+simulation::Sim::Sim(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
 {
-    init(compShader, renderShader, startPos);
+    init(compShader, renderShader, startPos, isTrack);
 }
 
 void simulation::Sim::update(window::Window* w)
@@ -31,6 +32,7 @@ void simulation::Sim::update(window::Window* w)
 
     // Set up the advection shader:
     mCompShader->activate();
+    mCompShader->setUniform("is_track_vert", this->isTrack);
 
     glBindVertexArray(VAO);
 
@@ -110,8 +112,8 @@ void simulation::Sim::draw(window::Window* w)
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    // float feedbackVec[6];
-    // glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(feedbackVec), feedbackVec);
+    float feedbackVec[sizeof(simulation::Position)*mStartPos.size()];
+    glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(feedbackVec), feedbackVec);
 
     // printf("%f %f %f %f %f %f\n", feedbackVec[0], feedbackVec[1], feedbackVec[2], feedbackVec[3], feedbackVec[4], feedbackVec[5]);
     

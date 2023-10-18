@@ -116,23 +116,26 @@ void app::App::init()
     glfwSetInputMode(w.getContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(w.getContext(), keyCallback);
 
-    // fancyShader.init(fancyShaderFile);
-    fancyShader.init(statcVert);
+    fancyShader.init(fancyShaderFile);
+    //fancyShader.init(statcVert);
     quadShader.init(quadVert, quadFrag);
     rayShader.init(rayMarchVert, rayMarchFrag);
 
+    simulation::Position origin(0.0, 0.0, 0.0);//utils::genRandomPoints(1).at(0);
+    track::Track initial_track(origin);
+    
+    std::vector<simulation::Position> track_verts = initial_track.get_vertices();
 
-    std::vector<simulation::Position> randParticles = utils::genRandomPoints(1);
-
-    // sim.init(&fancyShader, &quadShader, randParticles);
-    sim.init(&fancyShader, &rayShader, randParticles);
-    ray.init(&fancyShader, &rayShader, randParticles);
+    track_sim.init(&fancyShader, &quadShader, track_verts, 1);
+    //sim.init(&fancyShader, &rayShader, track_verts);
+    //ray.init(&fancyShader, &rayShader, track_verts);
 }
 
 void app::App::mainLoop()
 {
 
-    // sim.update(&w);
+    //sim.update(&w);
+    track_sim.update(&w);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -157,8 +160,8 @@ void app::App::mainLoop()
 
 
     time += 0.001;
-    // sim.mCompShader->setUniform("time", time);
-    // sim.mRenderShader->setUniformVec("view", cam.viewMatrix);
+    track_sim.mCompShader->setUniform("time", time);
+    track_sim.mRenderShader->setUniformVec("view", cam.viewMatrix);
     // Need to do this with a callback
     float aspectRatio = w.getAspect();
     ray.mRenderShader->setUniform("aspect", aspectRatio);
@@ -170,8 +173,9 @@ void app::App::mainLoop()
     ray.mRenderShader->setUniformVec("lightColour", lightColour);
     ray.mRenderShader->setUniform("time", time);
 
-    // sim.draw(&w);
-    ray.draw(&w);
+    //sim.draw(&w);
+    track_sim.draw(&w);
+    //ray.draw(&w);
 
     glfwSwapBuffers(w.getContext());
 

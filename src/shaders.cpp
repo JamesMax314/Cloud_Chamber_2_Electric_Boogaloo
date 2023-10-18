@@ -209,7 +209,7 @@ GLuint shaders::genCompProgram(const char *compShaderFile)
         "in vec3 vPosition;\n"
         "out vec4 FragColor;\n"
         "void main() {\n"
-        "    FragColor = vec4(0.2, 0.6, 0.2f, 1.0f);\n"
+        "   FragColor = vec4(0.2, 0.6, 0.2f, 1.0f);\n"
         "}\n";
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);

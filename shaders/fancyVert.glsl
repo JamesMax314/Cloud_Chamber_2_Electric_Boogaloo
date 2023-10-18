@@ -3,6 +3,7 @@
 in vec3 Position;
 out vec3 vPosition;
 uniform float time;
+uniform int is_track_vert;
 
 vec4 permute(vec4 x) {
      vec4 xm = mod(x, 289.0);
@@ -205,19 +206,23 @@ float psrdnoise(vec3 x, vec3 period, float alpha, out vec3 gradient)
   return 39.5 * n;
 }
 
+vec3 p1 = vec3(0.0, 0.0, 0.0);
+vec3 p2 = vec3(0.0, 0.0, 0.0);
+vec3 p3 = vec3(0.0, 0.0, 0.0);    
+
+vec3 offset2 = vec3(1000.0, 0.0, 0.0);
+vec3 offset3 = vec3(0.0, 0.0, 1000.0);
+
 vec3 curlnoise(vec3 pos, float alpha)
 {
 
-    vec3 p1 = vec3(0.0, 0.0, 0.0);
-    vec3 p2 = vec3(1.0, 0.1, 0.5);
-    vec3 p3 = vec3(0.5, 1.0, 0.1);    
 
     vec3 grad1;
     vec3 grad2;
     vec3 grad3;
     psrdnoise(pos, p1, alpha, grad1);
-    psrdnoise(pos, p2, alpha, grad2);
-    psrdnoise(pos, p3, alpha, grad3);
+    psrdnoise(pos+offset2, p2, alpha, grad2);
+    psrdnoise(pos+offset3, p3, alpha, grad3);
 
     vec3 velocity = vec3(grad3.y-grad2.z,grad1.z-grad3.x,grad2.x-grad1.y);
 
@@ -235,13 +240,15 @@ void main()
     float alpha = 0.1*time;
     vec3 velocity = curlnoise(Position, alpha);
     //velocity = normalise(velocity);
-    vec3 drift = vec3(0.0, 0.0, -0.001);
-    vPosition = Position + 0.0002*velocity + drift;
+    vec3 drift = vec3(0.0, 0.0, -0.0005);
+    vPosition = Position + 0.00005*velocity + drift;
     
-    if(abs(vPosition.x)>1.0 || abs(vPosition.y)>1.0 || abs(vPosition.z)>1.0){
-	float randx = random(vec2(drift.y, vPosition.z));
-	float randy = random(vec2(drift.z, vPosition.x));
-	vPosition = vec3(randx, randy, 1.0);
+    if(is_track_vert==0){
+        if(abs(vPosition.x)>1.0 || abs(vPosition.y)>1.0 || abs(vPosition.z)>1.0){
+    	    float randx = random(vec2(drift.y, vPosition.z));
+    	    float randy = random(vec2(drift.z, vPosition.x));
+    	    vPosition = vec3(randx, randy, 1.0);
+    	}
     }
 
     gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);
