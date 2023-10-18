@@ -4,6 +4,8 @@ precision mediump float;
 in vec3 fragPos;
 out vec4 FragColor;
 
+uniform samplerBuffer bufferTexture;
+
 uniform vec3 position;
 uniform vec3 lightPos;
 uniform vec3 lightColour;

@@ -84,7 +84,9 @@ namespace rayMarch {
 
         // Intagers that are used to reference buffer arrays in gpu ram
         GLuint VAO;
-        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer;
+        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer, texture_buffer;
+
+        int textureDim = 32;
 
         RayMarch();
         RayMarch(shaders::Shader *shader);

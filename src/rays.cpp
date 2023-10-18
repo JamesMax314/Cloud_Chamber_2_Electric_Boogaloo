@@ -17,6 +17,7 @@ void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *rend
     glGenBuffers(1, &ParticleBufferA);
     glGenBuffers(1, &ParticleBufferB);
     glGenBuffers(1, &billboard_vertex_buffer);
+    glGenBuffers(1, &texture_buffer);
     fillBuffers();
 }
 
@@ -71,6 +72,7 @@ void rayMarch::RayMarch::fillBuffers()
     // Bind all the model arrays to the appropriate buffers
     glBindVertexArray(VAO);
 
+    // VBO for even frames 
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
     glBufferData(GL_ARRAY_BUFFER, mStartPos.size()*sizeof(rayMarch::Position), &mStartPos.front(), GL_STREAM_DRAW);
 
@@ -86,6 +88,15 @@ void rayMarch::RayMarch::fillBuffers()
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // Fragment buffers are handeled as textures
+    glBindTexture(GL_TEXTURE_3D, textureID);
+    // Specify how to up/down sample
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, textureDim, textureDim, textureDim, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+
     glBindVertexArray(0);
 }
 
