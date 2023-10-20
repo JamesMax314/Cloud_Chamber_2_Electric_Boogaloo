@@ -110,11 +110,11 @@ float sphereTexture(in vec3 pos)
 
 float texture(in vec3 pos) 
 {
-    return sphereTexture(pos);
-    // if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
-    //     return 1.0;
-    // }
-    // return 0.0;
+    // return sphereTexture(pos);
+    if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
+        return 5.0;
+    }
+    return 1.0;
 }
 
 float stepSize = 0.02;
@@ -170,6 +170,8 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
     bool eneteredCube = false;
     vec3 col;
 
+    vec3 backGroundCol = vec3(0.0, 0.0, 0.0);
+
     if (rayIntersectsCube(ro, rd, boundingCubeMin, boundingCubeMax)) {
         for (int i = 0; i < maxIterations; i++) {
             // float sdf = distance_from_sphere(rayPosition, vec3(0.0, 0.0, 0.0), 0.5);
@@ -213,11 +215,13 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             if (transmittance < 0.01) {
                 break;
             }
-        }   
+        }
+        backGroundCol = vec3(0.0, 0.0, 0.0);
+    } else {
+        backGroundCol = vec3(1.0, 0.0, 0.0);
     }
 
     vec3 cloudCol = lightEnergy * lightColour;
-    vec3 backGroundCol = vec3(0.0, 0.0, 0.0);
     col = backGroundCol * transmittance + cloudCol;
     return vec4(col, 0.0);
 }
