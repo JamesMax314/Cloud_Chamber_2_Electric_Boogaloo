@@ -11,6 +11,8 @@ uniform vec3 lightPos;
 uniform vec3 lightColour;
 uniform float time;
 
+uniform float texDim;
+
 uniform vec3 minPos;
 uniform vec3 maxPos;
 
@@ -140,8 +142,8 @@ float texture(in vec3 pos)
     // return sphereTexture(pos);
     if (sdfCuboid(pos, boundingCubeMin, boundingCubeMax) < 0.0) {
         if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
-            vec3 stepSize = (maxPos - minPos) / 4.0; // texture dim - 1 add as uniform
-            vec3 texCoords = (pos-minPos) / stepSize;
+            vec3 stepSize = (maxPos - minPos) / (texDim-1.0); // texture dim - 1 add as uniform
+            vec3 texCoords = (pos-minPos) / (stepSize*texDim);
             return texture(texture3D, texCoords).r;
         }
         return 0.0;
@@ -275,7 +277,7 @@ void main()
     vec3 p = fragPos.xyz;
     p.z = time*p.z*10.0;
 
-    // FragColor = shaded_color;
-    FragColor = texture(texture3D, p);
+    FragColor = shaded_color;
+    // FragColor = texture(texture3D, p);
     // FragColor = vec4(abs(maxPos), 1.0);
 }

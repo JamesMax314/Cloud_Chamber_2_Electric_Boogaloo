@@ -21,7 +21,7 @@ void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *rend
     fillBuffers();
 
     feedbackVec = std::vector<glm::vec3>(numParticlesPerTrack);
-    texture3D = std::vector<std::vector<std::vector<float>>>(textureDim, std::vector<std::vector<float>>(textureDim, std::vector<float>(textureDim, 0)));
+    texture3D = new float[textureDim];//std::vector<std::vector<std::vector<float>>>(textureDim, std::vector<std::vector<float>>(textureDim, std::vector<float>(textureDim, 0)));
 }
 
 rayMarch::RayMarch::RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
@@ -66,7 +66,7 @@ void rayMarch::RayMarch::update(window::Window* w)
         glm::ivec3 index3D;
 
         index3D = glm::floor((feedbackVec[i] - minCorner) / stepSize);
-        texture3D[index3D.x][index3D.y][index3D.z] += 0.01;
+        texture3D[index3D.x + index3D.y*textureDim + index3D.z*textureDim*textureDim] += 0.001;
     }
 }
 
@@ -108,12 +108,14 @@ void rayMarch::RayMarch::draw(window::Window* w)
     // Bind and populate Texture
     glActiveTexture(GL_TEXTURE0); // Texture unit 0
     glBindTexture(GL_TEXTURE_3D, texture_buffer);
-    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, texture3D.data());
+    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, texture3D);
     glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "texture3D"), 0);
 
     // Set the max and min corners
     mRenderShader->setUniformVec("minPos", minCorner);
     mRenderShader->setUniformVec("maxPos", maxCorner);
+    float fTextDim = (float)textureDim;
+    mRenderShader->setUniform("texDim", fTextDim);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
 
