@@ -212,7 +212,7 @@ vec3 p3 = vec3(0.0, 0.0, 0.0);
 
 float fbm(vec3 pos, float alpha, out vec3 grad)
 {
-    int N = 4;
+    int N = 8;
 
     vec3 p = vec3(0.0);
     float w = 1.0; //Weight of noise
