@@ -48,10 +48,10 @@ void rayMarch::RayMarch::update(window::Window* w)
     // Find bounding box
     for (int i=0; i<numParticlesPerTrack; i++) {
         for (int j=0; j<3; j++) {
-            if (feedbackVec[i][j] < minCorner[j]) {
+            if (feedbackVec[i][j] < minCorner[j] && feedbackVec[i][j]!= 0) {
                 minCorner[j] = feedbackVec[i][j];
             }
-            if (feedbackVec[i][j] > maxCorner[j]) {
+            if (feedbackVec[i][j] > maxCorner[j] && feedbackVec[i][j]!= 0) {
                 maxCorner[j] = feedbackVec[i][j];
             }
         }
@@ -59,15 +59,22 @@ void rayMarch::RayMarch::update(window::Window* w)
 
     // Compute density texture
     glm::vec3 stepSize = (maxCorner - minCorner) / (float)(textureDim-1);
-    // printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
-    // printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
+    printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
+    printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
 
     for (int i=0; i<numParticlesPerTrack; i++) {
         glm::ivec3 index3D;
 
         index3D = glm::floor((feedbackVec[i] - minCorner) / stepSize);
-        texture3D[index3D.x + index3D.y*textureDim + index3D.z*textureDim*textureDim] += 0.001;
+        texture3D[index3D.x + index3D.y*textureDim + index3D.z*textureDim*textureDim] += 0.05;
     }
+    // for (int i1=0; i1<textureDim; i1++) {
+    //     for (int i2=0; i2<textureDim; i2++) {
+    //         for (int i3=0; i3<textureDim; i3++) {
+    //             texture3D[i1 + i2*textureDim + i3*textureDim*textureDim] = i2;
+    //         }
+    //     }
+    // }
 }
 
 void rayMarch::RayMarch::fillBuffers()
@@ -79,7 +86,8 @@ void rayMarch::RayMarch::fillBuffers()
     glBindTexture(GL_TEXTURE_3D, texture_buffer);
     // Specify how to up/down sample
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, textureDim, textureDim, textureDim, 0, GL_RED, GL_FLOAT, NULL);
 
     glBindVertexArray(0);

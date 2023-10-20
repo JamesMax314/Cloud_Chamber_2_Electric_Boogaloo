@@ -21,7 +21,10 @@ uniform mat4 view;
 vec3 boundingCubeMin = -1.0*vec3(1.0);
 vec3 boundingCubeMax = vec3(1.0);
 
+vec3 skyBlue = vec3(135.0, 206.0, 235.0)/255.0;
+
 const float PI = 3.14159265359;
+const float threshold = 0.0;
 
 float distance_from_sphere(in vec3 p, in vec3 c, float r)
 {
@@ -143,8 +146,12 @@ float texture(in vec3 pos)
     if (sdfCuboid(pos, boundingCubeMin, boundingCubeMax) < 0.0) {
         if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
             vec3 stepSize = (maxPos - minPos) / (texDim-1.0); // texture dim - 1 add as uniform
-            vec3 texCoords = (pos-minPos) / (stepSize*texDim);
-            return texture(texture3D, texCoords).r;
+            vec3 texCoords = (pos-minPos) / (stepSize*texDim/2.0);
+            float den = texture(texture3D, texCoords).r;
+            if (den < threshold) {
+                den = 0.0;
+            }
+            return den*0.1;
         }
         return 0.0;
     }
@@ -195,7 +202,7 @@ float lightMarch(in vec3 rayPosition) {
 
 vec4 ray_march(in vec3 ro, in vec3 rd)
 {
-    int maxIterations = 30;
+    int maxIterations = 60;
     vec3 rayPosition = ro;
 
     float transmittance = 1.0;
@@ -255,13 +262,13 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
                 break;
             }
         }
-        backGroundCol = vec3(0.0, 0.0, 0.0);
+        backGroundCol = skyBlue;
     } else {
         backGroundCol = vec3(0.0, 0.0, 0.0);
     }
 
     vec3 cloudCol = lightEnergy * lightColour;
-    col = backGroundCol * transmittance * 0.5 + cloudCol + lampIntensity*transmittance;
+    col = backGroundCol * transmittance + cloudCol + lampIntensity*transmittance;
     return vec4(col, 0.0);
 }
 
