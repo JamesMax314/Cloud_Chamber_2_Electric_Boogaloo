@@ -172,10 +172,10 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
 
     if (rayIntersectsCube(ro, rd, boundingCubeMin, boundingCubeMax)) {
         for (int i = 0; i < maxIterations; i++) {
-            float sdf = distance_from_sphere(rayPosition, vec3(0.0, 0.0, 0.0), 0.5);
+            // float sdf = distance_from_sphere(rayPosition, vec3(0.0, 0.0, 0.0), 0.5);
 
             // Ray march to edge of bounding cuboid
-            // float sdf = sdfCuboid(rayPosition, minPos, maxPos);
+            float sdf = sdfCuboid(rayPosition, minPos, maxPos);
             float step = 0.0;
             if (sdf > stepSize) {
                 step = sdf;
@@ -184,7 +184,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             }
 
             // Check if ray has left cloud chamber
-            float sdfCube = sdCube(rayPosition, 1.0);
+            float sdfCube = sdfCuboid(rayPosition, boundingCubeMin, boundingCubeMax);
             
             if (!eneteredCube && sdfCube < 0.0) {
                 eneteredCube = true;
