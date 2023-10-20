@@ -21,7 +21,7 @@ void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *rend
     fillBuffers();
 
     feedbackVec = std::vector<glm::vec3>(numParticlesPerTrack);
-    texture3D = new float[textureDim];//std::vector<std::vector<std::vector<float>>>(textureDim, std::vector<std::vector<float>>(textureDim, std::vector<float>(textureDim, 0)));
+    texture3D = new float[pow(textureDim, 3)];//std::vector<std::vector<std::vector<float>>>(textureDim, std::vector<std::vector<float>>(textureDim, std::vector<float>(textureDim, 0)));
 }
 
 rayMarch::RayMarch::RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
@@ -44,8 +44,6 @@ void rayMarch::RayMarch::update(window::Window* w)
 
     minCorner = feedbackVec[0];
     maxCorner = feedbackVec[0];
-    int count = 0;
-    int index;
 
     // Find bounding box
     for (int i=0; i<numParticlesPerTrack-1; i++) {
@@ -57,37 +55,29 @@ void rayMarch::RayMarch::update(window::Window* w)
             if (feedbackVec[i][j] > maxCorner[j] && feedbackVec[i][j]!= 0) {
                 maxCorner[j] = feedbackVec[i][j];
             }
-            if (feedbackVec[i][j] == 0) {
-                // printf("zero %f, %f, %f \n", feedbackVec[i][0], feedbackVec[i][1], feedbackVec[i][2]);
-                subcount ++;
-                index = i;
-            }
-        }
-        if (subcount >= 1) {
-            count ++;
-            // printf("index %u \n", index);
         }
     }
-    printf("Count %u \n", count);
 
     // Compute density texture
     glm::vec3 stepSize = (maxCorner - minCorner) / (float)(textureDim-1);
     // printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
     // printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
 
+    // for (int i1=0; i1<textureDim; i1++) {
+    //     for (int i2=0; i2<textureDim; i2++) {
+    //         for (int i3=0; i3<textureDim; i3++) {
+    //             texture3D[i1 + i2*textureDim + i3*textureDim*textureDim] = 0.0;
+    //         }
+    //     }
+    // }
+
     for (int i=0; i<numParticlesPerTrack-1; i++) {
         glm::ivec3 index3D;
 
         index3D = glm::floor((feedbackVec[i] - minCorner) / stepSize);
-        texture3D[index3D.x + index3D.y*textureDim + index3D.z*textureDim*textureDim] += 0.05;
+        int index = index3D.x + index3D.y*textureDim + index3D.z*textureDim*textureDim;
+        texture3D[index] += 0.1;
     }
-    // for (int i1=0; i1<textureDim; i1++) {
-    //     for (int i2=0; i2<textureDim; i2++) {
-    //         for (int i3=0; i3<textureDim; i3++) {
-    //             texture3D[i1 + i2*textureDim + i3*textureDim*textureDim] = i2;
-    //         }
-    //     }
-    // }
 }
 
 void rayMarch::RayMarch::fillBuffers()
@@ -100,7 +90,7 @@ void rayMarch::RayMarch::fillBuffers()
     // Specify how to up/down sample
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, textureDim, textureDim, textureDim, 0, GL_RED, GL_FLOAT, NULL);
 
     glBindVertexArray(0);
