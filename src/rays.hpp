@@ -27,7 +27,7 @@ namespace rayMarch {
         glm::vec3 maxCorner;
 
         int numParticlesPerTrack = 10000;
-        int textureDim = 32;
+        int textureDim = 5;
         std::vector<glm::vec3> feedbackVec;
         std::vector<std::vector<std::vector<float>>> texture3D;
 

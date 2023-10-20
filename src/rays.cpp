@@ -37,7 +37,7 @@ void rayMarch::RayMarch::update(window::Window* w)
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
     glGetBufferSubData(GL_ARRAY_BUFFER, 0, (feedbackVec.size()-1)*sizeof(glm::vec3), feedbackVec.data());
-    printf("%f %f %f\n", feedbackVec[0][0], feedbackVec[0][1], feedbackVec[0][2]);
+    // printf("%f %f %f\n", feedbackVec[0][0], feedbackVec[0][1], feedbackVec[0][2]);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -59,19 +59,14 @@ void rayMarch::RayMarch::update(window::Window* w)
 
     // Compute density texture
     glm::vec3 stepSize = (maxCorner - minCorner) / (float)(textureDim-1);
-    printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
-    printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
+    // printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
+    // printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
 
     for (int i=0; i<numParticlesPerTrack; i++) {
         glm::ivec3 index3D;
-        // printf("i %u\n", i); 
 
         index3D = glm::floor((feedbackVec[i] - minCorner) / stepSize);
-        if (index3D.x < textureDim && index3D.y < textureDim && index3D.z < textureDim) {
-            texture3D[index3D.x][index3D.y][index3D.z] += 1;
-        } else {
-            printf("Segfault %u %u %u \n", index3D.x, index3D.y, index3D.z);
-        }
+        texture3D[index3D.x][index3D.y][index3D.z] += 0.01;
     }
 }
 
