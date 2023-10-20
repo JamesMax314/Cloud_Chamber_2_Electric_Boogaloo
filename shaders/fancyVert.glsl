@@ -216,7 +216,7 @@ float fbm(vec3 pos, float alpha, out vec3 grad)
 
     vec3 p = vec3(0.0);
     float w = 1.0; //Weight of noise
-    float s = 1.0; //Scale of noise
+    float s = 4.0; //Scale of noise
     float n = 0.0; //Output noise value
 
     vec3 g;
@@ -266,8 +266,8 @@ void main()
     float alpha = 0.1*time;
     vec3 velocity = curlnoise(Position, alpha);
     //velocity = normalise(velocity);
-    vec3 drift = vec3(0.0, 0.0, -0.000);
-    vPosition = Position + 0.00003*velocity + drift;
+    vec3 drift = vec3(0.0, 0.0, -0.0001);
+    vPosition = Position + 0.0001*velocity + drift;
     
     if(is_track_vert==0){
         if(abs(vPosition.x)>1.0 || abs(vPosition.y)>1.0 || abs(vPosition.z)>1.0){

@@ -262,7 +262,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
                 break;
             }
         }
-        backGroundCol = skyBlue;
+        backGroundCol = vec3(0.0, 0.0, 0.0); //skyBlue;
     } else {
         backGroundCol = vec3(0.0, 0.0, 0.0);
     }
