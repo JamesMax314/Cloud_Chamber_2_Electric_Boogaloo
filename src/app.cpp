@@ -126,7 +126,7 @@ void app::App::init()
     
     std::vector<simulation::Position> track_verts = initial_track.get_vertices();
 
-    track_sim.init(&fancyShader, &quadShader, track_verts, 1);
+    track_sim.init(&fancyShader, &rayShader, track_verts, 1);
     //sim.init(&fancyShader, &rayShader, track_verts);
     //ray.init(&fancyShader, &rayShader, track_verts);
 }
@@ -164,14 +164,14 @@ void app::App::mainLoop()
     track_sim.mRenderShader->setUniformVec("view", cam.viewMatrix);
     // Need to do this with a callback
     float aspectRatio = w.getAspect();
-    ray.mRenderShader->setUniform("aspect", aspectRatio);
-    ray.mRenderShader->setUniformVec("position", position);
+    track_sim.mRenderShader->setUniform("aspect", aspectRatio);
+    track_sim.mRenderShader->setUniformVec("position", position);
 
     glm::vec3 lightPos = glm::vec3(2.0, 0.0, 0.0);
     glm::vec3 lightColour = glm::vec3(1.0, 1.0, 1.0);
-    ray.mRenderShader->setUniformVec("lightPos", lightPos);
-    ray.mRenderShader->setUniformVec("lightColour", lightColour);
-    ray.mRenderShader->setUniform("time", time);
+    track_sim.mRenderShader->setUniformVec("lightPos", lightPos);
+    track_sim.mRenderShader->setUniformVec("lightColour", lightColour);
+    track_sim.mRenderShader->setUniform("time", time);
 
     //sim.draw(&w);
     track_sim.draw(&w);

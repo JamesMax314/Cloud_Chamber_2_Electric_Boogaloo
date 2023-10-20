@@ -30,10 +30,10 @@ namespace simulation {
         public:
 
         const GLfloat g_vertex_buffer_data[12] = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            -0.5f, 0.5f, 0.0f,
-            0.5f, 0.5f, 0.0f,
+            -1.0f, -1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
         };
 
         const GLfloat g_vertex_buffer_data_cube[112] = {
@@ -86,7 +86,7 @@ namespace simulation {
         GLuint VAO;
         GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer;
 	
-	int isTrack;
+	    int isTrack;
 
         Sim();
         Sim(shaders::Shader *shader);

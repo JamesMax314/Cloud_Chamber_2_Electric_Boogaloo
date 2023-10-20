@@ -9,89 +9,32 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "simulation.hpp"
 #include "shaders.hpp"
 #include "window.hpp"
 
 namespace rayMarch {
-    typedef glm::vec3 Position;
 
-    struct VertexNormal {
-        glm::vec3 position;
-        glm::vec3 normal;
-    };
-
-    struct VertexNormalText {
-        glm::vec3 position;
-        glm::vec3 normal;
-        glm::vec3 texture;
-    };
-
-    class RayMarch {
+    class RayMarch: public simulation::Sim {
         public:
 
-        const GLfloat g_vertex_buffer_data[12] = {
-            -1.0f, -1.0f, 0.0f,
-            1.0f, -1.0f, 0.0f,
-            -1.0f, 1.0f, 0.0f,
-            1.0f, 1.0f, 0.0f,
-        };
-
-        const GLfloat g_vertex_buffer_data_cube[112] = {
-            -1.0f,-1.0f,-1.0f, // triangle 1 : begin
-            -1.0f,-1.0f, 1.0f,
-            -1.0f, 1.0f, 1.0f, // triangle 1 : end
-            1.0f, 1.0f,-1.0f, // triangle 2 : begin
-            -1.0f,-1.0f,-1.0f,
-            -1.0f, 1.0f,-1.0f, // triangle 2 : end
-            1.0f,-1.0f, 1.0f,
-            -1.0f,-1.0f,-1.0f,
-            1.0f,-1.0f,-1.0f,
-            1.0f, 1.0f,-1.0f,
-            1.0f,-1.0f,-1.0f,
-            -1.0f,-1.0f,-1.0f,
-            -1.0f,-1.0f,-1.0f,
-            -1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f,-1.0f,
-            1.0f,-1.0f, 1.0f,
-            -1.0f,-1.0f, 1.0f,
-            -1.0f,-1.0f,-1.0f,
-            -1.0f, 1.0f, 1.0f,
-            -1.0f,-1.0f, 1.0f,
-            1.0f,-1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f,-1.0f,-1.0f,
-            1.0f, 1.0f,-1.0f,
-            1.0f,-1.0f,-1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f,-1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f,-1.0f,
-            -1.0f, 1.0f,-1.0f,
-            1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f,-1.0f,
-            -1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f, 1.0f,
-            1.0f,-1.0f, 1.0f
-        };
-
-        unsigned int shaderProgramIndex;
-        shaders::Shader* mCompShader;
-        shaders::Shader* mRenderShader;
-
-        std::vector<glm::vec3> mStartPos;
         std::vector<unsigned int> mIndices;
 
         // Intagers that are used to reference buffer arrays in gpu ram
-        GLuint VAO;
-        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer, texture_buffer;
+        GLuint texture_buffer;
 
+        glm::vec3 minCorner;
+        glm::vec3 maxCorner;
+
+        int numParticlesPerTrack = 10000;
         int textureDim = 32;
+        std::vector<glm::vec3> feedbackVec;
+        std::vector<std::vector<std::vector<float>>> texture3D;
 
         RayMarch();
         RayMarch(shaders::Shader *shader);
-        RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<rayMarch::Position> startPos);
-        void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<rayMarch::Position> startPos);
+        RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
+        void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
 
         void update(window::Window* w);
         void fillBuffers();

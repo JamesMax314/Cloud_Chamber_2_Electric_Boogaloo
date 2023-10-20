@@ -4,12 +4,18 @@ precision mediump float;
 in vec3 fragPos;
 out vec4 FragColor;
 
-uniform samplerBuffer bufferTexture;
+uniform mediump sampler3D texture3D;
 
 uniform vec3 position;
 uniform vec3 lightPos;
 uniform vec3 lightColour;
 uniform float time;
+
+uniform vec3 minPos;
+uniform vec3 maxPos;
+
+vec3 boundingCubeMin = -1.0*vec3(1.0);
+vec3 boundingCubeMax = vec3(1.0);
 
 const float PI = 3.14159265359;
 
@@ -18,11 +24,10 @@ float distance_from_sphere(in vec3 p, in vec3 c, float r)
 	return length(p - c) - r;
 }
 
-bool rayIntersectsCube(vec3 rayOrigin, vec3 rayDirection) {
+bool rayIntersectsCube(vec3 rayOrigin, vec3 rayDirection, vec3 cubeMin, vec3 cubeMax) {
     float tmin, tmax, tymin, tymax, tzmin, tzmax;
     float scale = 2.0;
-    vec3 cubeMin = -1.0*vec3(1.0);
-    vec3 cubeMax = vec3(1.0);
+
 
     vec3 inverseDirection = 1.0 / rayDirection;
 
@@ -81,8 +86,13 @@ float sdCube(vec3 p, float s) {
     return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0)); // Return the signed distance
 }
 
+float sdfCuboid(vec3 p, vec3 minCorner, vec3 maxCorner) {
+    // Compute the signed distance from the point 'p' to the cuboid
+    vec3 d = max(min(maxCorner - p, p - minCorner), 0.0);
+    return length(d) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
 
-float texture(in vec3 pos) 
+float sphereTexture(in vec3 pos) 
 {
     vec3 centre = vec3(0.0, 0.0, 0.0);
     float rad = 0.5;
@@ -96,6 +106,15 @@ float texture(in vec3 pos)
     return 0.0;
 
     // return snoise(pos);
+}
+
+float texture(in vec3 pos) 
+{
+    return sphereTexture(pos);
+    // if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
+    //     return 1.0;
+    // }
+    // return 0.0;
 }
 
 float stepSize = 0.02;
@@ -151,9 +170,12 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
     bool eneteredCube = false;
     vec3 col;
 
-    if (rayIntersectsCube(ro, rd)) {
+    if (rayIntersectsCube(ro, rd, boundingCubeMin, boundingCubeMax)) {
         for (int i = 0; i < maxIterations; i++) {
             float sdf = distance_from_sphere(rayPosition, vec3(0.0, 0.0, 0.0), 0.5);
+
+            // Ray march to edge of bounding cuboid
+            // float sdf = sdfCuboid(rayPosition, minPos, maxPos);
             float step = 0.0;
             if (sdf > stepSize) {
                 step = sdf;
@@ -161,6 +183,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
                 step = stepSize;
             }
 
+            // Check if ray has left cloud chamber
             float sdfCube = sdCube(rayPosition, 1.0);
             
             if (!eneteredCube && sdfCube < 0.0) {
@@ -169,15 +192,17 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
                 break;
             }
 
-
+            // Update position with random step to avoid banding
             rayPosition += rd*step*random(rd.xy);
 
             float density = texture(rayPosition);
 
+            // Get light scattering factor
             vec3 lightDir = lightPos-rayPosition;
             float theta =  angleBetween(lightDir, rd) ;
             float phase = phaseFun(theta);
 
+            // Get light energy and opacity
             if (density > 0.0) {
                 float lightTransmittance = lightMarch(rayPosition);
                 
@@ -210,5 +235,5 @@ void main()
     vec4 shaded_color = ray_march(ro, rd);
 
     FragColor = shaded_color;
-    // FragColor = vec4(1.0, 0.0, 0.0, 0.0);
+    // FragColor = vec4(abs(fragPos), 0.0);
 }

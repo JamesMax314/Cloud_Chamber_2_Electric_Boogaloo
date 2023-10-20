@@ -42,7 +42,8 @@ namespace app {
         camera::Camera cam;
 
         simulation::Sim sim;
-        simulation::Sim track_sim;
+        rayMarch::RayMarch track_sim;
+        // simulation::Sim track_sim;
         rayMarch::RayMarch ray;
 
         double t = 0;

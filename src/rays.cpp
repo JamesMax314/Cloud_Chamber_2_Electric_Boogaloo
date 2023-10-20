@@ -8,94 +8,84 @@ rayMarch::RayMarch::RayMarch(shaders::Shader *shader)
 {
 }
 
-void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<rayMarch::Position> startPos)
+void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
 {
-    mCompShader = compShader;
-    mRenderShader = renderShader;
-    mStartPos = startPos;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &ParticleBufferA);
-    glGenBuffers(1, &ParticleBufferB);
-    glGenBuffers(1, &billboard_vertex_buffer);
-    glGenBuffers(1, &texture_buffer);
+    simulation::Sim::init(compShader, renderShader, startPos, isTrack);
+    glGenTextures(1, &texture_buffer);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    glBindVertexArray(0);
+
     fillBuffers();
+
+    feedbackVec = std::vector<glm::vec3>(numParticlesPerTrack);
+    texture3D = std::vector<std::vector<std::vector<float>>>(textureDim, std::vector<std::vector<float>>(textureDim, std::vector<float>(textureDim, 0)));
 }
 
-rayMarch::RayMarch::RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<rayMarch::Position> startPos)
+rayMarch::RayMarch::RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
 {
-    init(compShader, renderShader, startPos);
+    init(compShader, renderShader, startPos, isTrack);
 }
 
 void rayMarch::RayMarch::update(window::Window* w)
 {
-    glfwMakeContextCurrent(w->getContext());
+    simulation::Sim::update(w);
 
-    // Set up the advection shader:
-    mCompShader->activate();
-
+    // Get particle positions
     glBindVertexArray(VAO);
-
-    // Turn off drawing
-    glEnable(GL_RASTERIZER_DISCARD);
-
-    // Specify the target buffer:
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
-    // Specify input format
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glGetBufferSubData(GL_ARRAY_BUFFER, 0, (feedbackVec.size()-1)*sizeof(glm::vec3), feedbackVec.data());
+    printf("%f %f %f\n", feedbackVec[0][0], feedbackVec[0][1], feedbackVec[0][2]);
 
-    // Set output buffer
-    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, ParticleBufferB);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // Begin Reading data 
-    glBeginTransformFeedback(GL_POINTS);
-
-    // Do Calculation
-    glDrawArrays(GL_POINTS, 0, mStartPos.size());
-
-    // Close feedback
-    glEndTransformFeedback();
-    glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
-    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 0);    
-
-    glFlush();
-
-    std::swap(ParticleBufferA, ParticleBufferB);
-    glDisable(GL_RASTERIZER_DISCARD);
-
     glBindVertexArray(0);
+
+    minCorner = feedbackVec[0];
+    maxCorner = feedbackVec[0];
+
+    // Find bounding box
+    for (int i=0; i<numParticlesPerTrack; i++) {
+        for (int j=0; j<3; j++) {
+            if (feedbackVec[i][j] < minCorner[j]) {
+                minCorner[j] = feedbackVec[i][j];
+            }
+            if (feedbackVec[i][j] > maxCorner[j]) {
+                maxCorner[j] = feedbackVec[i][j];
+            }
+        }
+    }
+
+    // Compute density texture
+    glm::vec3 stepSize = (maxCorner - minCorner) / (float)(textureDim-1);
+    printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
+    printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
+
+    for (int i=0; i<numParticlesPerTrack; i++) {
+        glm::ivec3 index3D;
+        // printf("i %u\n", i); 
+
+        index3D = (glm::ivec3)glm::floor((feedbackVec[i] - minCorner) / stepSize);
+        if (index3D.x < textureDim && index3D.y < textureDim && index3D.z < textureDim) {
+            texture3D[index3D.x][index3D.y][index3D.z] += 1;
+        } else {
+            printf("Segfault %u %u %u \n", index3D.x, index3D.y, index3D.z);
+        }
+    }
 }
 
 void rayMarch::RayMarch::fillBuffers()
 {
     // Bind all the model arrays to the appropriate buffers
-    glBindVertexArray(VAO);
-
-    // VBO for even frames 
-    glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
-    glBufferData(GL_ARRAY_BUFFER, mStartPos.size()*sizeof(rayMarch::Position), &mStartPos.front(), GL_STREAM_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    // Create VBO for output on even-numbered frames and input on odd-numbered frames:
-    glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferB);
-    glBufferData(GL_ARRAY_BUFFER, mStartPos.size()*sizeof(rayMarch::Position), (void*)0, GL_STREAM_DRAW);
-
-    // Bind rendering buffers
-    glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+    // glBindVertexArray(VAO);
     // Fragment buffers are handeled as textures
-    glBindTexture(GL_TEXTURE_3D, textureID);
+
+    glBindTexture(GL_TEXTURE_3D, texture_buffer);
     // Specify how to up/down sample
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, textureDim, textureDim, textureDim, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, textureDim, textureDim, textureDim, 0, GL_RED, GL_FLOAT, NULL);
 
     glBindVertexArray(0);
 }
@@ -115,22 +105,21 @@ void rayMarch::RayMarch::draw(window::Window* w)
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    // Bind positions
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    // float feedbackVec[6];
-    // glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(feedbackVec), feedbackVec);
-
-    // printf("%f %f %f %f %f %f\n", feedbackVec[0], feedbackVec[1], feedbackVec[2], feedbackVec[3], feedbackVec[4], feedbackVec[5]);
     
     //  Draw 1 quad (4 vertices) for every position
     glVertexAttribDivisor(0, 0);
-    glVertexAttribDivisor(1, 1);
 
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, mStartPos.size());
+    // Bind and populate Texture
+    glActiveTexture(GL_TEXTURE0); // Texture unit 0
+    glBindTexture(GL_TEXTURE_3D, texture_buffer);
+    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, texture3D.data());
+    glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "texture3D"), 0);
+
+    // Set the max and min corners
+    mRenderShader->setUniformVec("minPos", minCorner);
+    mRenderShader->setUniformVec("maxPos", maxCorner);
+
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
 
     glBindVertexArray(0);
 }
