@@ -140,7 +140,9 @@ float texture(in vec3 pos)
     // return sphereTexture(pos);
     if (sdfCuboid(pos, boundingCubeMin, boundingCubeMax) < 0.0) {
         if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
-            return 1.0;
+            vec3 stepSize = (maxPos - minPos) / 31.0; // texture dim - 1 add as uniform
+            vec3 texCoords = (pos-minPos) / stepSize;
+            return texture(texture3D, texCoords).r;
         }
         return 0.0;
     }
