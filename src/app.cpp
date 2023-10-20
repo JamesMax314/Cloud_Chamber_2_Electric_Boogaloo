@@ -144,7 +144,7 @@ void app::App::mainLoop()
     // Move camera
     if (fb != 0) {
         printf("w %i\n", fb);
-        cam.move(0.0f, 0.0f, fb*motionSpeed*dt);
+        cam.move(0.0f, 0.0f, -fb*motionSpeed*dt);
     }
     if (lr != 0) {
         cam.move(lr*motionSpeed*dt, 0.0f, 0.0f);
@@ -155,7 +155,7 @@ void app::App::mainLoop()
 
     // Rotate Camera
     if (deltaX != 0.0 || deltaY != 0.0) {
-        cam.rotate(deltaX, deltaY);
+        cam.rotate(-deltaX, -deltaY);
         deltaX = 0;
         deltaY = 0;
     }

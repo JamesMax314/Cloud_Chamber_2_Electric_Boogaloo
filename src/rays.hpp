@@ -23,8 +23,8 @@ namespace rayMarch {
         // Intagers that are used to reference buffer arrays in gpu ram
         GLuint texture_buffer;
 
-        glm::vec4 minCorner;
-        glm::vec4 maxCorner;
+        glm::vec3 minCorner;
+        glm::vec3 maxCorner;
 
         int numParticlesPerTrack = 10000;
         int textureDim = 32;

@@ -6,18 +6,18 @@ out vec4 FragColor;
 
 uniform mediump sampler3D texture3D;
 
-uniform vec4 position;
+// uniform vec4 position;
 uniform vec3 lightPos;
 uniform vec3 lightColour;
 uniform float time;
 
-uniform vec4 minPos;
-uniform vec4 maxPos;
+uniform vec3 minPos;
+uniform vec3 maxPos;
 
 uniform mat4 view;
 
-vec4 boundingCubeMin = -1.0*vec4(1.0);
-vec4 boundingCubeMax = vec4(1.0);
+vec3 boundingCubeMin = -1.0*vec3(1.0);
+vec3 boundingCubeMax = vec3(1.0);
 
 const float PI = 3.14159265359;
 
@@ -115,10 +115,11 @@ float sphereTexture(in vec3 pos)
 float texture(in vec3 pos) 
 {
     // return sphereTexture(pos);
-    if (sdfCuboid(pos, boundingCubeMin.xyz, boundingCubeMax.xyz) < 0.0) {
-        if (sdfCuboid(pos, minPos.xyz, maxPos.xyz) < 0.0) {
+    if (sdfCuboid(pos, boundingCubeMin, boundingCubeMax) < 0.0) {
+        if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
             return 1.0;
         }
+        return 1.0;
     }
     return 0.0;
 }
@@ -135,14 +136,14 @@ float angleBetween(vec3 vectorA, vec3 vectorB) {
     float dotProduct = dot(normalizedA, normalizedB);
     
     // Use acos to find the angle in radians
-    float angle = acos(clamp(dotProduct, -1.0, 1.0));
+    float angle = acos(dotProduct);
 
     return angle;
 }
 
 float phaseFun(in float theta) {
     float g = 0.3;
-    float phase = (1.0-pow(g, 2.0)) / pow(1.0 + pow(g, 2.0) - 2.0*g*cos(theta), 3.0/2.0);
+    float phase = (1.0-pow(g, 2.0)) / pow(1.0 + pow(g, 2.0) - 2.0*g*cos(theta+PI/2.0), 3.0/2.0);
     return phase;
 }
 
@@ -172,18 +173,19 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
 
     float transmittance = 1.0;
     float lightEnergy = 0.0;
+    float lampIntensity = 0.0;
 
     bool eneteredCube = false;
     vec3 col;
 
     vec3 backGroundCol = vec3(0.0, 0.0, 0.0);
 
-    if (rayIntersectsCube(ro, rd, (boundingCubeMin).xyz, (boundingCubeMax).xyz)) {
+    if (rayIntersectsCube(ro, rd, boundingCubeMin, boundingCubeMax)) {
         for (int i = 0; i < maxIterations; i++) {
             // float sdf = distance_from_sphere(rayPosition, vec3(0.0, 0.0, 0.0), 0.5);
 
             // Ray march to edge of bounding cuboid
-            float sdf = sdfCuboid(rayPosition, minPos.xyz, maxPos.xyz);
+            float sdf = sdfCuboid(rayPosition, boundingCubeMin, boundingCubeMax);
             float step = 0.0;
             if (sdf > stepSize) {
                 step = sdf;
@@ -192,7 +194,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             }
 
             // Check if ray has left cloud chamber
-            float sdfCube = sdfCuboid(rayPosition, boundingCubeMin.xyz, boundingCubeMax.xyz);
+            float sdfCube = sdfCuboid(rayPosition, boundingCubeMin, boundingCubeMax);
             
             if (!eneteredCube && sdfCube < 0.0) {
                 eneteredCube = true;
@@ -214,27 +216,31 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             if (density > 0.0) {
                 float lightTransmittance = lightMarch(rayPosition);
                 
-                lightEnergy += density * stepSize * transmittance * lightTransmittance * phase;
+                lightEnergy += 2.0*density * stepSize * transmittance * lightTransmittance * phase;
                 transmittance *= exp(-density * stepSize);
+            } else {
+                if (angleBetween(rd, lightPos) < 0.01) {
+                    lampIntensity += 1.0*stepSize;
+                }
             }
 
             if (transmittance < 0.01) {
                 break;
             }
         }
-        backGroundCol = vec3(0.0, 0.0, 0.0);
+        backGroundCol = vec3(112.0,128.0,144.0)/255.0;
     } else {
-        backGroundCol = vec3(1.0, 0.0, 1.0);
+        backGroundCol = vec3(1.0, 1.0, 1.0);
     }
 
     vec3 cloudCol = lightEnergy * lightColour;
-    col = backGroundCol * transmittance + cloudCol;
+    col = backGroundCol * transmittance + cloudCol + lampIntensity*transmittance;
     return vec4(col, 0.0);
 }
 
 void main()
 {
-    vec4 camera_position = view*vec4(0.0, 0.0, 2.0, 1.0);
+    vec4 camera_position = view*vec4(0.0, 0.0, 0.0, 1.0);
     vec4 ro = camera_position;
     vec4 rd = view*fragPos - camera_position;
     float modulus = length(rd);

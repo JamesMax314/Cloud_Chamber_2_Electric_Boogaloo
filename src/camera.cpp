@@ -42,13 +42,13 @@ glm::mat4 camera::Camera::getViewMat()
 camera::Camera::Camera()
 {
     // Set camera to origin
-    camPos = glm::vec3(0.0f, 0.0f, 0.0f);
+    camPos = glm::vec3(0.0f, 0.0f, -2.0f);
     cameraFacing = glm::vec3(0.0f, 0.0f, -1.0f);
     cameraTarget = camPos + cameraFacing;
     cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
     motionSpeed = 0.1f;
     rotSpeed = 0.005f;
 
-    viewMatrix = glm::lookAt(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    // viewMatrix = glm::lookAt(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 }
