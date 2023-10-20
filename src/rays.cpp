@@ -44,9 +44,12 @@ void rayMarch::RayMarch::update(window::Window* w)
 
     minCorner = feedbackVec[0];
     maxCorner = feedbackVec[0];
+    int count = 0;
+    int index;
 
     // Find bounding box
-    for (int i=0; i<numParticlesPerTrack; i++) {
+    for (int i=0; i<numParticlesPerTrack-1; i++) {
+        int subcount = 0;
         for (int j=0; j<3; j++) {
             if (feedbackVec[i][j] < minCorner[j] && feedbackVec[i][j]!= 0) {
                 minCorner[j] = feedbackVec[i][j];
@@ -54,15 +57,25 @@ void rayMarch::RayMarch::update(window::Window* w)
             if (feedbackVec[i][j] > maxCorner[j] && feedbackVec[i][j]!= 0) {
                 maxCorner[j] = feedbackVec[i][j];
             }
+            if (feedbackVec[i][j] == 0) {
+                // printf("zero %f, %f, %f \n", feedbackVec[i][0], feedbackVec[i][1], feedbackVec[i][2]);
+                subcount ++;
+                index = i;
+            }
+        }
+        if (subcount >= 1) {
+            count ++;
+            // printf("index %u \n", index);
         }
     }
+    printf("Count %u \n", count);
 
     // Compute density texture
     glm::vec3 stepSize = (maxCorner - minCorner) / (float)(textureDim-1);
-    printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
-    printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
+    // printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
+    // printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
 
-    for (int i=0; i<numParticlesPerTrack; i++) {
+    for (int i=0; i<numParticlesPerTrack-1; i++) {
         glm::ivec3 index3D;
 
         index3D = glm::floor((feedbackVec[i] - minCorner) / stepSize);
