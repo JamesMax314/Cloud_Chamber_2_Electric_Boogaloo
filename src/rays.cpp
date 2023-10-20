@@ -117,8 +117,8 @@ void rayMarch::RayMarch::draw(window::Window* w)
     glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "texture3D"), 0);
 
     // Set the max and min corners
-    mRenderShader->setUniformVec("minPosUniform", minCorner);
-    mRenderShader->setUniformVec("maxPosUniform", maxCorner);
+    mRenderShader->setUniformVec("minPos", minCorner);
+    mRenderShader->setUniformVec("maxPos", maxCorner);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
 

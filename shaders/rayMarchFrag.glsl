@@ -88,7 +88,30 @@ float sdCube(vec3 p, float s) {
     return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0)); // Return the signed distance
 }
 
-float sdfCuboid(vec3 p, vec3 minCorner, vec3 maxCorner) {
+float sdfCuboid(vec3 p, vec3 minCorner, vec3 maxCorner)
+{
+    vec3 c = (minCorner + maxCorner) * 0.5;;
+    vec3 s = (maxCorner - minCorner);
+    float x = max
+    (   p.x - c.x - s.x / 2.,
+        c.x - p.x - s.x / 2.
+    );
+    float y = max
+    (   p.y - c.y - s.y / 2.,
+        c.y - p.y - s.y / 2.
+    );
+    
+    float z = max
+    (   p.z - c.z - s.z / 2.,
+        c.z - p.z - s.z / 2.
+    );
+    float d = x;
+    d = max(d,y);
+    d = max(d,z);
+    return d;
+}
+
+float sdf_box(vec3 p, vec3 minCorner, vec3 maxCorner) {
     // Compute the signed distance from the point 'p' to the cuboid
     vec3 r = (maxCorner - minCorner) * 0.5;
     vec3 c = (minCorner + maxCorner) * 0.5;
@@ -119,7 +142,7 @@ float texture(in vec3 pos)
         if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
             return 1.0;
         }
-        return 1.0;
+        return 0.0;
     }
     return 0.0;
 }
@@ -185,7 +208,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             // float sdf = distance_from_sphere(rayPosition, vec3(0.0, 0.0, 0.0), 0.5);
 
             // Ray march to edge of bounding cuboid
-            float sdf = sdfCuboid(rayPosition, boundingCubeMin, boundingCubeMax);
+            float sdf = sdfCuboid(rayPosition, minPos, maxPos);
             float step = 0.0;
             if (sdf > stepSize) {
                 step = sdf;
@@ -228,13 +251,13 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
                 break;
             }
         }
-        backGroundCol = vec3(112.0,128.0,144.0)/255.0;
+        backGroundCol = vec3(0.0, 0.0, 0.0);
     } else {
-        backGroundCol = vec3(1.0, 1.0, 1.0);
+        backGroundCol = vec3(0.0, 0.0, 0.0);
     }
 
     vec3 cloudCol = lightEnergy * lightColour;
-    col = backGroundCol * transmittance + cloudCol + lampIntensity*transmittance;
+    col = backGroundCol * transmittance * 0.5 + cloudCol + lampIntensity*transmittance;
     return vec4(col, 0.0);
 }
 
@@ -249,5 +272,5 @@ void main()
     vec4 shaded_color = ray_march(ro.xyz, rd.xyz);
 
     FragColor = shaded_color;
-    // FragColor = vec4(abs(fragPos.xyz), 0.0);
+    // FragColor = vec4(abs(maxPos), 1.0);
 }
