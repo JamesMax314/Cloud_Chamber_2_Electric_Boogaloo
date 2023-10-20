@@ -42,8 +42,8 @@ void rayMarch::RayMarch::update(window::Window* w)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    minCorner = feedbackVec[0];
-    maxCorner = feedbackVec[0];
+    minCorner = glm::vec4(feedbackVec[0], 1.0);
+    maxCorner = glm::vec4(feedbackVec[0], 1.0);
 
     // Find bounding box
     for (int i=0; i<numParticlesPerTrack; i++) {
@@ -58,15 +58,15 @@ void rayMarch::RayMarch::update(window::Window* w)
     }
 
     // Compute density texture
-    glm::vec3 stepSize = (maxCorner - minCorner) / (float)(textureDim-1);
+    glm::vec4 stepSize = (maxCorner - minCorner) / (float)(textureDim-1);
     printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
     printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
 
     for (int i=0; i<numParticlesPerTrack; i++) {
-        glm::ivec3 index3D;
+        glm::ivec4 index3D;
         // printf("i %u\n", i); 
 
-        index3D = (glm::ivec3)glm::floor((feedbackVec[i] - minCorner) / stepSize);
+        index3D = (glm::ivec4)glm::floor((glm::vec4(feedbackVec[i], 1.0) - minCorner) / stepSize);
         if (index3D.x < textureDim && index3D.y < textureDim && index3D.z < textureDim) {
             texture3D[index3D.x][index3D.y][index3D.z] += 1;
         } else {
@@ -97,6 +97,7 @@ void rayMarch::RayMarch::loadUniforms()
 void rayMarch::RayMarch::draw(window::Window* w)
 {
     glfwMakeContextCurrent(w->getContext());
+
     mRenderShader->activate();
 
     glBindVertexArray(VAO);
@@ -116,8 +117,8 @@ void rayMarch::RayMarch::draw(window::Window* w)
     glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "texture3D"), 0);
 
     // Set the max and min corners
-    mRenderShader->setUniformVec("minPos", minCorner);
-    mRenderShader->setUniformVec("maxPos", maxCorner);
+    mRenderShader->setUniformVec("minPosUniform", minCorner);
+    mRenderShader->setUniformVec("maxPosUniform", maxCorner);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
 

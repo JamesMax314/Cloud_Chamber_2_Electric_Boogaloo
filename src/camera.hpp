@@ -8,7 +8,7 @@ namespace camera {
         public:
         glm::mat4 viewMatrix;
         glm::vec3 camPos;
-        glm::vec3 cameraFront; // Initial view direction
+        glm::vec3 cameraFacing; // Initial view direction
         glm::vec3 cameraUp;
         glm::vec3 cameraTarget;
 
@@ -18,6 +18,7 @@ namespace camera {
         void move(float x, float y, float z);
         void rotate(float dx, float dy);
         void setViewMat(glm::mat4 view);
+        glm::mat4 getViewMat();
 
         Camera();
     };

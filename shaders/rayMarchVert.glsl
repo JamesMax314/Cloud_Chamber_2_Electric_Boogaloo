@@ -2,20 +2,20 @@
 layout(location = 0) in vec3 quad;
 // layout(location = 1) in vec3 particlePos;
 
-out vec3 fragPos;
+out vec4 fragPos;
 
 // uniform mat4 model;
 // uniform mat4 view;
-// uniform mat4 projection;
+uniform mat4 projection;
 uniform float aspect;
 
-vec3 aPos;
+vec4 aPos;
 
 void main()
 {
-    aPos = quad;
-    gl_Position = vec4(aPos, 1.0);
-    aPos.x = aPos.x*aspect;
+    aPos = vec4(quad, 1.0);
+    gl_Position = aPos;
+    aPos.x = aspect*aPos.x;
     // vec4 aPos4 = view*vec4(aPos, 1.0);
 
     fragPos = aPos;//particlePos;

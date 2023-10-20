@@ -30,6 +30,7 @@ python -m http.server
 Ray Marching
 - https://www.vertexfragment.com/ramblings/volumetric-cloud-banding/#raymarch-offset
 - https://www.scratchapixel.com/lessons/3d-basic-rendering/volume-rendering-for-developers/ray-marching-get-it-right.html
+- SDFs: https://iquilezles.org/articles/distfunctions/
 
 Clouds
 - https://hal.science/hal-01730789/file/Procedural-Cloudscapes-EG2018-article.pdf

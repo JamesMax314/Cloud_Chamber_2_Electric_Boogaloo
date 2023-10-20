@@ -141,31 +141,37 @@ void app::App::mainLoop()
 
     float dt = 1;
 
+    // Move camera
     if (fb != 0) {
         printf("w %i\n", fb);
-        position += glm::vec3(0.0f, 0.0f, fb*motionSpeed*dt);
+        cam.move(0.0f, 0.0f, fb*motionSpeed*dt);
     }
     if (lr != 0) {
-        position += glm::vec3(-lr*motionSpeed*dt, 0.0f, 0.0f);
+        cam.move(lr*motionSpeed*dt, 0.0f, 0.0f);
     }
     if (ud != 0) {
-        position += glm::vec3(0.0f, ud*motionSpeed*dt, 0.0f);
+        cam.move(0.0f, -ud*motionSpeed*dt, 0.0f);
     }
 
+    // Rotate Camera
     if (deltaX != 0.0 || deltaY != 0.0) {
         cam.rotate(deltaX, deltaY);
         deltaX = 0;
         deltaY = 0;
     }
 
+    // Compute the current view and perspective matrices
+    float aspectRatio = w.getAspect();
+    glm::mat4 viewMat = glm::inverse(cam.getViewMat());
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
 
     time += 0.001;
     track_sim.mCompShader->setUniform("time", time);
-    track_sim.mRenderShader->setUniformVec("view", cam.viewMatrix);
+    track_sim.mRenderShader->setUniformVec("view", viewMat);
+    track_sim.mRenderShader->setUniformVec("projection", projection);
     // Need to do this with a callback
-    float aspectRatio = w.getAspect();
     track_sim.mRenderShader->setUniform("aspect", aspectRatio);
-    track_sim.mRenderShader->setUniformVec("position", position);
+    // track_sim.mRenderShader->setUniformVec("position", cam.camPos);
 
     glm::vec3 lightPos = glm::vec3(2.0, 0.0, 0.0);
     glm::vec3 lightColour = glm::vec3(1.0, 1.0, 1.0);
