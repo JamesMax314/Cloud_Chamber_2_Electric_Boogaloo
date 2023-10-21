@@ -63,20 +63,24 @@ void rayMarch::RayMarch::update(window::Window* w)
     // printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
     // printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
 
-    // for (int i1=0; i1<textureDim; i1++) {
-    //     for (int i2=0; i2<textureDim; i2++) {
-    //         for (int i3=0; i3<textureDim; i3++) {
-    //             texture3D[i1 + i2*textureDim + i3*textureDim*textureDim] = 0.0;
-    //         }
-    //     }
-    // }
+    for (int i1=0; i1<textureDim; i1++) {
+        for (int i2=0; i2<textureDim; i2++) {
+            for (int i3=0; i3<textureDim; i3++) {
+                if (texture3D[i1 + i2*textureDim + i3*textureDim*textureDim] > 0) {
+                    texture3D[i1 + i2*textureDim + i3*textureDim*textureDim] -= 0.05;
+                }
+            }
+        }
+    }
 
     for (int i=0; i<numParticlesPerTrack-1; i++) {
         glm::ivec3 index3D;
 
         index3D = glm::floor((feedbackVec[i] - minCorner) / stepSize);
         int index = index3D.x + index3D.y*textureDim + index3D.z*textureDim*textureDim;
-        texture3D[index] += 0.1;
+        if (texture3D[index] < maxTexVal) {
+            texture3D[index] += 0.1;
+        }
     }
 }
 
@@ -89,11 +93,9 @@ void rayMarch::RayMarch::fillBuffers()
     glBindTexture(GL_TEXTURE_3D, texture_buffer);
     // Specify how to up/down sample
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, textureDim, textureDim, textureDim, 0, GL_RED, GL_FLOAT, NULL);
-
-    glBindVertexArray(0);
 }
 
 void rayMarch::RayMarch::loadUniforms()
@@ -131,4 +133,42 @@ void rayMarch::RayMarch::draw(window::Window* w)
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
 
     glBindVertexArray(0);
+}
+
+void rayMarch::RayMarch::draw(window::Window *w, GLuint inFBO, GLuint inDepthBuffer)
+{
+    glfwMakeContextCurrent(w->getContext());
+
+    mRenderShader->activate();
+
+    glBindVertexArray(VAO);
+
+    // Bind quad to render
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    
+    //  Draw 1 quad (4 vertices) for every position
+    glVertexAttribDivisor(0, 0);
+    glBindVertexArray(0);
+
+    // Bind and populate Texture
+    glActiveTexture(GL_TEXTURE0); // Texture unit 0
+    glBindTexture(GL_TEXTURE_3D, texture_buffer);
+    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, texture3D);
+    glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "texture3D"), 0); // Assign 3d texture to texture unit 0
+
+    glActiveTexture(GL_TEXTURE0); // Texture unit 0
+    glBindTexture(GL_TEXTURE_2D, inFBO);
+
+
+
+    // Set the max and min corners
+    mRenderShader->setUniformVec("minPos", minCorner);
+    mRenderShader->setUniformVec("maxPos", maxCorner);
+    float fTextDim = (float)textureDim;
+    mRenderShader->setUniform("texDim", fTextDim);
+
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
+
 }

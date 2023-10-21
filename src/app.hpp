@@ -22,6 +22,7 @@
 #include "camera.hpp"
 #include "rays.hpp"
 #include "track.hpp"
+#include "drawables.hpp"
 
 
 namespace app {
@@ -35,6 +36,7 @@ namespace app {
         shaders::Compute fancyShader;
         shaders::Shader quadShader;
         shaders::Shader rayShader;
+        shaders::Shader basicShader;
 
         float pos = 0;
         glm::vec3 position = glm::vec3(0.0, 0.0, 0.0);
@@ -45,6 +47,8 @@ namespace app {
         rayMarch::RayMarch track_sim;
         // simulation::Sim track_sim;
         rayMarch::RayMarch ray;
+
+        drawable::Drawable boundingBox;
 
         double t = 0;
         double now;

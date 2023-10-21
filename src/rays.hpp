@@ -28,6 +28,7 @@ namespace rayMarch {
 
         int numParticlesPerTrack = 10000;
         int textureDim = 64;
+        float maxTexVal = 20;
         std::vector<glm::vec3> feedbackVec;
         float* texture3D;
 
@@ -40,5 +41,6 @@ namespace rayMarch {
         void fillBuffers();
         void loadUniforms();
         void draw(window::Window* w);
+        void draw(window::Window* w, GLuint inFBO, GLuint inDepthBuffer);
     };
 }

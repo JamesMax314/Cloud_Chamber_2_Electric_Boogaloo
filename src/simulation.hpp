@@ -84,7 +84,7 @@ namespace simulation {
 
         // Intagers that are used to reference buffer arrays in gpu ram
         GLuint VAO;
-        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer;
+        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer, FBO, textureOut;
 	
 	    int isTrack;
 
@@ -97,5 +97,6 @@ namespace simulation {
         void fillBuffers();
         void loadUniforms();
         void draw(window::Window* w);
+        void drawToBuffer(window::Window* w);
     };
 }

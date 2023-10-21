@@ -36,6 +36,9 @@ Clouds
 - https://hal.science/hal-01730789/file/Procedural-Cloudscapes-EG2018-article.pdf
 - https://arxiv.org/pdf/1608.08570.pdf
 
+Frame buffers
+- https://learnopengl.com/Advanced-OpenGL/Framebuffers
+
 ## Class Structure
 
 ```mermaid
@@ -54,4 +57,5 @@ classDiagram
 ```
 
 # TODO:
-- [ ] Need to make shader loader adapt to different types of input and output variables
+- [ ] Make rays not a subclass of sim;
+- [ ] Rays should take a reference to the gpu data for particle tracks when it generates its density grid;

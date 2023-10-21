@@ -4,33 +4,34 @@ precision mediump float;
 in vec4 fragPos;
 out vec4 FragColor;
 
-uniform mediump sampler3D texture3D;
+uniform mediump sampler3D texture3D; // Cloud texture
+uniform sampler2D framebufferColorTexture; // The framebuffer's color texture
+uniform sampler2D framebufferDepthTexture;  // The depth texture
 
-// uniform vec4 position;
-uniform vec3 lightPos;
-uniform vec3 lightColour;
 uniform float time;
-
 uniform float texDim;
 
+uniform vec3 lightPos;
+uniform vec3 lightColour;
 uniform vec3 minPos;
 uniform vec3 maxPos;
 
 uniform mat4 view;
 
-vec3 boundingCubeMin = -1.0*vec3(1.0);
-vec3 boundingCubeMax = vec3(1.0);
-
-vec3 skyBlue = vec3(135.0, 206.0, 235.0)/255.0;
-
 const float PI = 3.14159265359;
 const float threshold = 0.0;
 
-float distance_from_sphere(in vec3 p, in vec3 c, float r)
-{
-	return length(p - c) - r;
-}
+int maxIterations = 120;
+int maxLightSamples = 120;
 
+float stepSize = 0.025;
+float lightFactor = 5.0;
+
+vec3 boundingCubeMin = -1.0*vec3(1.0);
+vec3 boundingCubeMax = vec3(1.0);
+
+
+// Used to determine whether a ray should be calculated
 bool rayIntersectsCube(vec3 rayOrigin, vec3 rayDirection, vec3 cubeMin, vec3 cubeMax) {
     float tmin, tmax, tymin, tymax, tzmin, tzmax;
     float scale = 2.0;
@@ -87,12 +88,7 @@ bool rayIntersectsCube(vec3 rayOrigin, vec3 rayDirection, vec3 cubeMin, vec3 cub
     return tmax >= 0.0;
 }
 
-
-float sdCube(vec3 p, float s) {
-    vec3 d = abs(p) - s * 1.0; // Calculate the distance from the point to the center of the cube
-    return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0)); // Return the signed distance
-}
-
+// SDF for track bounding boxes
 float sdfCuboid(vec3 p, vec3 minCorner, vec3 maxCorner)
 {
     vec3 c = (minCorner + maxCorner) * 0.5;;
@@ -116,30 +112,7 @@ float sdfCuboid(vec3 p, vec3 minCorner, vec3 maxCorner)
     return d;
 }
 
-float sdf_box(vec3 p, vec3 minCorner, vec3 maxCorner) {
-    // Compute the signed distance from the point 'p' to the cuboid
-    vec3 r = (maxCorner - minCorner) * 0.5;
-    vec3 c = (minCorner + maxCorner) * 0.5;
-    vec3 d = abs(p - c) - r;
-    return max(max(d[0]/r[0], d[1]/r[1]), d[2]/r[2]);
-}
-
-float sphereTexture(in vec3 pos) 
-{
-    vec3 centre = vec3(0.0, 0.0, 0.0);
-    float rad = 0.5;
-    float displacement = sin(8.0 * pos.x) * sin(8.0 * pos.y) * sin(8.0 * pos.z) * 0.25;
-    float sphere_0 = distance_from_sphere(pos, vec3(0.0), rad);
-    if (sphere_0 + displacement*sin(time*10.0) < 0.0) {
-        // return snoise(pos*5.0)*2.0;
-        return 2.0;
-    }
-
-    return 0.0;
-
-    // return snoise(pos);
-}
-
+// Need to move this into a world function
 float texture(in vec3 pos) 
 {
     // return sphereTexture(pos);
@@ -158,9 +131,8 @@ float texture(in vec3 pos)
     return 0.0;
 }
 
-float stepSize = 0.05;
-
-float random(vec2 st) {
+// To help avoid banding
+float randomStepModifier(vec2 st) {
     return max(0.0, fract(sin(dot(st, vec2(12.9898, 78.233)) * 43758.5453)))/10.0 + 0.9;
 }
 
@@ -169,44 +141,44 @@ float angleBetween(vec3 vectorA, vec3 vectorB) {
     vec3 normalizedB = normalize(vectorB);
     float dotProduct = dot(normalizedA, normalizedB);
     
-    // Use acos to find the angle in radians
     float angle = acos(dotProduct);
 
     return angle;
 }
 
+// Anisotropic light scattering
 float phaseFun(in float theta) {
     float g = 0.3;
     float phase = (1.0-pow(g, 2.0)) / pow(1.0 + pow(g, 2.0) - 2.0*g*cos(theta+PI/2.0), 3.0/2.0);
     return phase;
 }
 
+// Raycast back to light source
 float lightMarch(in vec3 rayPosition) {
-    vec3 lightDir = lightPos-rayPosition;
-    lightDir = lightDir / length(lightDir);
-
-    int numSamples = 30;
+    vec3 lightDir = normalize(lightPos-rayPosition);
 
     float subDen = 0.0;
 
     vec3 position = rayPosition;
 
-    for (int j=0; j<numSamples; j++) {
-        position += lightDir*stepSize;
-        subDen += texture(position)*stepSize*random(rayPosition.xy);
+    for (int j=0; j<maxLightSamples; j++) {
+        position += lightDir*stepSize*randomStepModifier(rayPosition.xy);
+        subDen += texture(position)*stepSize*randomStepModifier(rayPosition.xy);
     }
 
     float transmittance = exp(-subDen);
     return transmittance;
 }
 
+// Ray March/cast to/into fog
 vec4 ray_march(in vec3 ro, in vec3 rd)
 {
-    int maxIterations = 60;
     vec3 rayPosition = ro;
 
     float transmittance = 1.0;
     float lightEnergy = 0.0;
+
+    // Used to draw light location
     float lampIntensity = 0.0;
 
     bool eneteredCube = false;
@@ -237,7 +209,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             }
 
             // Update position with random step to avoid banding
-            rayPosition += rd*step*random(rd.xy);
+            rayPosition += rd*step*randomStepModifier(rd.xy);
 
             float density = texture(rayPosition);
 
@@ -250,7 +222,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             if (density > 0.0) {
                 float lightTransmittance = lightMarch(rayPosition);
                 
-                lightEnergy += 2.0*density * stepSize * transmittance * lightTransmittance * phase;
+                lightEnergy += lightFactor * density * stepSize * transmittance * lightTransmittance * phase;
                 transmittance *= exp(-density * stepSize);
             } else {
                 if (angleBetween(rd, lightPos) < 0.01) {

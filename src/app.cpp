@@ -19,6 +19,43 @@ GLfloat g_vertex_buffer_data[12] = {
             0.5f, 0.5f, 0.0f,
         };
 
+std::vector<glm::vec3> boxVerts {
+        glm::vec3(-1, -1,  1), //0
+        glm::vec3( 1, -1,  1), //1
+        glm::vec3(-1,  1,  1), //2
+        glm::vec3( 1,  1,  1), //3
+        glm::vec3(-1, -1, -1), //4
+        glm::vec3( 1, -1, -1), //5
+        glm::vec3(-1,  1, -1), //6
+        glm::vec3( 1,  1, -1)  //7
+    };
+
+std::vector<GLuint> boxInds {
+        //Top
+        2, 6, 7,
+        2, 3, 7,
+
+        //Bottom
+        0, 4, 5,
+        0, 1, 5,
+
+        //Left
+        0, 2, 6,
+        0, 4, 6,
+
+        //Right
+        1, 3, 7,
+        1, 5, 7,
+
+        //Front
+        0, 2, 3,
+        0, 1, 3,
+
+        //Back
+        4, 6, 7,
+        4, 5, 7
+    };
+
 app::App::App()
 {
 }
@@ -111,6 +148,10 @@ void app::App::init()
     const char* rayMarchFrag = "../shaders/rayMarchFrag.glsl";
     const char* rayMarchVert = "../shaders/rayMarchVert.glsl";
 
+
+    const char* basicVert = "../shaders/basicVert.glsl";
+    const char* basicFrag = "../shaders/basicFrag.glsl";
+
     glfwMakeContextCurrent(w.getContext());
     glfwSetCursorPosCallback(w.getContext(), cursorPosCallback);
     glfwSetInputMode(w.getContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -120,6 +161,7 @@ void app::App::init()
     //fancyShader.init(statcVert);
     quadShader.init(quadVert, quadFrag);
     rayShader.init(rayMarchVert, rayMarchFrag);
+    basicShader.init(basicVert, basicFrag);
 
     simulation::Position origin(0.0, 0.0, -1.0);//utils::genRandomPoints(1).at(0);
     track::Track initial_track(origin);
@@ -127,15 +169,20 @@ void app::App::init()
     std::vector<simulation::Position> track_verts = initial_track.get_vertices();
 
     track_sim.init(&fancyShader, &rayShader, track_verts, 1);
-    //sim.init(&fancyShader, &rayShader, track_verts);
+    sim.init(&fancyShader, &quadShader, track_verts, 1);
+
+    boundingBox.init(&basicShader, boxVerts, boxInds);
+    boundingBox.drawType = GL_LINES;
+
+    glEnable(GL_DEPTH_TEST);
     //ray.init(&fancyShader, &rayShader, track_verts);
 }
 
 void app::App::mainLoop()
 {
 
-    //sim.update(&w);
-    track_sim.update(&w);
+    sim.update(&w);
+    // track_sim.update(&w);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -144,7 +191,7 @@ void app::App::mainLoop()
     // Move camera
     if (fb != 0) {
         printf("w %i\n", fb);
-        cam.move(0.0f, 0.0f, -fb*motionSpeed*dt);
+        cam.move(0.0f, 0.0f, fb*motionSpeed*dt);
     }
     if (lr != 0) {
         cam.move(lr*motionSpeed*dt, 0.0f, 0.0f);
@@ -155,33 +202,38 @@ void app::App::mainLoop()
 
     // Rotate Camera
     if (deltaX != 0.0 || deltaY != 0.0) {
-        cam.rotate(-deltaX, -deltaY);
+        cam.rotate(deltaX, deltaY);
         deltaX = 0;
         deltaY = 0;
     }
 
     // Compute the current view and perspective matrices
     float aspectRatio = w.getAspect();
-    glm::mat4 viewMat = glm::inverse(cam.getViewMat());
+    glm::mat4 viewMat = cam.getViewMat();
+    glm::mat4 inverseViewMat = glm::inverse(cam.getViewMat());
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
 
     time += 0.001;
     track_sim.mCompShader->setUniform("time", time);
-    track_sim.mRenderShader->setUniformVec("view", viewMat);
-    track_sim.mRenderShader->setUniformVec("projection", projection);
+    // track_sim.mRenderShader->setUniformVec("view", inverseViewMat);
+    sim.mRenderShader->setUniformVec("view", viewMat);
+    // track_sim.mRenderShader->setUniformVec("projection", projection);
+    sim.mRenderShader->setUniformVec("projection", projection);
     // Need to do this with a callback
     track_sim.mRenderShader->setUniform("aspect", aspectRatio);
-    // track_sim.mRenderShader->setUniformVec("position", cam.camPos);
+
+    basicShader.setUniformVec("view", viewMat);
+    basicShader.setUniformVec("projection", projection);
 
     glm::vec3 lightPos = glm::vec3(2.0, 0.0, 0.0);
     glm::vec3 lightColour = glm::vec3(1.0, 1.0, 1.0);
-    track_sim.mRenderShader->setUniformVec("lightPos", lightPos);
-    track_sim.mRenderShader->setUniformVec("lightColour", lightColour);
-    track_sim.mRenderShader->setUniform("time", time);
+    // track_sim.mRenderShader->setUniformVec("lightPos", lightPos);
+    // track_sim.mRenderShader->setUniformVec("lightColour", lightColour);
 
-    //sim.draw(&w);
-    track_sim.draw(&w);
+    sim.draw(&w);
+    // track_sim.draw(&w);
     //ray.draw(&w);
+    boundingBox.draw(w.getContext());
 
     glfwSwapBuffers(w.getContext());
 

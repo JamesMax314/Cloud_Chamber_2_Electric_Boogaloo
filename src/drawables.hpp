@@ -38,6 +38,9 @@ namespace drawable {
         GLuint VBO; // Vertices
         GLuint EBO; // Indices
         GLuint NBO; // Normals
+
+        GLuint drawType = GL_TRIANGLES;
+
         glm::mat4 model;
         glm::mat3 normalModel;
 

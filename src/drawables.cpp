@@ -67,10 +67,12 @@ void drawable::Drawable::draw(GLFWwindow* w)
 
     // Bind model buffers and draw to screen
     glBindVertexArray(VAO);
-    // glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    // glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 4);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glDrawElements(drawType, mIndices.size(), GL_UNSIGNED_INT, 0);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    // glDrawArrays(GL_TRIANGLES, 0, 4);
     // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
