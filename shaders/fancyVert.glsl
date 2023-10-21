@@ -212,11 +212,11 @@ vec3 p3 = vec3(0.0, 0.0, 0.0);
 
 float fbm(vec3 pos, float alpha, out vec3 grad)
 {
-    int N = 4;
+    int N = 6;
 
     vec3 p = vec3(0.0);
     float w = 1.0; //Weight of noise
-    float s = 4.0; //Scale of noise
+    float s = 1.0; //Scale of noise
     float n = 0.0; //Output noise value
 
     vec3 g;
@@ -226,7 +226,7 @@ float fbm(vec3 pos, float alpha, out vec3 grad)
         n += w * psrdnoise(s*pos + 0.13*gsum, p, s*alpha, g);
         gsum += w*g;
         s *= 2.0;
-        w *= 0.5; //pow(s,-5.0/3.0);
+        w *= pow(s,-1.0/3.0);
     }
 
     grad = gsum;
@@ -266,7 +266,7 @@ void main()
     float alpha = 0.1*time;
     vec3 velocity = curlnoise(Position, alpha);
     //velocity = normalise(velocity);
-    vec3 drift = vec3(0.0, 0.0, -0.0001);
+    vec3 drift = vec3(0.0, 0.0, 0.0008);
     vPosition = Position + 0.0001*velocity + drift;
     
     if(is_track_vert==0){

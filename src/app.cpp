@@ -121,7 +121,7 @@ void app::App::init()
     quadShader.init(quadVert, quadFrag);
     rayShader.init(rayMarchVert, rayMarchFrag);
 
-    simulation::Position origin(0.0, 0.0, 0.0);//utils::genRandomPoints(1).at(0);
+    simulation::Position origin(0.0, 0.0, -1.0);//utils::genRandomPoints(1).at(0);
     track::Track initial_track(origin);
     
     std::vector<simulation::Position> track_verts = initial_track.get_vertices();
