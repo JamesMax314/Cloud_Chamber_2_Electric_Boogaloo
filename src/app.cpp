@@ -90,7 +90,7 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (action == GLFW_PRESS) {
         keys[key] = true;
-        printf("Keys: %i\n", key);
+        // printf("Keys: %i\n", key);
         forward = 1;
         if (key == GLFW_KEY_W) {
             fb = 1;
@@ -174,7 +174,7 @@ void app::App::init()
     sim.init(&fancyShader, &quadShader, track_verts, 1);
 
     boundingBox.init(&basicShader, boxVerts, boxInds);
-    // boundingBox.drawType = GL_LINES;
+    boundingBox.drawType = GL_LINES;
 
     glEnable(GL_DEPTH_TEST);
     initBuffers();
@@ -265,7 +265,6 @@ void app::App::mainLoop()
 
     // Move camera
     if (fb != 0) {
-        printf("w %i\n", fb);
         cam.move(0.0f, 0.0f, fb*motionSpeed*dt);
     }
     if (lr != 0) {
@@ -286,8 +285,8 @@ void app::App::mainLoop()
     float aspectRatio = w.getAspect();
     glm::mat4 viewMat = cam.getViewMat();
     glm::mat4 inverseViewMat = glm::inverse(cam.getViewMat());
-    float nearClip = 0.1f;
-    float farClip = 10.0f;
+    float nearClip = 0.01f;
+    float farClip = 5.0f;
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, nearClip, farClip);
 
     time += 0.001;
@@ -311,7 +310,7 @@ void app::App::mainLoop()
 
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    // sim.draw(&w);
+    sim.draw(&w);
     boundingBox.draw(w.getContext());
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
