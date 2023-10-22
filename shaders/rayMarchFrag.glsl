@@ -256,7 +256,8 @@ void main()
     vec3 p = fragPos.xyz;
     p.z = time*p.z*10.0;
 
-    FragColor = texture(framebufferColorTexture, (fragPos.xy + vec2(1.0))/2.0);
+    FragColor = vec4(vec3(texture(framebufferDepthTexture, (fragPos.xy + vec2(1.0))/2.0).x), 1.0);
+    // FragColor = texture(framebufferColorTexture, (fragPos.xy + vec2(1.0))/2.0);
     // FragColor = vec4(1.0);
     // FragColor = shaded_color;
     // FragColor = texture(texture3D, p);

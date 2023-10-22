@@ -213,12 +213,12 @@ void app::App::initBuffers()
     // Setup depth buffer
     glBindTexture(GL_TEXTURE_2D, depthOut);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, w.width, w.height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, w.width, w.height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
     // Attach the depth texture to the FBO
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthOut, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthOut, 0);
     
     // Check configuration
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
