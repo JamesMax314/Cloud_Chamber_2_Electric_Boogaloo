@@ -150,7 +150,6 @@ void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuin
     
     //  Draw 1 quad (4 vertices) for every position
     glVertexAttribDivisor(0, 0);
-    glBindVertexArray(0);
 
     // Bind and populate Texture
     glActiveTexture(GL_TEXTURE0); // Texture unit 0
@@ -160,16 +159,11 @@ void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuin
 
     glActiveTexture(GL_TEXTURE1); // Texture unit 1
     glBindTexture(GL_TEXTURE_2D, backgroundTexture);
-    float* pixels = new float[4*w->width*w->height];
-    for (int i=0; i<4*w->width*w->height;i++) {
-        pixels[i] = 1;
-    }
-    // glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w->width, w->height, GL_RGBA, GL_FL, pixels);
     glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "framebufferColorTexture"), 1);
 
-    // glActiveTexture(GL_TEXTURE2); // Texture unit 1
-    // glBindTexture(GL_TEXTURE_2D, backgroundDepth);
-    // glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "framebufferDepthTexture"), 2);
+    glActiveTexture(GL_TEXTURE2); // Texture unit 2
+    glBindTexture(GL_TEXTURE_2D, backgroundDepth);
+    glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "framebufferDepthTexture"), 2);
 
     // Set the max and min corners
     mRenderShader->setUniformVec("minPos", minCorner);
@@ -179,4 +173,5 @@ void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuin
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
 
+    glBindVertexArray(0);
 }
