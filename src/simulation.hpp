@@ -81,6 +81,7 @@ namespace simulation {
 
         std::vector<glm::vec3> mStartPos;
         std::vector<unsigned int> mIndices;
+        std::vector<glm::vec3> feedbackVec;
 
         // Intagers that are used to reference buffer arrays in gpu ram
         GLuint VAO;
@@ -96,6 +97,7 @@ namespace simulation {
         void update(window::Window* w);
         void fillBuffers();
         void loadUniforms();
+        void updateFeedbackVec();
         void draw(window::Window* w);
     };
 }

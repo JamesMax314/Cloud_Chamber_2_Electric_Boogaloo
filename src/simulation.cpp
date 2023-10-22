@@ -19,6 +19,8 @@ void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderS
     glGenBuffers(1, &ParticleBufferB);
     glGenBuffers(1, &billboard_vertex_buffer);
     fillBuffers();
+
+    feedbackVec = std::vector<glm::vec3>(startPos.size());
 }
 
 simulation::Sim::Sim(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
@@ -93,6 +95,18 @@ void simulation::Sim::fillBuffers()
 
 void simulation::Sim::loadUniforms()
 {
+}
+
+void simulation::Sim::updateFeedbackVec()
+{
+    // Get particle positions
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
+    glGetBufferSubData(GL_ARRAY_BUFFER, 0, (feedbackVec.size()-1)*sizeof(glm::vec3), feedbackVec.data());
+    // printf("%f %f %f\n", feedbackVec[0][0], feedbackVec[0][1], feedbackVec[0][2]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void simulation::Sim::draw(window::Window* w)

@@ -15,13 +15,23 @@
 
 namespace rayMarch {
 
-    class RayMarch: public simulation::Sim {
+    class RayMarch {
         public:
+
+        const GLfloat g_vertex_buffer_data[12] = {
+            -1.0f, -1.0f, 0.0f,
+            1.0f, -1.0f, 0.0f,
+            -1.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 0.0f,
+        };
 
         std::vector<unsigned int> mIndices;
 
         // Intagers that are used to reference buffer arrays in gpu ram
-        GLuint texture_buffer;
+        GLuint VAO, texture_buffer, billboard_vertex_buffer;
+
+        shaders::Shader* mCompShader;
+        shaders::Shader* mRenderShader;
 
         glm::vec3 minCorner;
         glm::vec3 maxCorner;
@@ -29,7 +39,6 @@ namespace rayMarch {
         int numParticlesPerTrack = 10000;
         int textureDim = 64;
         float maxTexVal = 20;
-        std::vector<glm::vec3> feedbackVec;
         float* texture3D;
 
         RayMarch();
@@ -37,7 +46,7 @@ namespace rayMarch {
         RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
         void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
 
-        void update(window::Window* w);
+        void update(std::vector<glm::vec3> &feedbackVec);
         void fillBuffers();
         void loadUniforms();
         void draw(window::Window* w);

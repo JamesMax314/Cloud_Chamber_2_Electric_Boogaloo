@@ -257,7 +257,6 @@ void app::App::mainLoop()
 {
 
     sim.update(&w);
-    track_sim.update(&w);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -320,6 +319,8 @@ void app::App::mainLoop()
     //ray.draw(&w);
     // boundingBox.draw(w.getContext());
 
+    sim.updateFeedbackVec();
+    track_sim.update(sim.feedbackVec);
     track_sim.draw(&w, textureOut, depthOut);
 
     // track_sim.draw(&w);

@@ -10,8 +10,12 @@ rayMarch::RayMarch::RayMarch(shaders::Shader *shader)
 
 void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
 {
-    simulation::Sim::init(compShader, renderShader, startPos, isTrack);
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &billboard_vertex_buffer);
     glGenTextures(1, &texture_buffer);
+
+    mCompShader = compShader;
+    mRenderShader = renderShader;
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
@@ -20,7 +24,6 @@ void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *rend
 
     fillBuffers();
 
-    feedbackVec = std::vector<glm::vec3>(numParticlesPerTrack);
     texture3D = new float[pow(textureDim, 3)];//std::vector<std::vector<std::vector<float>>>(textureDim, std::vector<std::vector<float>>(textureDim, std::vector<float>(textureDim, 0)));
 }
 
@@ -29,18 +32,12 @@ rayMarch::RayMarch::RayMarch(shaders::Shader *compShader, shaders::Shader *rende
     init(compShader, renderShader, startPos, isTrack);
 }
 
-void rayMarch::RayMarch::update(window::Window* w)
+void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
 {
-    simulation::Sim::update(w);
+    // should pass by ref
 
-    // Get particle positions
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
-    glGetBufferSubData(GL_ARRAY_BUFFER, 0, (feedbackVec.size()-1)*sizeof(glm::vec3), feedbackVec.data());
     // printf("%f %f %f\n", feedbackVec[0][0], feedbackVec[0][1], feedbackVec[0][2]);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 
     minCorner = feedbackVec[0];
     maxCorner = feedbackVec[0];
