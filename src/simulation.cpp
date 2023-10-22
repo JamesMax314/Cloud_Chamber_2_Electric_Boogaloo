@@ -15,8 +15,6 @@ void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderS
     mRenderShader = renderShader;
     mStartPos = startPos;
     glGenVertexArrays(1, &VAO);
-    glGenFramebuffers(1, &FBO);
-    glGenTextures(1, &textureOut);
     glGenBuffers(1, &ParticleBufferA);
     glGenBuffers(1, &ParticleBufferB);
     glGenBuffers(1, &billboard_vertex_buffer);
@@ -91,22 +89,6 @@ void simulation::Sim::fillBuffers()
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-    // Setup FBO
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO); 
-
-    // Setup texture
-    glBindTexture(GL_TEXTURE_2D, textureOut);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureOut, 0);
-
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	    std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0); 
 }
 
 void simulation::Sim::loadUniforms()
@@ -141,49 +123,5 @@ void simulation::Sim::draw(window::Window* w)
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 36, mStartPos.size());
 
-    glBindVertexArray(0);
-}
-
-void simulation::Sim::drawToBuffer(window::Window *w)
-{
-    // Initialise frame buffer object
-    // Bind FBO
-    // Gen texture
-    // bind texture
-    // glTexImage2D to specify we want a colour and depth buffer texture
-    // Specify interpolation
-    // Unbind texture
-    // glFramebufferTexture2D to bind texture to FBO
-    // Check FBO complete 
-    // Unbind FBO
-
-    glfwMakeContextCurrent(w->getContext());
-    mRenderShader->activate();
-
-    glBindVertexArray(VAO);
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO); 
-
-    // Bind quad to render
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    // Bind positions
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    // float feedbackVec[sizeof(simulation::Position)*mStartPos.size()];
-    // glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(feedbackVec), feedbackVec);
-
-    // printf("%f %f %f %f %f %f\n", feedbackVec[0], feedbackVec[1], feedbackVec[2], feedbackVec[3], feedbackVec[4], feedbackVec[5]);
-    
-    //  Draw 1 quad (4 vertices) for every position
-    glVertexAttribDivisor(0, 0);
-    glVertexAttribDivisor(1, 1);
-
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 36, mStartPos.size());
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0); 
     glBindVertexArray(0);
 }

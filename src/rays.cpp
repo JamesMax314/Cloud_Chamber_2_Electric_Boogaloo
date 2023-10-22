@@ -135,7 +135,7 @@ void rayMarch::RayMarch::draw(window::Window* w)
     glBindVertexArray(0);
 }
 
-void rayMarch::RayMarch::draw(window::Window *w, GLuint inFBO, GLuint inDepthBuffer)
+void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
     glfwMakeContextCurrent(w->getContext());
 
@@ -158,10 +158,18 @@ void rayMarch::RayMarch::draw(window::Window *w, GLuint inFBO, GLuint inDepthBuf
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, texture3D);
     glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "texture3D"), 0); // Assign 3d texture to texture unit 0
 
-    glActiveTexture(GL_TEXTURE0); // Texture unit 0
-    glBindTexture(GL_TEXTURE_2D, inFBO);
+    glActiveTexture(GL_TEXTURE1); // Texture unit 1
+    glBindTexture(GL_TEXTURE_2D, backgroundTexture);
+    float* pixels = new float[4*w->width*w->height];
+    for (int i=0; i<4*w->width*w->height;i++) {
+        pixels[i] = 1;
+    }
+    // glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w->width, w->height, GL_RGBA, GL_FL, pixels);
+    glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "framebufferColorTexture"), 1);
 
-
+    // glActiveTexture(GL_TEXTURE2); // Texture unit 1
+    // glBindTexture(GL_TEXTURE_2D, backgroundDepth);
+    // glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "framebufferDepthTexture"), 2);
 
     // Set the max and min corners
     mRenderShader->setUniformVec("minPos", minCorner);

@@ -41,6 +41,6 @@ namespace rayMarch {
         void fillBuffers();
         void loadUniforms();
         void draw(window::Window* w);
-        void draw(window::Window* w, GLuint inFBO, GLuint inDepthBuffer);
+        void draw(window::Window* w, GLuint backgroundTexture, GLuint backgroundDepth);
     };
 }

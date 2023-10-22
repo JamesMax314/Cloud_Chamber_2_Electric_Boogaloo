@@ -30,10 +30,10 @@ namespace simulation {
         public:
 
         const GLfloat g_vertex_buffer_data[12] = {
-            -1.0f, -1.0f, 1.0f,
-            1.0f, -1.0f, 1.0f,
-            -1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f,
+            1.0f, -1.0f, 0.0f,
+            -1.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 0.0f,
         };
 
         const GLfloat g_vertex_buffer_data_cube[112] = {
@@ -84,7 +84,7 @@ namespace simulation {
 
         // Intagers that are used to reference buffer arrays in gpu ram
         GLuint VAO;
-        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer, FBO, textureOut;
+        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer;
 	
 	    int isTrack;
 
@@ -97,6 +97,5 @@ namespace simulation {
         void fillBuffers();
         void loadUniforms();
         void draw(window::Window* w);
-        void drawToBuffer(window::Window* w);
     };
 }

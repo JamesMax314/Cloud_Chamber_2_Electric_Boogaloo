@@ -15,7 +15,7 @@ void main()
 {
     aPos = vec4(quad, 1.0);
     gl_Position = aPos;
-    aPos.x = aspect*aPos.x;
+    aPos.x = aPos.x;
     // vec4 aPos4 = view*vec4(aPos, 1.0);
 
     fragPos = aPos;//particlePos;

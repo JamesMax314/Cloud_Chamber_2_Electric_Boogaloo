@@ -133,6 +133,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
 }
 
+
+
 void app::App::init()
 {
     const char* vertexShaderFile = "../shaders/triangleVert.glsl";
@@ -172,10 +174,83 @@ void app::App::init()
     sim.init(&fancyShader, &quadShader, track_verts, 1);
 
     boundingBox.init(&basicShader, boxVerts, boxInds);
-    boundingBox.drawType = GL_LINES;
+    // boundingBox.drawType = GL_LINES;
 
     glEnable(GL_DEPTH_TEST);
-    //ray.init(&fancyShader, &rayShader, track_verts);
+    initBuffers();
+    // ray.init(&fancyShader, &rayShader, track_verts);
+}
+
+void app::App::initBuffers()
+{
+    // Initialise frame buffer object
+    // Bind FBO
+    // Gen texture
+    // bind texture
+    // glTexImage2D to specify we want a colour and depth buffer texture
+    // Specify interpolation
+    // Unbind texture
+    // glFramebufferTexture2D to bind texture to FBO
+    // Check FBO complete 
+    // Unbind FBO
+
+    glGenFramebuffers(1, &FBO);
+    glGenTextures(1, &textureOut);
+    glGenTextures(1, &depthOut);
+
+    // Setup FBO
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
+    // Setup texture
+    glBindTexture(GL_TEXTURE_2D, textureOut);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w.width, w.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureOut, 0);
+
+    // Setup depth buffer
+    glBindTexture(GL_TEXTURE_2D, depthOut);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, w.width, w.height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    // Attach the depth texture to the FBO
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthOut, 0);
+    
+    // Check configuration
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+	    std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+        switch (status) {
+            case GL_FRAMEBUFFER_UNDEFINED:
+                printf("GL_FRAMEBUFFER_UNDEFINED\n");
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                printf("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n");
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                printf("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT\n");
+                break;
+            case GL_FRAMEBUFFER_UNSUPPORTED:
+                printf("GL_FRAMEBUFFER_UNSUPPORTED\n");
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+                printf("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFE\n");
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+                printf("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER\n");
+                break;
+            // Handle other possible status codes as needed
+            default:
+                printf("Unknown Error\n");
+                break;
+        }
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); 
 }
 
 void app::App::mainLoop()
@@ -215,9 +290,9 @@ void app::App::mainLoop()
 
     time += 0.001;
     track_sim.mCompShader->setUniform("time", time);
-    // track_sim.mRenderShader->setUniformVec("view", inverseViewMat);
+    track_sim.mRenderShader->setUniformVec("view", inverseViewMat);
     sim.mRenderShader->setUniformVec("view", viewMat);
-    // track_sim.mRenderShader->setUniformVec("projection", projection);
+    track_sim.mRenderShader->setUniformVec("projection", projection);
     sim.mRenderShader->setUniformVec("projection", projection);
     // Need to do this with a callback
     track_sim.mRenderShader->setUniform("aspect", aspectRatio);
@@ -227,13 +302,22 @@ void app::App::mainLoop()
 
     glm::vec3 lightPos = glm::vec3(2.0, 0.0, 0.0);
     glm::vec3 lightColour = glm::vec3(1.0, 1.0, 1.0);
-    // track_sim.mRenderShader->setUniformVec("lightPos", lightPos);
-    // track_sim.mRenderShader->setUniformVec("lightColour", lightColour);
+    track_sim.mRenderShader->setUniformVec("lightPos", lightPos);
+    track_sim.mRenderShader->setUniformVec("lightColour", lightColour);
 
-    sim.draw(&w);
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    // sim.draw(&w);
+    boundingBox.draw(w.getContext());
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     // track_sim.draw(&w);
     //ray.draw(&w);
-    boundingBox.draw(w.getContext());
+    // boundingBox.draw(w.getContext());
+
+    track_sim.draw(&w, textureOut, depthOut);
+
+    // track_sim.draw(&w);
 
     glfwSwapBuffers(w.getContext());
 
@@ -243,5 +327,11 @@ void app::App::mainLoop()
         EM_ASM(document.getElementById("FPSVal").innerHTML = $0;, (int)(10/(now-t)));
         t = now;
     }
+
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        printf("Error %u \n", error);
+    }
+
     drawFPS++;
 }

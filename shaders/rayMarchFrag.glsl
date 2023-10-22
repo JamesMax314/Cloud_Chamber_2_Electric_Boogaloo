@@ -252,11 +252,13 @@ void main()
     float modulus = length(rd);
     rd = rd/modulus;
 
-    vec4 shaded_color = ray_march(ro.xyz, rd.xyz);
+    // vec4 shaded_color = ray_march(ro.xyz, rd.xyz);
     vec3 p = fragPos.xyz;
     p.z = time*p.z*10.0;
 
-    FragColor = shaded_color;
+    FragColor = texture(framebufferColorTexture, (fragPos.xy + vec2(1.0))/2.0);
+    // FragColor = vec4(1.0);
+    // FragColor = shaded_color;
     // FragColor = texture(texture3D, p);
     // FragColor = vec4(abs(maxPos), 1.0);
 }

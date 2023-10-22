@@ -29,7 +29,7 @@ namespace app {
     class App {
         public:
         window::Window w;
-        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer;
+        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer, FBO, textureOut, depthOut;
         const int ParticleCount = 4;
         GLuint vao;
         drawable::Drawable square;
@@ -63,6 +63,7 @@ namespace app {
         App();
 
         void init();
+        void initBuffers();
         void mainLoop();
 
 
