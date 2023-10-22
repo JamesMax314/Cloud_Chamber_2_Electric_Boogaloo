@@ -286,7 +286,9 @@ void app::App::mainLoop()
     float aspectRatio = w.getAspect();
     glm::mat4 viewMat = cam.getViewMat();
     glm::mat4 inverseViewMat = glm::inverse(cam.getViewMat());
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
+    float nearClip = 0.1f;
+    float farClip = 10.0f;
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, nearClip, farClip);
 
     time += 0.001;
     track_sim.mCompShader->setUniform("time", time);
@@ -296,6 +298,8 @@ void app::App::mainLoop()
     sim.mRenderShader->setUniformVec("projection", projection);
     // Need to do this with a callback
     track_sim.mRenderShader->setUniform("aspect", aspectRatio);
+    track_sim.mRenderShader->setUniform("nearClip", nearClip);
+    track_sim.mRenderShader->setUniform("farClip", farClip);
 
     basicShader.setUniformVec("view", viewMat);
     basicShader.setUniformVec("projection", projection);

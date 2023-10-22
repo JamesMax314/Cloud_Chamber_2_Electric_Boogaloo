@@ -10,6 +10,8 @@ uniform sampler2D framebufferDepthTexture;  // The depth texture
 
 uniform float time;
 uniform float texDim;
+uniform float nearClip;
+uniform float farClip;
 
 uniform vec3 lightPos;
 uniform vec3 lightColour;
@@ -30,6 +32,12 @@ float lightFactor = 5.0;
 vec3 boundingCubeMin = -1.0*vec3(1.0);
 vec3 boundingCubeMax = vec3(1.0);
 
+
+float depthToDistance(float depth) {
+    float ndcDepth = 2.0 * depth - 1.0;
+    float viewSpaceDepth = (2.0 * nearClip * farClip) / (farClip + nearClip - ndcDepth * (farClip - nearClip));
+    return viewSpaceDepth;
+}
 
 // Used to determine whether a ray should be calculated
 bool rayIntersectsCube(vec3 rayOrigin, vec3 rayDirection, vec3 cubeMin, vec3 cubeMax) {
@@ -256,8 +264,9 @@ void main()
     vec3 p = fragPos.xyz;
     p.z = time*p.z*10.0;
 
-    FragColor = vec4(vec3(texture(framebufferDepthTexture, (fragPos.xy + vec2(1.0))/2.0).x), 1.0);
-    // FragColor = texture(framebufferColorTexture, (fragPos.xy + vec2(1.0))/2.0);
+    float depthCol = texture(framebufferDepthTexture, (fragPos.xy + vec2(1.0))/2.0).x;
+    vec4 pixCol = texture(framebufferColorTexture, (fragPos.xy + vec2(1.0))/2.0);
+    FragColor = vec4(vec3(depthToDistance(depthCol)/farClip), 1.0);
     // FragColor = vec4(1.0);
     // FragColor = shaded_color;
     // FragColor = texture(texture3D, p);
