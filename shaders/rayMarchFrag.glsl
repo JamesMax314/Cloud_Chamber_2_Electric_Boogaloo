@@ -2,6 +2,7 @@
 precision mediump float;
 
 in vec4 fragPos;
+in vec2 texCoords;
 out vec4 FragColor;
 
 uniform mediump sampler3D texture3D; // Cloud texture
@@ -12,6 +13,7 @@ uniform float time;
 uniform float texDim;
 uniform float nearClip;
 uniform float farClip;
+uniform float fovRad;
 
 uniform vec3 lightPos;
 uniform vec3 lightColour;
@@ -37,6 +39,10 @@ float depthToDistance(float depth) {
     float ndcDepth = 2.0 * depth - 1.0;
     float viewSpaceDepth = (2.0 * nearClip * farClip) / (farClip + nearClip - ndcDepth * (farClip - nearClip));
     return viewSpaceDepth;
+}
+
+float getCamDepth(float fovRad) {
+    return 1.0/tan(fovRad/2.0);
 }
 
 // Used to determine whether a ray should be calculated
@@ -120,22 +126,43 @@ float sdfCuboid(vec3 p, vec3 minCorner, vec3 maxCorner)
     return d;
 }
 
+float distance_from_sphere(in vec3 p, in vec3 c, float r)
+{
+	return length(p - c) - r;
+}
+
+float sphereTexture(in vec3 pos) 
+{
+    vec3 centre = vec3(0.0, 0.0, 0.0);
+    float rad = 0.5;
+    float displacement = sin(8.0 * pos.x) * sin(8.0 * pos.y) * sin(8.0 * pos.z) * 0.25;
+    float sphere_0 = distance_from_sphere(pos, vec3(0.0), rad);
+    if (sphere_0 + displacement*sin(time*10.0) < 0.0) {
+        // return snoise(pos*5.0)*2.0;
+        return 2.0;
+    }
+
+    return 0.0;
+
+    // return snoise(pos);
+}
+
 // Need to move this into a world function
 float texture(in vec3 pos) 
 {
     // return sphereTexture(pos);
-    if (sdfCuboid(pos, boundingCubeMin, boundingCubeMax) < 0.0) {
-        if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
-            vec3 stepSize = (maxPos - minPos) / (texDim-1.0); // texture dim - 1 add as uniform
-            vec3 texCoords = (pos-minPos) / (stepSize*texDim);
-            float den = texture(texture3D, texCoords).r;
-            if (den < threshold) {
-                den = 0.0;
-            }
-            return den*0.1;
-        }
-        return 0.0;
-    }
+    // if (sdfCuboid(pos, boundingCubeMin, boundingCubeMax) < 0.0) {
+    //     if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
+    //         vec3 stepSize = (maxPos - minPos) / (texDim-1.0); // texture dim - 1 add as uniform
+    //         vec3 texCoords = (pos-minPos) / (stepSize*texDim);
+    //         float den = texture(texture3D, texCoords).r;
+    //         if (den < threshold) {
+    //             den = 0.0;
+    //         }
+    //         return den*0.1;
+    //     }
+    //     return 0.0;
+    // }
     return 0.0;
 }
 
@@ -242,10 +269,10 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
                 break;
             }
         }
-        vec4 pixCol = texture(framebufferColorTexture, (fragPos.xy + vec2(1.0))/2.0);
-        backGroundCol = pixCol.xyz; //skyBlue;
+        vec4 pixCol = texture(framebufferColorTexture, texCoords);
+        backGroundCol = pixCol.xyz;
     } else {
-        backGroundCol = vec3(0.0, 0.0, 0.0);
+        backGroundCol = vec3(0.6, 0.2, 0.4);
     }
 
     vec3 cloudCol = lightEnergy * lightColour;
@@ -257,7 +284,9 @@ void main()
 {
     vec4 camera_position = view*vec4(0.0, 0.0, 0.0, 1.0);
     vec4 ro = camera_position;
-    vec4 rd = view*fragPos - camera_position;
+    vec4 mFragPos = fragPos;
+    mFragPos.z = -getCamDepth(fovRad);
+    vec3 rd = normalize((view*mFragPos - camera_position).xyz);
     float modulus = length(rd);
     rd = rd/modulus;
 
@@ -265,9 +294,11 @@ void main()
     vec3 p = fragPos.xyz;
     p.z = time*p.z*10.0;
 
+    // FragColor = abs(rd);
+
     // float depthCol = texture(framebufferDepthTexture, (fragPos.xy + vec2(1.0))/2.0).x;
     // vec4 pixCol = texture(framebufferColorTexture, (fragPos.xy + vec2(1.0))/2.0);
-    // FragColor = vec4(vec3(depthToDistance(depthCol)/farClip), 1.0);
+    // FragColor = texture(framebufferColorTexture, texCoords);
     // FragColor = vec4(1.0);
     FragColor = shaded_color;
     // FragColor = texture(texture3D, p);
