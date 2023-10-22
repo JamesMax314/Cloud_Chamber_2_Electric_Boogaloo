@@ -151,18 +151,18 @@ float sphereTexture(in vec3 pos)
 float texture(in vec3 pos) 
 {
     // return sphereTexture(pos);
-    // if (sdfCuboid(pos, boundingCubeMin, boundingCubeMax) < 0.0) {
-    //     if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
-    //         vec3 stepSize = (maxPos - minPos) / (texDim-1.0); // texture dim - 1 add as uniform
-    //         vec3 texCoords = (pos-minPos) / (stepSize*texDim);
-    //         float den = texture(texture3D, texCoords).r;
-    //         if (den < threshold) {
-    //             den = 0.0;
-    //         }
-    //         return den*0.1;
-    //     }
-    //     return 0.0;
-    // }
+    if (sdfCuboid(pos, boundingCubeMin, boundingCubeMax) < 0.0) {
+        if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
+            vec3 stepSize = (maxPos - minPos) / (texDim-1.0); // texture dim - 1 add as uniform
+            vec3 texCoords = (pos-minPos) / (stepSize*texDim);
+            float den = texture(texture3D, texCoords).r;
+            if (den < threshold) {
+                den = 0.0;
+            }
+            return den*0.1;
+        }
+        return 0.0;
+    }
     return 0.0;
 }
 
