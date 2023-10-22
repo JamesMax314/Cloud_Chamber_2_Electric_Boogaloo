@@ -257,7 +257,7 @@ void app::App::mainLoop()
 {
 
     sim.update(&w);
-    // track_sim.update(&w);
+    track_sim.update(&w);
 
     glClear(GL_COLOR_BUFFER_BIT);
 

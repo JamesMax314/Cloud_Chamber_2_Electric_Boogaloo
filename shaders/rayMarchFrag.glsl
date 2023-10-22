@@ -242,7 +242,8 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
                 break;
             }
         }
-        backGroundCol = vec3(0.0, 0.0, 0.0); //skyBlue;
+        vec4 pixCol = texture(framebufferColorTexture, (fragPos.xy + vec2(1.0))/2.0);
+        backGroundCol = pixCol.xyz; //skyBlue;
     } else {
         backGroundCol = vec3(0.0, 0.0, 0.0);
     }
@@ -260,15 +261,15 @@ void main()
     float modulus = length(rd);
     rd = rd/modulus;
 
-    // vec4 shaded_color = ray_march(ro.xyz, rd.xyz);
+    vec4 shaded_color = ray_march(ro.xyz, rd.xyz);
     vec3 p = fragPos.xyz;
     p.z = time*p.z*10.0;
 
-    float depthCol = texture(framebufferDepthTexture, (fragPos.xy + vec2(1.0))/2.0).x;
-    vec4 pixCol = texture(framebufferColorTexture, (fragPos.xy + vec2(1.0))/2.0);
-    FragColor = vec4(vec3(depthToDistance(depthCol)/farClip), 1.0);
+    // float depthCol = texture(framebufferDepthTexture, (fragPos.xy + vec2(1.0))/2.0).x;
+    // vec4 pixCol = texture(framebufferColorTexture, (fragPos.xy + vec2(1.0))/2.0);
+    // FragColor = vec4(vec3(depthToDistance(depthCol)/farClip), 1.0);
     // FragColor = vec4(1.0);
-    // FragColor = shaded_color;
+    FragColor = shaded_color;
     // FragColor = texture(texture3D, p);
     // FragColor = vec4(abs(maxPos), 1.0);
 }
