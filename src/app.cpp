@@ -165,10 +165,16 @@ void app::App::init()
     rayShader.init(rayMarchVert, rayMarchFrag);
     basicShader.init(basicVert, basicFrag);
 
-    simulation::Position origin(0.0, 0.0, -1.0);//utils::genRandomPoints(1).at(0);
-    track::Track initial_track(origin);
+    std::vector<simulation::Position> origin = utils::genRandomPoints(2);
     
-    std::vector<simulation::Position> track_verts = initial_track.get_vertices();
+    std::vector<track::Track> tracks;
+    std::vector<simulation::Position> track_verts;
+
+    for(int i =0; i<2; i++){
+	tracks.emplace_back(origin.at(i));
+	std::vector<glm::vec3> temp_track_verts = tracks.at(i).get_vertices();
+	track_verts.insert(track_verts.end(), temp_track_verts.begin(), temp_track_verts.end());
+    }
 
     track_sim.init(&fancyShader, &rayShader, track_verts, 1);
     sim.init(&fancyShader, &quadShader, track_verts, 1);

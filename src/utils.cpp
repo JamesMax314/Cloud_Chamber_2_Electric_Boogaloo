@@ -18,3 +18,4 @@ std::vector<glm::vec3> utils::genRandomPoints(int number)
     return points;
 }
 
+

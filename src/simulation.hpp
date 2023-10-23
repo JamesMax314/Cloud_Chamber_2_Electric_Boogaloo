@@ -87,7 +87,7 @@ namespace simulation {
         GLuint VAO;
         GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer;
 	
-	    int isTrack;
+	int isTrack;
 
         Sim();
         Sim(shaders::Shader *shader);
