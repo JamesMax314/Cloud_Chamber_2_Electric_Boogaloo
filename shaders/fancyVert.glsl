@@ -273,7 +273,7 @@ void main()
         if(abs(vPosition.x)>1.0 || abs(vPosition.y)>1.0 || abs(vPosition.z)>1.0){
     	    float randx = random(vec2(drift.y, vPosition.z));
     	    float randy = random(vec2(drift.z, vPosition.x));
-    	    vPosition = vec3(randx, randy, 1.0);
+    	    vPosition = vec3(randx, randy, 0.0);
     	}
     }
 
