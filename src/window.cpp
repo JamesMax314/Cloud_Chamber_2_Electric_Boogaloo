@@ -33,6 +33,7 @@ GLFWwindow* window::setupWindow(int width, int height) {
 
     printf("Initialising WEBGL context!\n");
 
+
     return window;
 }
 
@@ -45,8 +46,8 @@ void window::framebuffer_size_callback(GLFWwindow* window, int width, int height
 
 window::Window::Window()
 {
-    width = EM_ASM_INT({return document.getElementById("canvas").width}, 100);
-    height = EM_ASM_INT({return document.getElementById("canvas").height}, 100);
+    this->width = EM_ASM_INT({return document.getElementById("canvas").width}, 100);
+    this->height = EM_ASM_INT({return document.getElementById("canvas").height}, 100);
     win = setupWindow(width, height);
     glfwSetFramebufferSizeCallback(win, framebuffer_size_callback);
 }
