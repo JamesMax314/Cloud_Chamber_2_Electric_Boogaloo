@@ -176,8 +176,11 @@ void app::App::init()
 	track_verts.insert(track_verts.end(), temp_track_verts.begin(), temp_track_verts.end());
     }
 
-    track_sim.init(&fancyShader, &rayShader, track_verts, 1);
-    sim.init(&fancyShader, &quadShader, track_verts, 1);
+    ray_marcher.init(&fancyShader, &rayShader, track_verts, 1);
+    track_sim.init(&fancyShader, &quadShader, track_verts, 1);
+
+    std::vector<simulation::Position> bg_verts = utils::genRandomPoints(10000);
+    sim.init(&fancyShader, &quadShader, bg_verts, 0);
 
     boundingBox.init(&basicShader, boxVerts, boxInds);
     boundingBox.drawType = GL_LINES;
@@ -265,6 +268,7 @@ void app::App::mainLoop()
 {
 
     sim.update(&w);
+    track_sim.update(&w);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -298,24 +302,28 @@ void app::App::mainLoop()
     glm::mat4 projection = glm::perspective(fovRad, aspectRatio, nearClip, farClip);
 
     time += 0.001;
+    sim.mCompShader->setUniform("time", time);
     track_sim.mCompShader->setUniform("time", time);
-    track_sim.mRenderShader->setUniformVec("view", inverseViewMat);
+    ray_marcher.mCompShader->setUniform("time", time);
+    ray_marcher.mRenderShader->setUniformVec("view", inverseViewMat);
     sim.mRenderShader->setUniformVec("view", viewMat);
-    track_sim.mRenderShader->setUniformVec("projection", projection);
+    track_sim.mRenderShader->setUniformVec("view", viewMat);
+    ray_marcher.mRenderShader->setUniformVec("projection", projection);
     sim.mRenderShader->setUniformVec("projection", projection);
+    track_sim.mRenderShader->setUniformVec("projection", projection);
     // Need to do this with a callback
-    track_sim.mRenderShader->setUniform("aspect", aspectRatio);
-    track_sim.mRenderShader->setUniform("nearClip", nearClip);
-    track_sim.mRenderShader->setUniform("farClip", farClip);
-    track_sim.mRenderShader->setUniform("fovRad", fovRad);
+    ray_marcher.mRenderShader->setUniform("aspect", aspectRatio);
+    ray_marcher.mRenderShader->setUniform("nearClip", nearClip);
+    ray_marcher.mRenderShader->setUniform("farClip", farClip);
+    ray_marcher.mRenderShader->setUniform("fovRad", fovRad);
 
     basicShader.setUniformVec("view", viewMat);
     basicShader.setUniformVec("projection", projection);
 
     glm::vec3 lightPos = glm::vec3(2.0, 0.0, 0.0);
     glm::vec3 lightColour = glm::vec3(1.0, 1.0, 1.0);
-    track_sim.mRenderShader->setUniformVec("lightPos", lightPos);
-    track_sim.mRenderShader->setUniformVec("lightColour", lightColour);
+    ray_marcher.mRenderShader->setUniformVec("lightPos", lightPos);
+    ray_marcher.mRenderShader->setUniformVec("lightColour", lightColour);
 
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -323,15 +331,15 @@ void app::App::mainLoop()
     boundingBox.draw(w.getContext());
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // track_sim.draw(&w);
+    // ray_marcher.draw(&w);
     //ray.draw(&w);
     // boundingBox.draw(w.getContext());
 
-    sim.updateFeedbackVec();
-    track_sim.update(sim.feedbackVec);
-    track_sim.draw(&w, textureOut, depthOut);
+    track_sim.updateFeedbackVec();
+    ray_marcher.update(track_sim.feedbackVec);
+    ray_marcher.draw(&w, textureOut, depthOut);
 
-    // track_sim.draw(&w);
+    // ray_marcher.draw(&w);
 
     glfwSwapBuffers(w.getContext());
 
