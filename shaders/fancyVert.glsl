@@ -216,7 +216,7 @@ float fbm(vec3 pos, float alpha, out vec3 grad)
 
     vec3 p = vec3(0.0);
     float w = 1.0; //Weight of noise
-    float s = 1.0; //Scale of noise
+    float s = 2.0; //Scale of noise
     float n = 0.0; //Output noise value
 
     vec3 g;
