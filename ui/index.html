@@ -70,20 +70,36 @@
 	    
 	    <script> 
 		function selectRow(info){
-		    document.getElementById("infoText").innerText = "You clicked on row "+info+" !"
+		    document.getElementById("infoText").innerText = "You clicked on row "+info+" !";
 	    }
 
 	    </script>
 
 	</div>
 
-    <div id="floating_fps">
+    <div id="dev_console_wrapper">
+	<button type="button" class="dev_console_clickable" >Open dev console </button>
+	<div id = "dev_console">
 	    <div id="FPSBox">
 	    	<h2 id="FPSBoxHeadder">FPS</h2>
 	    	<h1 id="FPSVal">00</h1>
 	    </div> 
-
+	<p> Lorem ipsum... </p>
 	</div>
+	<script>
+	    var coll = document.getElementsByClassName("dev_console_clickable"); 
+
+	    coll[0].addEventListener("click", function (){
+		var content = this.nextElementSibling;
+		if(content.style.display === "block"){
+		    content.style.display =  "none";
+		} else {
+		    content.style.display = "block";
+		}
+	    });
+	</script>
+    </div>
+
 
     </body>
 </html>
