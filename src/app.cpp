@@ -267,6 +267,17 @@ void app::App::initBuffers()
 void app::App::mainLoop()
 {
 
+    //Generate new track
+    
+    double p = uniform_dist(rand_gen);
+ 
+    if(p < 0.01){
+	std::vector<simulation::Position> origin = utils::genRandomPoints(1);
+	track::Track new_track(origin.at(0));
+    	std::vector<glm::vec3> temp_track_verts = new_track.get_vertices();
+	track_sim.addVerts(temp_track_verts);
+    }
+
     sim.update(&w);
     track_sim.update(&w);
 

@@ -14,6 +14,7 @@
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <random>
 
 #include "window.hpp"
 #include "shaders.hpp"
@@ -49,6 +50,9 @@ namespace app {
         rayMarch::RayMarch ray;
 
         drawable::Drawable boundingBox;
+
+	std::default_random_engine rand_gen;
+	std::uniform_real_distribution<double> uniform_dist;
 
         double t = 0;
         double now;

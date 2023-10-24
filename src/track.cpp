@@ -1,7 +1,7 @@
 #include "track.hpp"
 
 track::Track::Track(simulation::Position origin){	
-    int N_points = 10000;
+    int N_points = 2000;
     float length = 1.0;
     float thickness = 0.05;
 
