@@ -4,8 +4,10 @@
 
 #define GLM_FORCE_PURE
 #include <glm/glm.hpp>
+#include "glm/gtx/string_cast.hpp"
 
 #include "simulation.hpp"
+#include "utils.hpp"
 
 namespace track{
     class Track{
@@ -13,14 +15,9 @@ namespace track{
 	
 	std::vector<simulation::Position> vertices;
 
-	//Random number engine
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> uniform_dist;
-
 	Track(simulation::Position origin);	
 
         std::vector<simulation::Position> get_vertices();
-	glm::vec3 gen_rand_direction();
 
     };
 }
