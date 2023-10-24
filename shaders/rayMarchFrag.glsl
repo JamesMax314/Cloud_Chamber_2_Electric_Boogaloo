@@ -315,7 +315,7 @@ void main()
     // FragColor = abs(rd);
 
     float depthCol = texture(framebufferDepthTexture, texCoords).x;
-    FragColor = vec4(vec3(depthCol), 1.0);
+    FragColor = vec4(vec3(depthToDistance(depthCol)), 1.0);
     // vec4 pixCol = texture(framebufferColorTexture, (fragPos.xy + vec2(1.0))/2.0);
     // FragColor = texture(framebufferColorTexture, texCoords);
     // FragColor = vec4(1.0);

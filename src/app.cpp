@@ -183,7 +183,7 @@ void app::App::init()
     sim.init(&fancyShader, &quadShader, bg_verts, 0);
 
     boundingBox.init(&basicShader, boxVerts, boxInds);
-    boundingBox.drawType = GL_LINES;
+    // boundingBox.drawType = GL_LINES;
 
     glEnable(GL_DEPTH_TEST);
     initBuffers();
@@ -221,9 +221,9 @@ void app::App::initBuffers()
 
     // Setup depth buffer
     glBindTexture(GL_TEXTURE_2D, depthOut);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, w.width, w.height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, w.width, w.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
     // Attach the depth texture to the FBO
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthOut, 0);
