@@ -212,7 +212,6 @@ void app::App::initBuffers()
 
     // Setup texture
     glBindTexture(GL_TEXTURE_2D, textureOut);
-    std::cout<<w.width<<" "<<w.height<<"\n";
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w.width, w.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -222,8 +221,6 @@ void app::App::initBuffers()
 
     // Setup depth buffer
     glBindTexture(GL_TEXTURE_2D, depthOut);
-    
-
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, w.width, w.height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
