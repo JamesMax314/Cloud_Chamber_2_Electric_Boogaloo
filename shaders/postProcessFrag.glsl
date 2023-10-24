@@ -5,8 +5,8 @@ in vec4 fragPos;
 in vec2 texCoords;
 out vec4 FragColor;
 
-uniform sampler2D backgroundTexture; // The framebuffer's color texture
-uniform sampler2D cloudTexture;  // The depth texture
+uniform mediump sampler2D backgroundTexture; // The framebuffer's color texture
+uniform mediump sampler2D cloudTexture;  // The depth texture
 
 vec3 cloudColour = vec3(1.0);
 

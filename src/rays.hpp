@@ -32,7 +32,7 @@ namespace rayMarch {
 
         shaders::Shader* mCompShader;
         shaders::Shader* mRenderShader;
-        shaders::Shader mPostProcessShader;
+        shaders::Shader* mPostProcessShader;
 
         glm::vec3 minCorner;
         glm::vec3 maxCorner;
@@ -47,9 +47,8 @@ namespace rayMarch {
         RayMarch();
         RayMarch(shaders::Shader *shader);
         RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
-        void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
+        void init(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *postProcessShader);
 
-        void compShaders();
         void genFBO();
         void update(std::vector<glm::vec3> &feedbackVec);
         void fillBuffers();

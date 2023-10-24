@@ -154,6 +154,10 @@ void app::App::init()
     const char* basicVert = "../shaders/basicVert.glsl";
     const char* basicFrag = "../shaders/basicFrag.glsl";
 
+    const char* vertexPostProcess = "../shaders/postProcessVert.glsl";
+    const char* fragmentPostProcess = "../shaders/postProcessFrag.glsl";
+
+
     glfwMakeContextCurrent(w.getContext());
     glfwSetCursorPosCallback(w.getContext(), cursorPosCallback);
     glfwSetInputMode(w.getContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -164,6 +168,7 @@ void app::App::init()
     quadShader.init(quadVert, quadFrag);
     rayShader.init(rayMarchVert, rayMarchFrag);
     basicShader.init(basicVert, basicFrag);
+    postProcessShader.init(vertexPostProcess, fragmentPostProcess);
 
     std::vector<simulation::Position> origin = utils::genRandomPoints(2);
     
@@ -176,14 +181,14 @@ void app::App::init()
 	track_verts.insert(track_verts.end(), temp_track_verts.begin(), temp_track_verts.end());
     }
 
-    ray_marcher.init(&fancyShader, &rayShader, track_verts, 1);
+    ray_marcher.init(&fancyShader, &rayShader, &postProcessShader);
     track_sim.init(&fancyShader, &quadShader, track_verts, 1);
 
     std::vector<simulation::Position> bg_verts = utils::genRandomPoints(10000);
     sim.init(&fancyShader, &quadShader, bg_verts, 0);
 
     boundingBox.init(&basicShader, boxVerts, boxInds);
-    // boundingBox.drawType = GL_LINES;
+    boundingBox.drawType = GL_LINES;
 
     glEnable(GL_DEPTH_TEST);
     initBuffers();

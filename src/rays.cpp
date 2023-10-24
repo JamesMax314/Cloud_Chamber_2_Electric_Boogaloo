@@ -8,7 +8,7 @@ rayMarch::RayMarch::RayMarch(shaders::Shader *shader)
 {
 }
 
-void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
+void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *postProcessShader)
 {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &billboard_vertex_buffer);
@@ -16,6 +16,7 @@ void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *rend
 
     mCompShader = compShader;
     mRenderShader = renderShader;
+    mPostProcessShader = postProcessShader;
 
     genFBO();
     glBindVertexArray(VAO);
@@ -25,22 +26,12 @@ void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *rend
 
     fillBuffers();
 
-    compShaders();
-
     texture3D = new float[pow(textureDim, 3)];//std::vector<std::vector<std::vector<float>>>(textureDim, std::vector<std::vector<float>>(textureDim, std::vector<float>(textureDim, 0)));
 }
 
 rayMarch::RayMarch::RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
 {
-    init(compShader, renderShader, startPos, isTrack);
-}
-
-void rayMarch::RayMarch::compShaders()
-{
-    const char* vertexShaderFile = "../shaders/postProcessVert.glsl";
-    const char* fragmentShaderFile = "../shaders/postProcessFrag.glsl";
-
-    mPostProcessShader.init(vertexShaderFile, fragmentShaderFile);
+    // init(compShader, renderShader, startPos, isTrack);
 }
 
 void rayMarch::RayMarch::genFBO()
@@ -163,9 +154,6 @@ void rayMarch::RayMarch::loadUniforms()
 void rayMarch::RayMarch::draw(window::Window* w)
 {
     glfwMakeContextCurrent(w->getContext());
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    glClear(GL_COLOR_BUFFER_BIT);
 
     mRenderShader->activate();
 
@@ -252,7 +240,7 @@ void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuin
 
     glfwMakeContextCurrent(w->getContext());
 
-    // mPostProcessShader.activate();
+    // mPostProcessShader->activate();
 
     // glBindVertexArray(VAO);
 

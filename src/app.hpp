@@ -37,6 +37,7 @@ namespace app {
         shaders::Shader quadShader;
         shaders::Shader rayShader;
         shaders::Shader basicShader;
+        shaders::Shader postProcessShader;
 
         float pos = 0;
         glm::vec3 position = glm::vec3(0.0, 0.0, 0.0);
