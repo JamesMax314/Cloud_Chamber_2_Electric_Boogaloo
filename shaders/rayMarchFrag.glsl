@@ -25,7 +25,7 @@ uniform mat4 view;
 const float PI = 3.14159265359;
 const float threshold = 0.0;
 
-int maxIterations = 16;
+int maxIterations = 64;
 int maxLightSamples = 64;
 
 float stepSize = 0.025;
@@ -44,9 +44,10 @@ float depthToDistance(float depth) {
 }
 
 float getDepth(vec3 ro, vec3 rd) {
-    vec3 rayLen = rd-ro;
-    float projectionZ = dot(rayLen, (view*vec4(0.0, 0.0, 1.0, 1.0)).xyz);
-    return projectionZ;
+    vec3 rayLenWorld = rd-ro;
+    // vec4 rayLenWorld4 = vec4(rayLenWorld, 0.0);
+    vec3 rayLenCam = mat3(view) * rayLenWorld;
+    return abs(rayLenCam.z);
 }
 
 float getCamDepth(float fovRad) {
@@ -223,7 +224,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
 
     // Used to draw light location
     float lampIntensity = 0.0;
-    float backgroundDepth = texture(framebufferDepthTexture, texCoords).x;
+    float backgroundDepth = depthToDistance(texture(framebufferDepthTexture, texCoords).x);
 
     bool eneteredCube = false;
     vec3 col;
@@ -255,12 +256,10 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             // Update position with random step to avoid banding
             rayPosition += rd*step*randomStepModifier(rd.xy);
 
-            // if (getDepth(ro, rayPosition) > backgroundDepth) {
-            //     FragColor = vec4(1.0);
-            //     break;
-            // }
-            // FragColor = vec4(vec3(backgroundDepth), 1.0);
-            // FragColor = vec4(1.0);
+            // Stop if hits background bubble
+            if (getDepth(ro, rayPosition) > backgroundDepth) {
+                break;
+            }
 
             float density = texture(rayPosition);
 
@@ -272,10 +271,10 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             // Get light energy and opacity
             if (density > 0.0) {
                 // Only accumulate light energy if in strip of light
-                if (abs(rayPosition.z) < lightHeightZ) {
+                // if (abs(rayPosition.z) < lightHeightZ) {
                     float lightTransmittance = lightMarch(rayPosition);
                     lightEnergy += lightFactor * density * stepSize * transmittance * lightTransmittance * phase;
-                }
+                // }
                 transmittance *= exp(-density * stepSize*20.0);
             } else {
                 // Draw lamp location on screen
@@ -289,33 +288,36 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             }
         }
         vec4 pixCol = texture(framebufferColorTexture, texCoords);
-        backGroundCol = pixCol.xyz;
+        backGroundCol = vec3(1.0);
     } else {
         backGroundCol = vec3(0.6, 0.2, 0.4);
     }
 
     vec3 cloudCol = lightEnergy * lightColour;
-    col = backGroundCol * transmittance + cloudCol + lampIntensity*transmittance;
-    return vec4(col, 0.0);
+    col = cloudCol;
+    return vec4(col, transmittance);
 }
 
 void main()
 {
-    vec4 camera_position = view*vec4(0.0, 0.0, 0.0, 1.0);
+    mat4 invertView = inverse(view);
+    vec4 camera_position = invertView*vec4(0.0, 0.0, 0.0, 1.0);
     vec4 ro = camera_position;
     vec4 mFragPos = fragPos;
     mFragPos.z = -getCamDepth(fovRad);
-    vec3 rd = normalize((view*mFragPos - camera_position).xyz);
+    vec3 rd = normalize((invertView*mFragPos - camera_position).xyz);
     FragColor = vec4(0.0);
 
-    // vec4 shaded_color = ray_march(ro.xyz, rd.xyz);
-    vec3 p = fragPos.xyz;
-    p.z = time*p.z*10.0;
+    vec4 shaded_color = ray_march(ro.xyz, rd.xyz);
+    FragColor = shaded_color;
+
+    // vec3 p = fragPos.xyz;
+    // p.z = time*p.z*10.0;
 
     // FragColor = abs(rd);
 
-    float depthCol = texture(framebufferDepthTexture, texCoords).x;
-    FragColor = vec4(vec3(depthToDistance(depthCol)), 1.0);
+    // float depthCol = texture(framebufferDepthTexture, texCoords).x;
+    // FragColor = vec4(vec3(depthToDistance(depthCol)), 1.0);
     // vec4 pixCol = texture(framebufferColorTexture, (fragPos.xy + vec2(1.0))/2.0);
     // FragColor = texture(framebufferColorTexture, texCoords);
     // FragColor = vec4(1.0);

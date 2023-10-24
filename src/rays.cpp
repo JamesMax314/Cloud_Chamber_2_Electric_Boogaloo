@@ -132,7 +132,7 @@ void rayMarch::RayMarch::draw(window::Window* w)
     glBindVertexArray(0);
 }
 
-void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
+void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
     glfwMakeContextCurrent(w->getContext());
 
@@ -171,4 +171,9 @@ void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuin
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
 
     glBindVertexArray(0);
+}
+
+void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
+{
+    genMask(w, backgroundTexture, backgroundDepth);
 }

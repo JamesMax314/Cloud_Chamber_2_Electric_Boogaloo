@@ -50,6 +50,7 @@ namespace rayMarch {
         void fillBuffers();
         void loadUniforms();
         void draw(window::Window* w);
+        void genMask(window::Window* w, GLuint backgroundTexture, GLuint backgroundDepth);
         void draw(window::Window* w, GLuint backgroundTexture, GLuint backgroundDepth);
     };
 }
