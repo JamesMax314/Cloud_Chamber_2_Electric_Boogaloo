@@ -66,6 +66,8 @@ int lr = 0;
 int ud = 0;
 int fb = 0;
 
+bool move_mode = false;
+
 double prevMouseX = 0.0;
 double prevMouseY = 0.0;
 double deltaX;
@@ -110,6 +112,9 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         if (key == GLFW_KEY_LEFT_SHIFT) {
             ud = -1;
         }
+	if (key == GLFW_KEY_F) {
+	    move_mode = !move_mode;
+	}
 
     } else if (action == GLFW_RELEASE) {
         if (key == GLFW_KEY_W) {
@@ -274,22 +279,24 @@ void app::App::mainLoop()
 
     float dt = 1;
 
-    // Move camera
-    if (fb != 0) {
-        cam.move(0.0f, 0.0f, fb*motionSpeed*dt);
-    }
-    if (lr != 0) {
-        cam.move(lr*motionSpeed*dt, 0.0f, 0.0f);
-    }
-    if (ud != 0) {
-        cam.move(0.0f, -ud*motionSpeed*dt, 0.0f);
-    }
+    if (move_mode == true){
+	// Move camera
+    	if (fb != 0) {
+    	    cam.move(0.0f, 0.0f, fb*motionSpeed*dt);
+    	}
+    	if (lr != 0) {
+    	    cam.move(lr*motionSpeed*dt, 0.0f, 0.0f);
+    	}
+    	if (ud != 0) {
+    	    cam.move(0.0f, -ud*motionSpeed*dt, 0.0f);
+    	}
 
-    // Rotate Camera
-    if (deltaX != 0.0 || deltaY != 0.0) {
-        cam.rotate(deltaX, deltaY);
-        deltaX = 0;
-        deltaY = 0;
+    	// Rotate Camera
+    	if (deltaX != 0.0 || deltaY != 0.0) {
+    	    cam.rotate(deltaX, deltaY);
+    	    deltaX = 0;
+    	    deltaY = 0;
+    	}
     }
 
     // Compute the current view and perspective matrices
