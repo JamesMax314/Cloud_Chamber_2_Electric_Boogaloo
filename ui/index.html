@@ -75,31 +75,32 @@
 
 	    </script>
 
-	</div>
-
-    <div id="dev_console_wrapper">
-	<button type="button" class="dev_console_clickable" >Open dev console </button>
-	<div id = "dev_console">
-	    <div id="FPSBox">
-	    	<h2 id="FPSBoxHeadder">FPS</h2>
-	    	<h1 id="FPSVal">00</h1>
-	    </div> 
-	<p> Lorem ipsum... </p>
-	</div>
+	<button type="button" id="dev_console_toggle" >Open dev console </button>
 	<script>
-	    var coll = document.getElementsByClassName("dev_console_clickable"); 
+	    var coll = document.getElementById("dev_console_toggle"); 
 
-	    coll[0].addEventListener("click", function (){
-		var content = this.nextElementSibling;
+	    coll.addEventListener("click", function (){
+		var content = document.getElementById("dev_console");
 		if(content.style.display === "block"){
 		    content.style.display =  "none";
+		    this.innerText = "Open dev console";
 		} else {
 		    content.style.display = "block";
+		    this.innerText = "Close dev console";
 		}
 	    });
 	</script>
     </div>
 
+    <div id="dev_console_wrapper">
+	<div id = "dev_console">
+    	    <div id="FPSBox">
+    	    	<h2 id="FPSBoxHeadder">FPS</h2>
+    	    	<h1 id="FPSVal">00</h1>
+    	    </div> 
+    	<p> Lorem ipsum... </p>
+    	</div>
+    </div>
 
     </body>
 </html>

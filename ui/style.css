@@ -19,9 +19,9 @@ body {
 
 #floating_wrapper {
     position: fixed;
-    top: 100px;
-    right: 10px;
-    width: 200px;
+    top: 10vh;
+    right: 1vw;
+    width: 7vw;
 }
 
 #trackerBox {
@@ -30,7 +30,7 @@ body {
     z-index: 2;
     border-radius: 10px;
     padding: 10px;
-    height: 300px
+    height: 28vh; 
 }
 
 #trackerBoxHeader {
@@ -52,7 +52,7 @@ body {
 
 .TrackTableData {
     background-color: #36213E;
-    height: 20px;
+    height: 2vh;
 }
 
 .TrackTableData:hover {
@@ -73,25 +73,7 @@ body {
     text-align: center;
 }
 
-#dev_console_wrapper{
-    position: fixed;
-    top: 600px;
-    right: 10px;
-    width: 200px;
-
-}
-
-#dev_console{
-    color: #70B77E;
-    background-color: #554971;
-    z-index: 2;
-    border-radius: 10px;
-    height: 300px;
-    width: 100%;
-    display: block;
-}
-
-.dev_console_clickable{
+#dev_console_toggle{
     background-color: #554971;
     width: 100%;
     color: #70B77E;
@@ -102,8 +84,26 @@ body {
     border: none;
 }
 
-.dev_console_clickable:hover{
+#dev_console_toggle:hover{
     background-color: #36213E;
+}
+
+#dev_console_wrapper{
+    position: fixed;
+    top: 10vh;
+    left: 1vw;
+    width: 10vw;
+
+}
+
+#dev_console{
+    color: #70B77E;
+    background-color: #554971;
+    z-index: 2;
+    border-radius: 10px;
+    height: 300px;
+    width: 100%;
+    display: none;
 }
 
 #FPSBox {
