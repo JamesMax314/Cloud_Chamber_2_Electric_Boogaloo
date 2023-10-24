@@ -28,16 +28,19 @@ namespace rayMarch {
         std::vector<unsigned int> mIndices;
 
         // Intagers that are used to reference buffer arrays in gpu ram
-        GLuint VAO, texture_buffer, billboard_vertex_buffer;
+        GLuint VAO, FBO, texture_buffer, billboard_vertex_buffer, cloudTex;
 
         shaders::Shader* mCompShader;
         shaders::Shader* mRenderShader;
+        shaders::Shader mPostProcessShader;
 
         glm::vec3 minCorner;
         glm::vec3 maxCorner;
 
         int numParticlesPerTrack = 10000;
         int textureDim = 64;
+        int renderWidth = 100;
+        int renderHeight = 50;
         float maxTexVal = 20;
         float* texture3D;
 
@@ -46,6 +49,8 @@ namespace rayMarch {
         RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
         void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
 
+        void compShaders();
+        void genFBO();
         void update(std::vector<glm::vec3> &feedbackVec);
         void fillBuffers();
         void loadUniforms();

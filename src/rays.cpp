@@ -17,6 +17,7 @@ void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *rend
     mCompShader = compShader;
     mRenderShader = renderShader;
 
+    genFBO();
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
@@ -24,12 +25,72 @@ void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *rend
 
     fillBuffers();
 
+    compShaders();
+
     texture3D = new float[pow(textureDim, 3)];//std::vector<std::vector<std::vector<float>>>(textureDim, std::vector<std::vector<float>>(textureDim, std::vector<float>(textureDim, 0)));
 }
 
 rayMarch::RayMarch::RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
 {
     init(compShader, renderShader, startPos, isTrack);
+}
+
+void rayMarch::RayMarch::compShaders()
+{
+    const char* vertexShaderFile = "../shaders/postProcessVert.glsl";
+    const char* fragmentShaderFile = "../shaders/postProcessFrag.glsl";
+
+    mPostProcessShader.init(vertexShaderFile, fragmentShaderFile);
+}
+
+void rayMarch::RayMarch::genFBO()
+{
+    glGenFramebuffers(1, &FBO);
+    glGenTextures(1, &cloudTex);
+
+    // Setup FBO
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
+    // Setup texture
+    glBindTexture(GL_TEXTURE_2D, cloudTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, renderWidth, renderHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, cloudTex, 0);
+
+    // Check configuration
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+	    std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+        switch (status) {
+            case GL_FRAMEBUFFER_UNDEFINED:
+                printf("GL_FRAMEBUFFER_UNDEFINED\n");
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                printf("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n");
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                printf("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT\n");
+                break;
+            case GL_FRAMEBUFFER_UNSUPPORTED:
+                printf("GL_FRAMEBUFFER_UNSUPPORTED\n");
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+                printf("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFE\n");
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+                printf("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER\n");
+                break;
+            // Handle other possible status codes as needed
+            default:
+                printf("Unknown Error\n");
+                break;
+        }
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); 
 }
 
 void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
@@ -102,6 +163,9 @@ void rayMarch::RayMarch::loadUniforms()
 void rayMarch::RayMarch::draw(window::Window* w)
 {
     glfwMakeContextCurrent(w->getContext());
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     mRenderShader->activate();
 
@@ -135,6 +199,10 @@ void rayMarch::RayMarch::draw(window::Window* w)
 void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
     glfwMakeContextCurrent(w->getContext());
+
+    // Render to low res texture
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     mRenderShader->activate();
 
@@ -171,9 +239,38 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
 
     glBindVertexArray(0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
     genMask(w, backgroundTexture, backgroundDepth);
+
+    glfwMakeContextCurrent(w->getContext());
+
+    mPostProcessShader.activate();
+
+    glBindVertexArray(VAO);
+
+    // Bind quad to render
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    
+    //  Draw 1 quad (4 vertices) for every position
+    glVertexAttribDivisor(0, 0);
+
+    // Bind and populate Textures
+    glActiveTexture(GL_TEXTURE0); // Texture unit 0
+    glBindTexture(GL_TEXTURE_2D, backgroundTexture);
+    glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "backgroundTexture"), 0);
+
+    glActiveTexture(GL_TEXTURE1); // Texture unit 1
+    glBindTexture(GL_TEXTURE_2D, cloudTex);
+    glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "cloudTexture"), 1);
+
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
+
+    glBindVertexArray(0);
 }
