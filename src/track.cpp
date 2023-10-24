@@ -5,8 +5,8 @@ track::Track::Track(simulation::Position origin){
     std::mt19937 gen(rd()); // Mersenne Twister PRNG
     std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-    int N_points = 2000;
-    float length = 1.0;
+    int N_points = 10000;
+    float length = 0.5;
     float thickness = 0.05;
 
     //Define two vectors orthogonal to the direction of the track 
@@ -21,7 +21,6 @@ track::Track::Track(simulation::Position origin){
     d2 = d2/std::sqrt(glm::dot(d2, d2));
 
     glm::vec3 direction = glm::cross(d1, d2);
-    std::cout<<glm::to_string(direction)<<std::endl;
     
     for(int i = 0; i < N_points-1; i++){
 	float r = thickness*dis(gen);

@@ -263,17 +263,21 @@ float random(vec2 st)
 
 void main()
 {
-    float alpha = 0.1*time;
-    vec3 velocity = curlnoise(Position, alpha);
-    //velocity = normalise(velocity);
-    vec3 drift = vec3(0.0, 0.0, 0.0008);
-    vPosition = Position + 0.0001*velocity + drift;
+    //Only update positions if vertex is in the box
+    if(abs(vPosition.x)<1.0 || abs(vPosition.y)<1.0){
+	float alpha = 0.1*time;
+    	vec3 velocity = curlnoise(Position, alpha);
+    	//velocity = normalise(velocity);
+    	vec3 drift = vec3(0.0, 0.0, 0.0008);
+    	vPosition = Position + 0.0001*velocity + drift;
+    }
     
+    //Background bubbles respawn in the chamber
     if(is_track_vert==0){
         if(abs(vPosition.x)>1.0 || abs(vPosition.y)>1.0 || abs(vPosition.z)>1.0){
-    	    float randx = random(vec2(drift.y, vPosition.z));
-    	    float randy = random(vec2(drift.z, vPosition.x));
-    	    vPosition = vec3(randx, randy, 1.0);
+    	    float randx = random(vec2(3.1415, vPosition.z)); //Generate random x/y value
+    	    float randy = random(vec2(6.6262, vPosition.x));
+    	    vPosition = vec3(randx, randy, 0.0);
     	}
     }
 

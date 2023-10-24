@@ -45,6 +45,26 @@ void simulation::Sim::update(window::Window* w)
 
     glBindVertexArray(VAO);
 
+    if(newVerts.size() > 0){
+	int n_new_Verts = newVerts.size();
+
+    	glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
+    	if(current_index + n_new_Verts < nVerts){//Check if buffer has enough memory
+    	    glBufferSubData(GL_ARRAY_BUFFER, (current_index+1)*sizeof(simulation::Position), n_new_Verts*sizeof(simulation::Position), &newVerts.front());
+    	}else{
+    	    //Split the data into two pieces and start writing the second piece from the beginning of the buffer
+    	    int spare_space = (nVerts-1)-current_index;
+    	    glBufferSubData(GL_ARRAY_BUFFER, (current_index+1)*sizeof(simulation::Position), spare_space*sizeof(simulation::Position), &newVerts.front());
+    	    glBufferSubData(GL_ARRAY_BUFFER, 0, (n_new_Verts-spare_space)*sizeof(simulation::Position), &newVerts.at(spare_space-1));
+    	}
+	newVerts.clear();
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+    	glBindVertexArray(0);
+
+    	current_index = (current_index + n_new_Verts)%nVerts;
+    }
+
     // Turn off drawing
     glEnable(GL_RASTERIZER_DISCARD);
 
@@ -148,17 +168,9 @@ void simulation::Sim::draw(window::Window* w)
 }
 
 void simulation::Sim::addVerts(std::vector<simulation::Position>& new_verts){
-    updateFeedbackVec();
+    
     for (int i = 0; i < new_verts.size(); i++){
-        current_index = (current_index+i)%nVerts;
-        feedbackVec.at(current_index) = new_verts.at(i);
+	newVerts.push_back(new_verts.at(i));
     }
-    // Bind all the model arrays to the appropriate buffers
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
-    glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), &feedbackVec.front(), GL_STREAM_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    std::cout<<newVerts.size()<<std::endl;
 }

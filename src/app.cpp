@@ -273,7 +273,7 @@ void app::App::mainLoop()
  
     if(p < 0.01){
 	std::vector<simulation::Position> origin = utils::genRandomPoints(1);
-	track::Track new_track(origin.at(0));
+	track::Track new_track(glm::vec3(0.0));
     	std::vector<glm::vec3> temp_track_verts = new_track.get_vertices();
 	track_sim.addVerts(temp_track_verts);
     }
