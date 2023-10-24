@@ -14,6 +14,9 @@ void main() {
     vec4 backTex = texture(backgroundTexture, texCoords);
     vec4 clouds = texture(cloudTexture, texCoords);
 
-    vec3 outCol = backTex.xyz;
-    FragColor = clouds;
+    backTex = backTex*clouds.w;
+    backTex.xyz = backTex.xyz + clouds.xyz;
+
+    // vec3 outCol = backTex.xyz+clouds;
+    FragColor = backTex;
 }

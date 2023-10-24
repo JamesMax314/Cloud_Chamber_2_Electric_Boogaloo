@@ -30,7 +30,7 @@ int maxLightSamples = 64;
 
 float stepSize = 0.025;
 float courseStep = 1.0/5.0;
-float lightFactor = 5.0;
+float lightFactor = 10.0;
 float lightHeightZ = 1.0;
 
 vec3 boundingCubeMin = -1.0*vec3(1.0);
@@ -288,14 +288,14 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             }
         }
         vec4 pixCol = texture(framebufferColorTexture, texCoords);
-        backGroundCol = pixCol.xyz;
+        backGroundCol = vec3(0.0);
     } else {
         backGroundCol = vec3(0.6, 0.2, 0.4);
     }
 
     vec3 cloudCol = lightEnergy * lightColour;
     col = backGroundCol * transmittance + cloudCol + lampIntensity*transmittance;
-    return vec4(col, 0.0);
+    return vec4(col, transmittance);
 }
 
 void main()

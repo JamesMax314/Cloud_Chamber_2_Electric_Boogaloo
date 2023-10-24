@@ -187,11 +187,11 @@ void rayMarch::RayMarch::draw(window::Window* w)
 void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
     glfwMakeContextCurrent(w->getContext());
-    // glViewport(0, 0, renderWidth, renderHeight);
+    glViewport(0, 0, renderWidth, renderHeight);
 
     // Render to low res texture
-    // glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    // glClear(GL_COLOR_BUFFER_BIT);
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     mRenderShader->activate();
 
@@ -229,9 +229,9 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
 
     glBindVertexArray(0);
 
-    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // glViewport(0, 0, w->width, w->height);
+    glViewport(0, 0, w->width, w->height);
 }
 
 void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
@@ -240,28 +240,28 @@ void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuin
 
     glfwMakeContextCurrent(w->getContext());
 
-    // mPostProcessShader->activate();
+    mPostProcessShader->activate();
 
-    // glBindVertexArray(VAO);
+    glBindVertexArray(VAO);
 
-    // // Bind quad to render
-    // glEnableVertexAttribArray(0);
-    // glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    // Bind quad to render
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     
-    // //  Draw 1 quad (4 vertices) for every position
-    // glVertexAttribDivisor(0, 0);
+    //  Draw 1 quad (4 vertices) for every position
+    glVertexAttribDivisor(0, 0);
 
-    // // Bind and populate Textures
-    // glActiveTexture(GL_TEXTURE3); // Texture unit 3
-    // glBindTexture(GL_TEXTURE_2D, backgroundTexture);
-    // glUniform1i(glGetUniformLocation(mPostProcessShader.mProgram, "backgroundTexture"), 3);
+    // Bind and populate Textures
+    glActiveTexture(GL_TEXTURE3); // Texture unit 3
+    glBindTexture(GL_TEXTURE_2D, backgroundTexture);
+    glUniform1i(glGetUniformLocation(mPostProcessShader->mProgram, "backgroundTexture"), 3);
 
-    // glActiveTexture(GL_TEXTURE4); // Texture unit 4
-    // glBindTexture(GL_TEXTURE_2D, cloudTex);
-    // glUniform1i(glGetUniformLocation(mPostProcessShader.mProgram, "cloudTexture"), 4);
+    glActiveTexture(GL_TEXTURE4); // Texture unit 4
+    glBindTexture(GL_TEXTURE_2D, cloudTex);
+    glUniform1i(glGetUniformLocation(mPostProcessShader->mProgram, "cloudTexture"), 4);
 
-    // glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
 
-    // glBindVertexArray(0);
+    glBindVertexArray(0);
 }
