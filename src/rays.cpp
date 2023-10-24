@@ -241,7 +241,7 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
 
     glBindVertexArray(0);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // glViewport(0, 0, w->width, w->height);
 }
