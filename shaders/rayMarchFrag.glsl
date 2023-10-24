@@ -288,14 +288,14 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             }
         }
         vec4 pixCol = texture(framebufferColorTexture, texCoords);
-        backGroundCol = vec3(1.0);
+        backGroundCol = pixCol.xyz;
     } else {
         backGroundCol = vec3(0.6, 0.2, 0.4);
     }
 
     vec3 cloudCol = lightEnergy * lightColour;
-    col = cloudCol;
-    return vec4(col, transmittance);
+    col = backGroundCol * transmittance + cloudCol + lampIntensity*transmittance;
+    return vec4(col, 0.0);
 }
 
 void main()

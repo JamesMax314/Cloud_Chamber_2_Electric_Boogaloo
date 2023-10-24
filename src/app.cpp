@@ -183,7 +183,7 @@ void app::App::init()
     sim.init(&fancyShader, &quadShader, bg_verts, 0);
 
     boundingBox.init(&basicShader, boxVerts, boxInds);
-    boundingBox.drawType = GL_LINES;
+    // boundingBox.drawType = GL_LINES;
 
     glEnable(GL_DEPTH_TEST);
     initBuffers();

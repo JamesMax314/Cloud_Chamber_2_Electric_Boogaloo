@@ -40,7 +40,7 @@ namespace rayMarch {
         int numParticlesPerTrack = 10000;
         int textureDim = 64;
         int renderWidth = 100;
-        int renderHeight = 50;
+        int renderHeight = 100;
         float maxTexVal = 20;
         float* texture3D;
 
