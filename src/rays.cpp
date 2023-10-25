@@ -122,7 +122,7 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
         }
     }
 
-    for (int i=0; i<feedbackVec.size()-1; i++) {
+    for (int i=0; i<feedbackVec.size(); i++) {
         glm::ivec3 index3D;
 
         index3D = glm::floor((feedbackVec.at(i) - minCorner) / stepSize);
