@@ -95,14 +95,14 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
     maxCorner = feedbackVec[0];
 
     // Find bounding box
-    for (int i=0; i<numParticlesPerTrack-1; i++) {
+    for (int i=0; i<feedbackVec.size()-1; i++) {
         int subcount = 0;
         for (int j=0; j<3; j++) {
-            if (feedbackVec[i][j] < minCorner[j] && feedbackVec[i][j]!= 0) {
-                minCorner[j] = feedbackVec[i][j];
+            if (feedbackVec.at(i)[j] < minCorner[j] && feedbackVec.at(i)[j]!= 0) {
+                minCorner[j] = feedbackVec.at(i)[j];
             }
-            if (feedbackVec[i][j] > maxCorner[j] && feedbackVec[i][j]!= 0) {
-                maxCorner[j] = feedbackVec[i][j];
+            if (feedbackVec.at(i)[j] > maxCorner[j] && feedbackVec.at(i)[j]!= 0) {
+                maxCorner[j] = feedbackVec.at(i)[j];
             }
         }
     }
@@ -122,10 +122,10 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
         }
     }
 
-    for (int i=0; i<numParticlesPerTrack-1; i++) {
+    for (int i=0; i<feedbackVec.size()-1; i++) {
         glm::ivec3 index3D;
 
-        index3D = glm::floor((feedbackVec[i] - minCorner) / stepSize);
+        index3D = glm::floor((feedbackVec.at(i) - minCorner) / stepSize);
         int index = index3D.x + index3D.y*textureDim + index3D.z*textureDim*textureDim;
         if (texture3D[index] < maxTexVal) {
             texture3D[index] += 0.1;

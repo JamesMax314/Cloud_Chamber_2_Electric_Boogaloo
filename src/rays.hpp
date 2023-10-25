@@ -37,7 +37,7 @@ namespace rayMarch {
         glm::vec3 minCorner;
         glm::vec3 maxCorner;
 
-        int numParticlesPerTrack = 10000;
+        int numParticlesPerTrack = 5000;
         int textureDim = 64;
         int renderWidth = 1080;
         int renderHeight = 720;

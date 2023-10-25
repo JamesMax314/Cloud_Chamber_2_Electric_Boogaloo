@@ -79,15 +79,18 @@ namespace simulation {
         shaders::Shader* mCompShader;
         shaders::Shader* mRenderShader;
 
+	unsigned int nVerts = 200000;
         std::vector<glm::vec3> mStartPos;
         std::vector<unsigned int> mIndices;
         std::vector<glm::vec3> feedbackVec;
+        std::vector<glm::vec3> newVerts;
 
         // Intagers that are used to reference buffer arrays in gpu ram
         GLuint VAO;
         GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer;
 	
 	int isTrack;
+	unsigned int current_index = 0;
 
         Sim();
         Sim(shaders::Shader *shader);
@@ -99,5 +102,6 @@ namespace simulation {
         void loadUniforms();
         void updateFeedbackVec();
         void draw(window::Window* w);
+	void addVerts(std::vector<simulation::Position>& new_verts);
     };
 }

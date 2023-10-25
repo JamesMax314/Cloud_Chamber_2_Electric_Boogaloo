@@ -18,4 +18,21 @@ std::vector<glm::vec3> utils::genRandomPoints(int number)
     return points;
 }
 
+glm::vec3 utils::genRandomDirection(){
+    std::random_device rd;
+    std::mt19937 gen(rd()); // Mersenne Twister PRNG
+    std::uniform_real_distribution<double> dis(-1.0, 1.0);
+
+    float costheta = (float)dis(gen);
+    float phi = 2*M_PI*(float)dis(gen);
+    
+    float theta = std::acos(costheta);
+    
+    float x = std::sin(theta)*std::cos(phi);
+    float y = std::sin(theta)*std::sin(phi);
+    float z = costheta;
+
+    return glm::vec3(x, y, z);
+
+}
 

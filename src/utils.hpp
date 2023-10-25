@@ -18,4 +18,6 @@
 
 namespace utils {
     std::vector<glm::vec3> genRandomPoints(int number);
+
+    glm::vec3 genRandomDirection();
 }
