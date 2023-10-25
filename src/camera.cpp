@@ -42,7 +42,7 @@ glm::mat4 camera::Camera::getViewMat()
 camera::Camera::Camera()
 {
     // Set camera to origin
-    camPos = glm::vec3(0.0f, 0.0f, -2.0f);
+    camPos = glm::vec3(0.0f, 0.0f, -0.8f);
     cameraFacing = glm::vec3(0.0f, 0.0f, 1.0f);
     cameraTarget = camPos + cameraFacing;
     cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);

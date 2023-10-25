@@ -27,8 +27,12 @@ const float threshold = 0.0;
 
 int maxIterations = 64;
 int maxLightSamples = 64;
+int numResetSteps = 2;
 
 float stepSize = 0.025;
+float densityThreashold = 0.01;
+float numCoarseSteps = 32.0;
+float numFineSteps = 32.0;
 float courseStep = 1.0/5.0;
 float lightFactor = 10.0;
 float fogFactor = 10.0;
@@ -36,6 +40,14 @@ float lightHeightZ = 0.5;
 
 vec3 boundingCubeMin = -1.0*vec3(1.0);
 vec3 boundingCubeMax = vec3(1.0);
+
+struct Intersection {
+    float tNear;
+    float tFar;
+    bool intersectFound;
+    vec3 minIntersect;
+    vec3 maxIntersect;
+};
 
 
 float depthToDistance(float depth) {
@@ -111,6 +123,50 @@ bool rayIntersectsCube(vec3 rayOrigin, vec3 rayDirection, vec3 cubeMin, vec3 cub
     // Check if there is a valid intersection
     return tmax >= 0.0;
 }
+
+float getTCurrent(vec3 rayOrigin, vec3 rayDirection, vec3 rayPosition) {
+    float tCurrent = -999999.0;
+
+    for (int i = 0; i < 3; i++) {
+        float t1 = (rayPosition[i] - rayOrigin[i]) / rayDirection[i];
+        
+        tCurrent = max(tCurrent, t1);
+    }
+
+    return tCurrent;
+}
+
+// Used to determine where ray enters and exits cloud box
+Intersection rayCubeIntersectionPoints(vec3 rayOrigin, vec3 rayDirection, vec3 minVertex, vec3 maxVertex) {
+    float tNear = -999999.0;  // A very small negative value
+    float tFar = 999999.0;    // A very large positive value
+    Intersection intersect;
+    intersect.intersectFound = false;
+    intersect.tNear = tNear;
+    intersect.tFar = tFar;
+    intersect.minIntersect = vec3(0.0);
+    intersect.maxIntersect = vec3(0.0);
+
+    for (int i = 0; i < 3; i++) {
+        float t1 = (minVertex[i] - rayOrigin[i]) / rayDirection[i];
+        float t2 = (maxVertex[i] - rayOrigin[i]) / rayDirection[i];
+        
+        tNear = max(tNear, min(t1, t2));
+        tFar = min(tFar, max(t1, t2));
+    }
+
+    if (tNear <= tFar && tFar > 0.0) {
+        intersect.intersectFound = true;
+        intersect.tNear = tNear;
+        intersect.tFar = tFar;
+        intersect.minIntersect = rayOrigin + tNear * rayDirection;
+        intersect.maxIntersect = rayOrigin + tFar * rayDirection;
+        return intersect;
+    }
+
+    return intersect;  // No intersection; you can return any sentinel value
+}
+
 
 // SDF for track bounding boxes
 float sdfCuboid(vec3 p, vec3 minCorner, vec3 maxCorner)
@@ -230,27 +286,38 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
     bool eneteredCube = false;
     vec3 col;
 
+    bool hit = false;
+
     vec3 backGroundCol = vec3(0.0, 0.0, 0.0);
 
-    if (rayIntersectsCube(ro, rd, boundingCubeMin, boundingCubeMax)) {
+    // Determine distance to traverse cloud box
+    Intersection intersect = rayCubeIntersectionPoints(ro, rd, minPos, maxPos);
+    // Run 10 course steps through cloud box
+    // Upon hitting an area of high density, back step by 1 step
+    // Switch to smaller step size
+    // Once cloud density < threashold for 10 small steps 
+    // Switch to course steps again
+
+    if (intersect.intersectFound) {
+        // if outside cloudbox then start ray at edge of cloud box
+        if (intersect.tNear > 0.0) {
+            rayPosition = intersect.minIntersect;
+        }
+        float coarseStep = (intersect.tFar-intersect.tNear) / numCoarseSteps;
+        float fineStep = (intersect.tFar-intersect.tNear) / numFineSteps;
+        int numStepsBelowThreshold = 0;
+
+        float lastLightEnergy = lightEnergy;
+        float lastTransmittance = transmittance;
+        float lastLampIntensity = lampIntensity;
+
+
+        float step = coarseStep;
+
         for (int i = 0; i < maxIterations; i++) {
-            // float sdf = distance_from_sphere(rayPosition, vec3(0.0, 0.0, 0.0), 0.5);
-
-            // Ray march to edge of bounding cuboid
-            float sdf = sdfCuboid(rayPosition, minPos, maxPos);
-            float step = 0.0;
-            if (sdf > stepSize) {
-                step = sdf;
-            } else {
-                step = stepSize;
-            }
-
-            // Check if ray has left cloud chamber
-            float sdfCube = sdfCuboid(rayPosition, boundingCubeMin, boundingCubeMax);
-            
-            if (!eneteredCube && sdfCube < 0.0) {
-                eneteredCube = true;
-            } else if (eneteredCube && sdfCube > 0.0) {
+            // Check if ray has left cloud box
+            float tCurrent = getTCurrent(ro, rd, rayPosition);
+            if (tCurrent > intersect.tFar) {
                 break;
             }
 
@@ -263,6 +330,30 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             }
 
             float density = texture(rayPosition);
+
+            // If hit clouds switch to fine steps
+            if (!hit && density > densityThreashold) {
+                rayPosition -= rd*step;
+                step = fineStep;
+                hit = true;
+                numStepsBelowThreshold = 0;
+                lightEnergy = lastLightEnergy;
+                transmittance = lastTransmittance;
+                lampIntensity = lastLampIntensity;
+            }
+
+            // // If taken numResetSteps in low density switch to coarse steps
+            if (hit && density > densityThreashold) {
+                numStepsBelowThreshold ++;
+                if (numStepsBelowThreshold > numResetSteps) {
+                    // step = courseStep;
+                    hit = false;
+                }
+            }
+
+            lastLightEnergy = lightEnergy;
+            lastTransmittance = transmittance;
+            lastLampIntensity = lampIntensity;
 
             // Get light scattering factor
             vec3 lightDir = lightPos-rayPosition;

@@ -266,7 +266,7 @@ void main()
     float alpha = 0.1*time;
     vec3 velocity = curlnoise(Position, alpha);
     //velocity = normalise(velocity);
-    vec3 drift = vec3(0.0, 0.0, 0.0008);
+    vec3 drift = vec3(0.0, 0.0, 0.000);
     vPosition = Position + 0.0001*velocity + drift;
     
     if(is_track_vert==0){
