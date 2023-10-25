@@ -5,7 +5,7 @@ track::Track::Track(simulation::Position origin){
     std::mt19937 gen(rd()); // Mersenne Twister PRNG
     std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-    int N_points = 10000;
+    int N_points = 2000;
     float length = 0.5;
     float thickness = 0.05;
 
@@ -22,7 +22,7 @@ track::Track::Track(simulation::Position origin){
 
     glm::vec3 direction = glm::cross(d1, d2);
     
-    for(int i = 0; i < N_points-1; i++){
+    for(int i = 0; i < N_points; i++){
 	float r = thickness*dis(gen);
 	float theta = 2*M_PI*dis(gen);
 	float z = length*dis(gen);

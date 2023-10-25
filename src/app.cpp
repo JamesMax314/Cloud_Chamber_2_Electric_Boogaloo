@@ -272,6 +272,7 @@ void app::App::mainLoop()
     double p = uniform_dist(rand_gen);
  
     if(p < 0.01){
+	std::cout<<"Track created"<<std::endl;
 	std::vector<simulation::Position> origin = utils::genRandomPoints(1);
 	track::Track new_track(glm::vec3(0.0));
     	std::vector<glm::vec3> temp_track_verts = new_track.get_vertices();
@@ -347,8 +348,9 @@ void app::App::mainLoop()
     // boundingBox.draw(w.getContext());
 
     track_sim.updateFeedbackVec();
-    ray_marcher.update(track_sim.feedbackVec);
-    ray_marcher.draw(&w, textureOut, depthOut);
+    //ray_marcher.update(track_sim.feedbackVec);
+    track_sim.draw(&w);
+    //ray_marcher.draw(&w, textureOut, depthOut);
 
     // ray_marcher.draw(&w);
 

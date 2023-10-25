@@ -44,23 +44,20 @@ void simulation::Sim::update(window::Window* w)
     mCompShader->setUniform("is_track_vert", this->isTrack);
 
     glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
 
     if(newVerts.size() > 0){
 	int n_new_Verts = newVerts.size();
 
-    	glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
-    	if(current_index + n_new_Verts < nVerts){//Check if buffer has enough memory
-    	    glBufferSubData(GL_ARRAY_BUFFER, (current_index+1)*sizeof(simulation::Position), n_new_Verts*sizeof(simulation::Position), &newVerts.front());
+    	if(current_index + 1 + n_new_Verts < nVerts){//Check if buffer has enough memory
+    	    glBufferSubData(GL_ARRAY_BUFFER, (current_index+1)*sizeof(simulation::Position), n_new_Verts*sizeof(simulation::Position), newVerts.data());
     	}else{
     	    //Split the data into two pieces and start writing the second piece from the beginning of the buffer
     	    int spare_space = (nVerts-1)-current_index;
-    	    glBufferSubData(GL_ARRAY_BUFFER, (current_index+1)*sizeof(simulation::Position), spare_space*sizeof(simulation::Position), &newVerts.front());
+    	    glBufferSubData(GL_ARRAY_BUFFER, (current_index+1)*sizeof(simulation::Position), spare_space*sizeof(simulation::Position), newVerts.data());
     	    glBufferSubData(GL_ARRAY_BUFFER, 0, (n_new_Verts-spare_space)*sizeof(simulation::Position), &newVerts.at(spare_space-1));
     	}
 	newVerts.clear();
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-    	glBindVertexArray(0);
 
     	current_index = (current_index + n_new_Verts)%nVerts;
     }
@@ -69,7 +66,6 @@ void simulation::Sim::update(window::Window* w)
     glEnable(GL_RASTERIZER_DISCARD);
 
     // Specify the target buffer:
-    glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
     // Specify input format
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
