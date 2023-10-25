@@ -43,7 +43,7 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
     maxCorner = feedbackVec[0];
 
     // Find bounding box
-    for (int i=0; i<numParticlesPerTrack-1; i++) {
+    for (int i=0; i<feedbackVec.size()-1; i++) {
         int subcount = 0;
         for (int j=0; j<3; j++) {
             if (feedbackVec.at(i)[j] < minCorner[j] && feedbackVec.at(i)[j]!= 0) {
@@ -70,7 +70,7 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
         }
     }
 
-    for (int i=0; i<numParticlesPerTrack-1; i++) {
+    for (int i=0; i<feedbackVec.size()-1; i++) {
         glm::ivec3 index3D;
 
         index3D = glm::floor((feedbackVec.at(i) - minCorner) / stepSize);
