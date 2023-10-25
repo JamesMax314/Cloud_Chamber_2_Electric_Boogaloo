@@ -271,7 +271,7 @@ void app::App::mainLoop()
     
     double p = uniform_dist(rand_gen);
  
-    if(p < 0.01){
+    if(p < 0.005){
 	std::cout<<"Track created"<<std::endl;
 	std::vector<simulation::Position> origin = utils::genRandomPoints(1);
 	track::Track new_track(glm::vec3(0.0));
@@ -339,7 +339,8 @@ void app::App::mainLoop()
 
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    sim.draw(&w);
+    //sim.draw(&w);
+    track_sim.draw(&w);
     boundingBox.draw(w.getContext());
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -348,9 +349,8 @@ void app::App::mainLoop()
     // boundingBox.draw(w.getContext());
 
     track_sim.updateFeedbackVec();
-    //ray_marcher.update(track_sim.feedbackVec);
-    track_sim.draw(&w);
-    //ray_marcher.draw(&w, textureOut, depthOut);
+    ray_marcher.update(track_sim.feedbackVec);
+    ray_marcher.draw(&w, textureOut, depthOut);
 
     // ray_marcher.draw(&w);
 

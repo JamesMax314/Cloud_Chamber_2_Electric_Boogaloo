@@ -125,7 +125,7 @@ void simulation::Sim::updateFeedbackVec()
     // Get particle positions
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
-    glGetBufferSubData(GL_ARRAY_BUFFER, 0, (feedbackVec.size()-1)*sizeof(glm::vec3), feedbackVec.data());
+    glGetBufferSubData(GL_ARRAY_BUFFER, 0, feedbackVec.size()*sizeof(glm::vec3), feedbackVec.data());
     // printf("%f %f %f\n", feedbackVec[0][0], feedbackVec[0][1], feedbackVec[0][2]);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
