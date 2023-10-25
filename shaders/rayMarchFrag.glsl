@@ -31,7 +31,8 @@ int maxLightSamples = 64;
 float stepSize = 0.025;
 float courseStep = 1.0/5.0;
 float lightFactor = 10.0;
-float lightHeightZ = 1.0;
+float fogFactor = 10.0;
+float lightHeightZ = 0.5;
 
 vec3 boundingCubeMin = -1.0*vec3(1.0);
 vec3 boundingCubeMax = vec3(1.0);
@@ -275,7 +276,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
                     float lightTransmittance = lightMarch(rayPosition);
                     lightEnergy += lightFactor * density * stepSize * transmittance * lightTransmittance * phase;
                 // }
-                transmittance *= exp(-density * stepSize*20.0);
+                transmittance *= exp(-density * stepSize * fogFactor);
             } else {
                 // Draw lamp location on screen
                 if (angleBetween(rd, lightPos) < 0.01) {
@@ -295,7 +296,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
 
     vec3 cloudCol = lightEnergy * lightColour;
     col = backGroundCol * transmittance + cloudCol + lampIntensity*transmittance;
-    return vec4(col, transmittance);
+    return vec4(lightEnergy, transmittance, lampIntensity, 0.0);
 }
 
 void main()
