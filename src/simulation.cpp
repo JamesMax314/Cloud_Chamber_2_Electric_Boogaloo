@@ -54,8 +54,9 @@ void simulation::Sim::update(window::Window* w)
     	}else{
     	    //Split the data into two pieces and start writing the second piece from the beginning of the buffer
     	    int spare_space = (nVerts-1)-current_index;
-    	    glBufferSubData(GL_ARRAY_BUFFER, (current_index+1)*sizeof(simulation::Position), spare_space*sizeof(simulation::Position), newVerts.data());
-    	    glBufferSubData(GL_ARRAY_BUFFER, 0, (n_new_Verts-spare_space)*sizeof(simulation::Position), &newVerts.at(spare_space-1));
+    	    glBufferSubData(GL_ARRAY_BUFFER, (nVerts-1-newVerts.size())*sizeof(simulation::Position), spare_space*sizeof(simulation::Position), newVerts.data());//Write to last section of buffer
+//    	    glBufferSubData(GL_ARRAY_BUFFER, (current_index+1)*sizeof(simulation::Position), spare_space*sizeof(simulation::Position), newVerts.data());
+//    	    glBufferSubData(GL_ARRAY_BUFFER, 0, (n_new_Verts-spare_space)*sizeof(simulation::Position), &newVerts.at(spare_space-1));
     	}
 	newVerts.clear();
 
