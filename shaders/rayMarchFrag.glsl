@@ -16,7 +16,6 @@ uniform float farClip;
 uniform float fovRad;
 
 uniform vec3 lightPos;
-uniform vec3 lightColour;
 uniform vec3 minPos;
 uniform vec3 maxPos;
 
@@ -25,18 +24,13 @@ uniform mat4 view;
 const float PI = 3.14159265359;
 const float threshold = 0.0;
 
-int maxIterations = 64;
-int maxLightSamples = 64;
-int numResetSteps = 2;
+float maxTransmissionSamples = 32.0;
+float maxLightSamples = 32.0;
 
-float stepSize = 0.025;
-float densityThreashold = 0.01;
-float numCoarseSteps = 32.0;
-float numFineSteps = 32.0;
-float courseStep = 1.0/5.0;
 float lightFactor = 10.0;
 float fogFactor = 10.0;
-float lightHeightZ = 0.5;
+float lightCentreZ = 0.0;
+float lightStd = 0.2;
 
 vec3 boundingCubeMin = -1.0*vec3(1.0);
 vec3 boundingCubeMax = vec3(1.0);
@@ -167,7 +161,6 @@ Intersection rayCubeIntersectionPoints(vec3 rayOrigin, vec3 rayDirection, vec3 m
     return intersect;  // No intersection; you can return any sentinel value
 }
 
-
 // SDF for track bounding boxes
 float sdfCuboid(vec3 p, vec3 minCorner, vec3 maxCorner)
 {
@@ -254,17 +247,32 @@ float phaseFun(in float theta) {
     return phase;
 }
 
+// Simulate light being produced in a strip
+float lightBeamFactor(vec3 rayPos) {
+    float x = rayPos.z;
+    float gaussian = exp(-((x - lightCentreZ) * (x - lightCentreZ)) / (2.0 * lightStd * lightStd));
+    return gaussian;
+}
+
 // Raycast back to light source
 float lightMarch(in vec3 rayPosition) {
     vec3 lightDir = normalize(lightPos-rayPosition);
-
-    float subDen = 0.0;
-
     vec3 position = rayPosition;
 
-    for (int j=0; j<maxLightSamples; j++) {
-        position += lightDir*stepSize*randomStepModifier(rayPosition.xy);
-        subDen += texture(position)*stepSize*randomStepModifier(rayPosition.xy);
+    Intersection intersect = rayCubeIntersectionPoints(rayPosition, lightDir, minPos, maxPos);
+
+    float subDen = 0.0;
+    float step = (intersect.tFar-intersect.tNear) / maxLightSamples;
+
+    for (int j=0; j<int(maxLightSamples); j++) {
+        // Check whether light ray has left the cloud box
+        float tCurrent = getTCurrent(rayPosition, lightDir, position);
+        if (tCurrent > intersect.tFar) {
+            break;
+        }
+        
+        position += lightDir*step*randomStepModifier(rayPosition.xy);
+        subDen += texture(position)*step*randomStepModifier(rayPosition.xy);
     }
 
     float transmittance = exp(-subDen);
@@ -283,38 +291,19 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
     float lampIntensity = 0.0;
     float backgroundDepth = depthToDistance(texture(framebufferDepthTexture, texCoords).x);
 
-    bool eneteredCube = false;
-    vec3 col;
-
-    bool hit = false;
-
-    vec3 backGroundCol = vec3(0.0, 0.0, 0.0);
 
     // Determine distance to traverse cloud box
     Intersection intersect = rayCubeIntersectionPoints(ro, rd, minPos, maxPos);
-    // Run 10 course steps through cloud box
-    // Upon hitting an area of high density, back step by 1 step
-    // Switch to smaller step size
-    // Once cloud density < threashold for 10 small steps 
-    // Switch to course steps again
+
 
     if (intersect.intersectFound) {
         // if outside cloudbox then start ray at edge of cloud box
         if (intersect.tNear > 0.0) {
             rayPosition = intersect.minIntersect;
         }
-        float coarseStep = (intersect.tFar-intersect.tNear) / numCoarseSteps;
-        float fineStep = (intersect.tFar-intersect.tNear) / numFineSteps;
-        int numStepsBelowThreshold = 0;
+        float step = (intersect.tFar-intersect.tNear) / maxTransmissionSamples;
 
-        float lastLightEnergy = lightEnergy;
-        float lastTransmittance = transmittance;
-        float lastLampIntensity = lampIntensity;
-
-
-        float step = coarseStep;
-
-        for (int i = 0; i < maxIterations; i++) {
+        for (int i = 0; i < int(maxTransmissionSamples); i++) {
             // Check if ray has left cloud box
             float tCurrent = getTCurrent(ro, rd, rayPosition);
             if (tCurrent > intersect.tFar) {
@@ -331,47 +320,21 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
 
             float density = texture(rayPosition);
 
-            // If hit clouds switch to fine steps
-            if (!hit && density > densityThreashold) {
-                rayPosition -= rd*step;
-                step = fineStep;
-                hit = true;
-                numStepsBelowThreshold = 0;
-                lightEnergy = lastLightEnergy;
-                transmittance = lastTransmittance;
-                lampIntensity = lastLampIntensity;
-            }
-
-            // // If taken numResetSteps in low density switch to coarse steps
-            if (hit && density > densityThreashold) {
-                numStepsBelowThreshold ++;
-                if (numStepsBelowThreshold > numResetSteps) {
-                    // step = courseStep;
-                    hit = false;
-                }
-            }
-
-            lastLightEnergy = lightEnergy;
-            lastTransmittance = transmittance;
-            lastLampIntensity = lampIntensity;
-
             // Get light scattering factor
             vec3 lightDir = lightPos-rayPosition;
             float theta =  angleBetween(lightDir, rd) ;
             float phase = phaseFun(theta);
+            float lightBeamMult = lightBeamFactor(rayPosition);
 
             // Get light energy and opacity
             if (density > 0.0) {
-                // Only accumulate light energy if in strip of light
-                // if (abs(rayPosition.z) < lightHeightZ) {
-                    float lightTransmittance = lightMarch(rayPosition);
-                    lightEnergy += lightFactor * density * stepSize * transmittance * lightTransmittance * phase;
-                // }
-                transmittance *= exp(-density * stepSize * fogFactor);
+                float lightTransmittance = lightMarch(rayPosition);
+                lightEnergy += lightFactor * density * step * transmittance * lightTransmittance * phase * lightBeamMult;
+                transmittance *= exp(-density * step * fogFactor);
             } else {
                 // Draw lamp location on screen
                 if (angleBetween(rd, lightPos) < 0.01) {
-                    lampIntensity += 1.0*stepSize;
+                    lampIntensity += 1.0*step;
                 }
             }
 
@@ -379,14 +342,8 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
                 break;
             }
         }
-        vec4 pixCol = texture(framebufferColorTexture, texCoords);
-        backGroundCol = vec3(0.0);
-    } else {
-        backGroundCol = vec3(0.6, 0.2, 0.4);
     }
 
-    vec3 cloudCol = lightEnergy * lightColour;
-    col = backGroundCol * transmittance + cloudCol + lampIntensity*transmittance;
     return vec4(lightEnergy, transmittance, lampIntensity, 0.0);
 }
 
