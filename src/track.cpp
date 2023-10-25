@@ -5,7 +5,7 @@ track::Track::Track(simulation::Position origin){
     std::mt19937 gen(rd()); // Mersenne Twister PRNG
     std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-    int N_points = 5000;
+    int N_points = 2000;
     float length = 0.5;
     float thickness = 0.05;
 

@@ -25,8 +25,8 @@ uniform mat4 view;
 const float PI = 3.14159265359;
 const float threshold = 0.0;
 
-int maxIterations = 32;
-int maxLightSamples = 32;
+int maxIterations = 64;
+int maxLightSamples = 64;
 
 float stepSize = 0.025;
 float lightFactor = 5.0;
