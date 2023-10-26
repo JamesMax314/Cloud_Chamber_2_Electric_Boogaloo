@@ -277,7 +277,7 @@ void main()
         if(abs(vPosition.x)>1.0 || abs(vPosition.y)>1.0 || abs(vPosition.z)>1.0){
     	    float randx = random(vec2(3.1415, vPosition.z)); //Generate random x/y value
     	    float randy = random(vec2(6.6262, vPosition.x));
-    	    vPosition = vec3(randx, randy, 0.0);
+    	    vPosition = vec3(randx, randy, -1.0);
     	}
     }
 

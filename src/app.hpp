@@ -37,7 +37,7 @@ namespace app {
         shaders::Compute fancyShader;
         shaders::Shader quadShader;
         shaders::Shader rayShader;
-        shaders::Shader basicShader;
+        shaders::Shader gridShader;
         shaders::Shader postProcessShader;
 
         float pos = 0;

@@ -152,7 +152,7 @@ void app::App::init()
 
 
     const char* basicVert = "../shaders/basicVert.glsl";
-    const char* basicFrag = "../shaders/basicFrag.glsl";
+    const char* gridFrag = "../shaders/gridFrag.glsl";
 
     const char* vertexPostProcess = "../shaders/postProcessVert.glsl";
     const char* fragmentPostProcess = "../shaders/postProcessFrag.glsl";
@@ -167,7 +167,7 @@ void app::App::init()
     //fancyShader.init(statcVert);
     quadShader.init(quadVert, quadFrag);
     rayShader.init(rayMarchVert, rayMarchFrag);
-    basicShader.init(basicVert, basicFrag);
+    gridShader.init(basicVert, gridFrag);
     postProcessShader.init(vertexPostProcess, fragmentPostProcess);
 
     std::vector<simulation::Position> origin = utils::genRandomPoints(2);
@@ -187,8 +187,8 @@ void app::App::init()
     std::vector<simulation::Position> bg_verts = utils::genRandomPoints(10000);
     sim.init(&fancyShader, &quadShader, bg_verts, 0);
 
-    boundingBox.init(&basicShader, boxVerts, boxInds);
-    boundingBox.drawType = GL_LINES;
+    boundingBox.init(&gridShader, boxVerts, boxInds);
+    //boundingBox.drawType = GL_LINES;
 
     glEnable(GL_DEPTH_TEST);
     initBuffers();
@@ -330,8 +330,8 @@ void app::App::mainLoop()
     ray_marcher.mRenderShader->setUniform("farClip", farClip);
     ray_marcher.mRenderShader->setUniform("fovRad", fovRad);
 
-    basicShader.setUniformVec("view", viewMat);
-    basicShader.setUniformVec("projection", projection);
+    gridShader.setUniformVec("view", viewMat);
+    gridShader.setUniformVec("projection", projection);
 
     glm::vec3 lightPos = glm::vec3(2.0, 0.0, 0.0);
     glm::vec3 lightColour = glm::vec3(1.0, 1.0, 1.0);
