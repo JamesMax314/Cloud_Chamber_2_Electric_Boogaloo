@@ -24,6 +24,8 @@
 #include "rays.hpp"
 #include "track.hpp"
 #include "drawables.hpp"
+#include "frame.hpp"
+#include "textures.hpp"
 
 
 namespace app {
@@ -40,6 +42,8 @@ namespace app {
         shaders::Shader basicShader;
         shaders::Shader postProcessShader;
 
+        frame::Frame frameBuffer;
+
         float pos = 0;
         glm::vec3 position = glm::vec3(0.0, 0.0, 0.0);
 
@@ -52,8 +56,8 @@ namespace app {
 
         drawable::Drawable boundingBox;
 
-	std::default_random_engine rand_gen;
-	std::uniform_real_distribution<double> uniform_dist;
+	    std::default_random_engine rand_gen;
+	    std::uniform_real_distribution<double> uniform_dist;
 
         double t = 0;
         double now;
