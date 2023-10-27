@@ -95,6 +95,7 @@ namespace simulation {
 	unsigned int current_index = 0;
 
         Sim();
+        ~Sim();
         Sim(shaders::Shader *shader);
         Sim(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
         void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
@@ -104,7 +105,7 @@ namespace simulation {
         void loadUniforms();
         void updateFeedbackVec();
         void draw(window::Window* w);
-	void addVerts(std::vector<simulation::Position>& new_verts);
+	    void addVerts(std::vector<simulation::Position>& new_verts);
     };
 
     // Class for gpu density advection
@@ -114,9 +115,9 @@ namespace simulation {
         public:
 
         const GLfloat zeroToOneQuad[12] = {
-            0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
+            -1.0f, -1.0f, 0.0f,
+            1.0f, -1.0f, 0.0f,
+            -1.0f, 1.0f, 0.0f,
             1.0f, 1.0f, 0.0f,
         };
 
@@ -128,6 +129,7 @@ namespace simulation {
         frame::Frame frameBufferCloudDen;
 
         DensitySim();
+        ~DensitySim();
         void init(shaders::Shader *compShader);
         void update(window::Window* w);
     };

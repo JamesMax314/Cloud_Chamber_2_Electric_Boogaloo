@@ -1,11 +1,11 @@
 #version 300 es
 precision mediump float;
 
-in vec4 texturePos;
+in vec2 texturePos;
 out vec4 densityVal;
 
-uniform time;
-uniform dT;
+uniform float time;
+uniform float dT;
 uniform sampler2D texture2D; //The density texture at the previous time step 
 
 vec4 permute(vec4 x) {
@@ -278,7 +278,7 @@ vec3 BoxCoords(vec2 texturecoords){
 
 vec2 TexCoords(vec3 boxcoords){
 //Converts between box coordinates and texture coordinates
-    vec2 texcoords = vec3(0.0);
+    vec2 texcoords = vec2(0.0);
     texcoords.x = (1.0+boxcoords.x)/2.0 + (1.0+boxcoords.z)/2.0;
     texcoords.y = (1.0+boxcoords.y)/2.0;
     return texcoords;
@@ -297,6 +297,5 @@ void main()
 
     densityVal = texture(texture2D, prev_tex_pos); //Get the density value at that point
 
-    return densityVal;
-
+    // densityVal = vec4(0.0, texturePos.y, texturePos.x, 1.0);
 }

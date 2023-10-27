@@ -198,7 +198,7 @@ void app::App::init()
     bubbleDepthTex.initDepth(w.width, w.height);
     frameBufferBackBubbles.init(&bubbleColourTex, &bubbleDepthTex);
 
-    densitySim.init(&densityCompShader);
+    // densitySim.init(&densityCompShader);
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -209,6 +209,7 @@ void app::App::mainLoop()
     //Generate new track
     
     double p = uniform_dist(rand_gen);
+    // densitySim.update(&w);
  
     if(p < 0.004){
 	std::cout<<"Track created"<<std::endl;
@@ -283,9 +284,9 @@ void app::App::mainLoop()
     boundingBox.draw(w.getContext());
     frameBufferBackBubbles.deactivate();
 
-    // ray_marcher.draw(&w);
+    ray_marcher.draw(&w);
     //ray.draw(&w);
-    // boundingBox.draw(w.getContext());
+    boundingBox.draw(w.getContext());
 
     track_sim.updateFeedbackVec();
     ray_marcher.update(track_sim.feedbackVec);
