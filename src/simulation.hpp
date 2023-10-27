@@ -121,7 +121,7 @@ namespace simulation {
             1.0f, 1.0f, 0.0f,
         };
 
-        const int cloudTexDim = 100;
+        const int cloudTexDim = 1000;
 
         texture::Texture* flattenedCloudTexIn;
         texture::Texture* flattenedCloudTexOut;

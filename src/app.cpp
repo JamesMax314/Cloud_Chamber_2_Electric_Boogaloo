@@ -278,6 +278,7 @@ void app::App::mainLoop()
     ray_marcher.mRenderShader->setUniformVec("lightPos", lightPos);
     ray_marcher.mRenderShader->setUniformVec("lightColour", lightColour);
 
+    glViewport(0, 0, w.width, w.height);
     frameBufferBackBubbles.activate();
     sim.draw(&w);
     //track_sim.draw(&w); //Draw track particles

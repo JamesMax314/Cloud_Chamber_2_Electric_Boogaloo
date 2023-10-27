@@ -190,8 +190,8 @@ void simulation::DensitySim::init(shaders::Shader *compShader)
     // Initialise a colour texture to render the volume to
     flattenedCloudTexIn = new texture::Texture();
     flattenedCloudTexOut = new texture::Texture();
-    flattenedCloudTexIn->initColour(cloudTexDim*cloudTexDim, cloudTexDim);
-    flattenedCloudTexOut->initColour(cloudTexDim*cloudTexDim, cloudTexDim);
+    flattenedCloudTexIn->initColour(cloudTexDim, cloudTexDim);
+    flattenedCloudTexOut->initColour(cloudTexDim, cloudTexDim);
     frameBufferCloudDen.init(flattenedCloudTexOut);
 
     mCompShader = compShader;
@@ -225,7 +225,7 @@ void simulation::DensitySim::update(window::Window* w)
     mCompShader->activate();
 
     // Set window dimensions
-    glViewport(0, 0, cloudTexDim*cloudTexDim, cloudTexDim);
+    glViewport(0, 0, cloudTexDim, cloudTexDim);
 
     // Bind render quad 
     glEnableVertexAttribArray(0);
@@ -247,9 +247,11 @@ void simulation::DensitySim::update(window::Window* w)
     std::swap(flattenedCloudTexIn, flattenedCloudTexOut);
     frameBufferCloudDen.setRenderTexture(flattenedCloudTexOut);
 
+    // Reset window dimensions
+    glViewport(0, 0, w->width, w->height);
+
     // Deactivate FBO
     frameBufferCloudDen.deactivate();
-
-    // Reset window dimensions
+    
     // glfwSwapBuffers(w->getContext());
 }
