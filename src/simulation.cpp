@@ -257,7 +257,7 @@ void simulation::DensitySim::update(window::Window* w)
     // glfwSwapBuffers(w->getContext());
 }
 
-void simulation::DensitySim::addTrack(window::Window* w, std::vector<glm::vec3> positions)
+void simulation::DensitySim::addTrack(window::Window* w, std::vector<glm::vec3> &positions)
 {
     // Make context current
     glfwMakeContextCurrent(w->getContext());
@@ -272,6 +272,8 @@ void simulation::DensitySim::addTrack(window::Window* w, std::vector<glm::vec3> 
     // Activate compute shader
     mTrackShader->activate();
     mTrackShader->setUniformArrVec("trackPoints", positions.data(), positions.size());
+    int trackID = 0;
+    mTrackShader->setUniform("trackID", trackID);
 
     // Set positions uniform
 
@@ -284,7 +286,7 @@ void simulation::DensitySim::addTrack(window::Window* w, std::vector<glm::vec3> 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     // Bind cloud texture in to read from
-    glActiveTexture(GL_TEXTURE5); // Texture unit 0
+    glActiveTexture(GL_TEXTURE5); // Texture unit 5
     glBindTexture(GL_TEXTURE_2D, flattenedCloudTexIn->getRef());
     glUniform1i(glGetUniformLocation(mCompShader->mProgram, "texture2D"), 5);
 

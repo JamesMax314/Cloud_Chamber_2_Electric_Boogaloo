@@ -81,7 +81,7 @@ namespace simulation {
         shaders::Shader* mCompShader;
         shaders::Shader* mRenderShader;
 
-	unsigned int nVerts = 200000;
+	unsigned int nVerts = 20000;
         std::vector<glm::vec3> mStartPos;
         std::vector<unsigned int> mIndices;
         std::vector<glm::vec3> feedbackVec;
@@ -134,6 +134,6 @@ namespace simulation {
         ~DensitySim();
         void init(shaders::Shader *compShader, shaders::Shader *trackShader);
         void update(window::Window* w);
-        void addTrack(window::Window* w, std::vector<glm::vec3> positions);
+        void addTrack(window::Window* w, std::vector<glm::vec3> &positions);
     };
 }

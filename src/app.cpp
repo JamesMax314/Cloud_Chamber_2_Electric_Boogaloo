@@ -175,7 +175,7 @@ void app::App::init()
     basicShader.init(basicVert, basicFrag);
     postProcessShader.init(vertexPostProcess, fragmentPostProcess);
     densityCompShader.init(vertexTexture, fragmentTexture);
-    // trackGenShader.init(vertexTexture, fragmentTrackGen);
+    trackGenShader.init(vertexTexture, fragmentTrackGen);
 
     std::vector<simulation::Position> origin = utils::genRandomPoints(2);
     
@@ -202,7 +202,7 @@ void app::App::init()
     frameBufferBackBubbles.init(&bubbleColourTex, &bubbleDepthTex);
 
     densitySim.init(&densityCompShader, &trackGenShader);
-    // densitySim.addTrack(&w, track_verts);
+    densitySim.addTrack(&w, track_verts);
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -213,7 +213,7 @@ void app::App::mainLoop()
     //Generate new track
     
     double p = uniform_dist(rand_gen);
-    // densitySim.update(&w);
+    densitySim.update(&w);
  
     if(p < 0.004){
 	std::cout<<"Track created"<<std::endl;

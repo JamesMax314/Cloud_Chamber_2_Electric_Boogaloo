@@ -47,7 +47,7 @@ namespace shaders {
         }
 
         template <typename dataType>
-        void setUniformArrVec(const char *name, dataType* data, int numPoints)
+        void setUniformArrVec(const char *name, const dataType* data, int numPoints)
         {
             activate();
 
