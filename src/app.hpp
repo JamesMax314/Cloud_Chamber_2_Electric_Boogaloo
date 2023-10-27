@@ -67,7 +67,7 @@ namespace app {
 
         simulation::Sim sim;
         simulation::Sim track_sim;
-        // simulation::DensitySim densitySim;
+        simulation::DensitySim densitySim;
         
         rayMarch::RayMarch ray_marcher;
         rayMarch::RayMarch ray;

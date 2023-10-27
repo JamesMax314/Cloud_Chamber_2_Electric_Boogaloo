@@ -198,7 +198,7 @@ void app::App::init()
     bubbleDepthTex.initDepth(w.width, w.height);
     frameBufferBackBubbles.init(&bubbleColourTex, &bubbleDepthTex);
 
-    // densitySim.init(&densityCompShader);
+    densitySim.init(&densityCompShader);
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -209,7 +209,7 @@ void app::App::mainLoop()
     //Generate new track
     
     double p = uniform_dist(rand_gen);
-    // densitySim.update(&w);
+    densitySim.update(&w);
  
     if(p < 0.004){
 	std::cout<<"Track created"<<std::endl;
