@@ -284,9 +284,9 @@ void app::App::mainLoop()
     boundingBox.draw(w.getContext());
     frameBufferBackBubbles.deactivate();
 
-    ray_marcher.draw(&w);
+    // ray_marcher.draw(&w);
     //ray.draw(&w);
-    boundingBox.draw(w.getContext());
+    // boundingBox.draw(w.getContext());
 
     track_sim.updateFeedbackVec();
     ray_marcher.update(track_sim.feedbackVec);
