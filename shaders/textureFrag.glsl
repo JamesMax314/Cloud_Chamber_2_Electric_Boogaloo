@@ -270,17 +270,18 @@ float N = 100.0; //Grid size in each direction
 vec3 BoxCoords(vec2 texturecoords){
 //Converts between texture coords and spatial coordinates in the box
     vec3 boxcoords = vec3(0.0);
-    boxcoords.x = mod(texturecoords.x, 1.0/N);
-    boxcoords.y = texturecoords.y;
-    boxcoords.z = (texturecoords.x-boxcoords.x);
+    boxcoords.x = mod(texturecoords.x, 1.0/sqrt(N));
+    boxcoords.y = mod(texturecoords.y, 1.0/sqrt(N));
+    boxcoords.z = (texturecoords.x-boxcoords.x) + 0.1*(texturecoords.y-boxcoords.y);
     return 2.0*boxcoords-1.0;
 }
 
 vec2 TexCoords(vec3 boxcoords){
 //Converts between box coordinates and texture coordinates
+    vec3 newboxcoords = (boxcoords+1.0)/2.0;
     vec2 texcoords = vec2(0.0);
-    texcoords.x = (1.0+boxcoords.x)/2.0 + (1.0+boxcoords.z)/2.0;
-    texcoords.y = (1.0+boxcoords.y)/2.0;
+    texcoords.x = newboxcoords.x + (1.0/N)*mod(newboxcoords.z, 1.0/N);
+    texcoords.y = newboxcoords.y + (1.0/N)*mod(newboxcoords.z, 1.0/sqrt(N));
     return texcoords;
 }
 
