@@ -47,6 +47,21 @@ namespace shaders {
         }
 
         template <typename dataType>
+        void setUniformArrVec(const char *name, dataType* data, int numPoints)
+        {
+            activate();
+
+            GLuint location = glGetUniformLocation(mProgram, name);
+
+            // todo seperate into if blocks
+            if (typeid(dataType) == typeid(glm::mat4)) {
+                glUniformMatrix4fv(location, numPoints, GL_FALSE, glm::value_ptr(data[0]));
+            } else if (typeid(dataType) == typeid(glm::vec3)) {
+                glUniform3fv(location, numPoints, glm::value_ptr(data[0]));
+            }   
+        }
+
+        template <typename dataType>
         void setUniform(const char *name, dataType &data)
         {
             activate();

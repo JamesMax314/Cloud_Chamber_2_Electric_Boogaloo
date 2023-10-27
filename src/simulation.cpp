@@ -185,7 +185,7 @@ simulation::DensitySim::~DensitySim()
     delete flattenedCloudTexOut;
 }
 
-void simulation::DensitySim::init(shaders::Shader *compShader)
+void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *trackShader)
 {
     // Initialise a colour texture to render the volume to
     flattenedCloudTexIn = new texture::Texture();
@@ -195,6 +195,7 @@ void simulation::DensitySim::init(shaders::Shader *compShader)
     frameBufferCloudDen.init(flattenedCloudTexOut);
 
     mCompShader = compShader;
+    mTrackShader = trackShader;
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &billboard_vertex_buffer);
@@ -254,4 +255,52 @@ void simulation::DensitySim::update(window::Window* w)
     frameBufferCloudDen.deactivate();
     
     // glfwSwapBuffers(w->getContext());
+}
+
+void simulation::DensitySim::addTrack(window::Window* w, std::vector<glm::vec3> positions)
+{
+    // Make context current
+    glfwMakeContextCurrent(w->getContext());
+
+    // Bind FBO
+    frameBufferCloudDen.activate();
+    frameBufferCloudDen.clear();
+
+    // Bind VAO
+    glBindVertexArray(VAO);
+
+    // Activate compute shader
+    mTrackShader->activate();
+    mTrackShader->setUniformArrVec("trackPoints", positions.data(), positions.size());
+
+    // Set positions uniform
+
+    // Set window dimensions
+    glViewport(0, 0, cloudTexDim, cloudTexDim);
+
+    // Bind render quad 
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Bind cloud texture in to read from
+    glActiveTexture(GL_TEXTURE5); // Texture unit 0
+    glBindTexture(GL_TEXTURE_2D, flattenedCloudTexIn->getRef());
+    glUniform1i(glGetUniformLocation(mCompShader->mProgram, "texture2D"), 5);
+
+    // Draw call
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
+
+    // Deactivate VAO
+    glBindVertexArray(0);
+
+    // Swap reading and wirthin textures
+    std::swap(flattenedCloudTexIn, flattenedCloudTexOut);
+    frameBufferCloudDen.setRenderTexture(flattenedCloudTexOut);
+
+    // Reset window dimensions
+    glViewport(0, 0, w->width, w->height);
+
+    // Deactivate FBO
+    frameBufferCloudDen.deactivate();
 }

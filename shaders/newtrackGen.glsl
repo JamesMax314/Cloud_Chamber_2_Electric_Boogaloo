@@ -5,6 +5,8 @@ uniform vec3 trackPoints[1000];
 uniform int trackID;
 uniform sampler2D texture2D; //The density texture at the previous time step 
 
+float N = 100.0; //Grid size in each direction
+
 in vec2 texturePos;
 out vec4 densityVal;
 
@@ -255,7 +257,7 @@ void main(){
     densityVal = texture(texture2D, texturePos);
     
     for(int i =0; i<1000; i++){
-	vec3 pos = boxcoords-trackPoints[i];
-	densityVal.x += fbm(pos, 0.0, grad)/(abs(pos)*abs(pos));	
+      vec3 pos = boxcoords-trackPoints[i];
+      densityVal.x += fbm(pos, 0.0, grad)/(length(pos)*length(pos));	
     }
 }

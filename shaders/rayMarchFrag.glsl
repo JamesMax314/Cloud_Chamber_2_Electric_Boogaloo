@@ -5,7 +5,7 @@ in vec4 fragPos;
 in vec2 texCoords;
 out vec4 FragColor;
 
-uniform mediump sampler3D texture3D; // Cloud texture
+uniform sampler2D texture3D; // Cloud texture
 uniform sampler2D framebufferColorTexture; // The framebuffer's color texture
 uniform sampler2D framebufferDepthTexture;  // The depth texture
 
@@ -32,6 +32,8 @@ float fogFactor = 10.0;
 float lightCentreZ = 0.0;
 float lightStd = 0.2;
 
+float N = 100.0; //Grid size in each direction
+
 vec3 boundingCubeMin = -1.0*vec3(1.0);
 vec3 boundingCubeMax = vec3(1.0);
 
@@ -43,6 +45,23 @@ struct Intersection {
     vec3 maxIntersect;
 };
 
+vec3 BoxCoords(vec2 texturecoords){
+//Converts between texture coords and spatial coordinates in the box
+    vec3 boxcoords = vec3(0.0);
+    boxcoords.x = mod(texturecoords.x, 1.0/sqrt(N));
+    boxcoords.y = mod(texturecoords.y, 1.0/sqrt(N));
+    boxcoords.z = (texturecoords.x-boxcoords.x) + 0.1*(texturecoords.y-boxcoords.y);
+    return 2.0*boxcoords-1.0;
+}
+
+vec2 TexCoords(vec3 boxcoords){
+//Converts between box coordinates and texture coordinates
+    vec3 newboxcoords = (boxcoords+1.0)/2.0;
+    vec2 texcoords = vec2(0.0);
+    texcoords.x = newboxcoords.x + (1.0/N)*mod(newboxcoords.z, 1.0/N);
+    texcoords.y = newboxcoords.y + (1.0/N)*mod(newboxcoords.z, 1.0/sqrt(N));
+    return texcoords;
+}
 
 float depthToDistance(float depth) {
     float ndcDepth = 2.0 * depth - 1.0;
@@ -210,19 +229,20 @@ float sphereTexture(in vec3 pos)
 float texture(in vec3 pos) 
 {
     // return sphereTexture(pos);
-    if (sdfCuboid(pos, boundingCubeMin, boundingCubeMax) < 0.0) {
-        if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
-            vec3 stepSize = (maxPos - minPos) / (texDim-1.0); // texture dim - 1 add as uniform
-            vec3 texCoords = (pos-minPos) / (stepSize*texDim);
-            float den = texture(texture3D, texCoords).r;
-            if (den < threshold) {
-                den = 0.0;
-            }
-            return den*0.1;
-        }
-        return 0.0;
+
+    // Convert world space position into box position
+    vec3 stepSize = (maxPos - minPos) / (texDim-1.0); // texture dim - 1 add as uniform
+    vec3 boxCoords = (pos-minPos) / (stepSize*texDim);
+
+    // Convert box position into texture position
+    vec2 tex3DCoords = TexCoords(boxCoords);
+
+    // Read out texture value
+    float den = texture(texture3D, tex3DCoords).r;
+    if (den < threshold) {
+        den = 0.0;
     }
-    return 0.0;
+    return den*0.1;
 }
 
 // To help avoid banding

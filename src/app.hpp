@@ -55,6 +55,7 @@ namespace app {
         shaders::Shader basicShader;
         shaders::Shader postProcessShader;
         shaders::Shader densityCompShader;
+        shaders::Shader trackGenShader;
 
         texture::Texture bubbleColourTex;
         texture::Texture bubbleDepthTex;
