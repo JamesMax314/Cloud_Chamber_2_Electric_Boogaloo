@@ -11,6 +11,8 @@
 
 #include "shaders.hpp"
 #include "window.hpp"
+#include "textures.hpp"
+#include "frame.hpp"
 
 namespace simulation {
     typedef glm::vec3 Position;
@@ -103,5 +105,30 @@ namespace simulation {
         void updateFeedbackVec();
         void draw(window::Window* w);
 	void addVerts(std::vector<simulation::Position>& new_verts);
+    };
+
+    // Class for gpu density advection
+
+    class DensitySim : public Sim
+    {
+        public:
+
+        const GLfloat zeroToOneQuad[12] = {
+            0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+            1.0f, 1.0f, 0.0f,
+        };
+
+        const int cloudTexDim = 100;
+
+        texture::Texture* flattenedCloudTexIn;
+        texture::Texture* flattenedCloudTexOut;
+
+        frame::Frame frameBufferCloudDen;
+
+        DensitySim();
+        void init(shaders::Shader *compShader);
+        void update(window::Window* w);
     };
 }

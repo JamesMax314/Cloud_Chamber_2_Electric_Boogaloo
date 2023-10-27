@@ -84,3 +84,20 @@ void frame::Frame::setRenderTexture(texture::Texture *colourTexture, texture::Te
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture->getRef(), 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+void frame::Frame::clear()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void frame::Frame::activate()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+}
+
+void frame::Frame::deactivate()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}

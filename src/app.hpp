@@ -31,48 +31,56 @@
 namespace app {
     class App {
         public:
-        window::Window w;
-        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer, FBO, textureOut, depthOut;
+
+        bool keys[GLFW_KEY_LAST] = { false };
+
+        int drawFPS = 0;
         const int ParticleCount = 4;
+
+        float pos = 0;
+        float motionSpeed = 0.01;
+	    float time = 0.0;
+
+        double t = 0;
+        double now;
+
+        window::Window w;
+
+        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer, FBO, textureOut, depthOut;
         GLuint vao;
-        drawable::Drawable square;
+
         shaders::Compute fancyShader;
         shaders::Shader quadShader;
         shaders::Shader rayShader;
         shaders::Shader basicShader;
         shaders::Shader postProcessShader;
+        shaders::Shader densityCompShader;
 
-        frame::Frame frameBuffer;
+        texture::Texture bubbleColourTex;
+        texture::Texture bubbleDepthTex;
 
-        float pos = 0;
+        frame::Frame frameBufferBackBubbles;
+
         glm::vec3 position = glm::vec3(0.0, 0.0, 0.0);
 
         camera::Camera cam;
 
         simulation::Sim sim;
         simulation::Sim track_sim;
+        simulation::DensitySim densitySim;
+        
         rayMarch::RayMarch ray_marcher;
         rayMarch::RayMarch ray;
 
         drawable::Drawable boundingBox;
+        drawable::Drawable square;
 
 	    std::default_random_engine rand_gen;
 	    std::uniform_real_distribution<double> uniform_dist;
 
-        double t = 0;
-        double now;
-        int drawFPS = 0;
-
-        bool keys[GLFW_KEY_LAST] = { false };
-
-        float motionSpeed = 0.01;
-
-	    float time = 0.0;
-
         App();
 
         void init();
-        void initBuffers();
         void mainLoop();
 
 

@@ -170,3 +170,69 @@ void simulation::Sim::addVerts(std::vector<simulation::Position>& new_verts){
     }
     std::cout<<newVerts.size()<<std::endl;
 }
+
+simulation::DensitySim::DensitySim()
+{
+}
+
+void simulation::DensitySim::init(shaders::Shader *compShader)
+{
+    // Initialise a colour texture to render the volume to
+    flattenedCloudTexIn->initColour(cloudTexDim, cloudTexDim*cloudTexDim);
+    flattenedCloudTexOut->initColour(cloudTexDim, cloudTexDim*cloudTexDim);
+    frameBufferCloudDen.init(flattenedCloudTexOut);
+
+    mCompShader = compShader;
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &billboard_vertex_buffer);
+    
+    glBindVertexArray(VAO);
+
+    // Bind rendering buffers
+    glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(zeroToOneQuad), zeroToOneQuad, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
+void simulation::DensitySim::update(window::Window* w)
+{
+    // Make context current
+    glfwMakeContextCurrent(w->getContext());
+
+    // Bind FBO
+    frameBufferCloudDen.clear();
+    frameBufferCloudDen.activate();
+
+    // Bind VAO
+    glGenVertexArrays(1, &VAO);
+
+    // Activate compute shader
+    mCompShader->activate();
+
+    // Set window dimensions
+    glViewport(0, 0, cloudTexDim, cloudTexDim*cloudTexDim);
+
+    // Bind cloud texture in to read from
+    glActiveTexture(GL_TEXTURE0); // Texture unit 0
+    glBindTexture(GL_TEXTURE_2D, flattenedCloudTexIn->getRef());
+    glUniform1i(glGetUniformLocation(mCompShader->mProgram, "texture2D"), 0);
+
+    // Draw call
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
+
+    // Deactivate VAO
+    glGenVertexArrays(1, 0);
+
+    // Swap reading and wirthin textures
+    std::swap(flattenedCloudTexIn, flattenedCloudTexOut);
+
+    // Deactivate FBO
+    frameBufferCloudDen.deactivate();
+    frameBufferCloudDen.setRenderTexture(flattenedCloudTexOut);
+
+    // Reset window dimensions
+    glViewport(0, 0, w->width, w->height);
+}

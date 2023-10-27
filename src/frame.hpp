@@ -18,6 +18,7 @@
 #include <random>
 
 #include "textures.hpp"
+#include "window.hpp"
 
 namespace frame
 {
@@ -35,6 +36,10 @@ namespace frame
 
         void setRenderTexture(texture::Texture* colourTexture);
         void setRenderTexture(texture::Texture* colourTexture, texture::Texture* depthTexture);
+
+        void clear();
+        void activate();
+        void deactivate();
 
     };
 }
