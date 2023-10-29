@@ -184,7 +184,7 @@ void rayMarch::RayMarch::draw(window::Window* w)
     glBindVertexArray(0);
 }
 
-void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
+void rayMarch::RayMarch::genMask(window::Window *w, GLuint cloudTexFlat, GLuint backgroundTexture, GLuint backgroundDepth)
 {
     glfwMakeContextCurrent(w->getContext());
     glViewport(0, 0, renderWidth, renderHeight);
@@ -207,9 +207,8 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
 
     // Bind and populate Texture
     glActiveTexture(GL_TEXTURE0); // Texture unit 0
-    glBindTexture(GL_TEXTURE_3D, texture_buffer);
-    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, texture3D);
-    glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "texture3D"), 0); // Assign 3d texture to texture unit 0
+    glBindTexture(GL_TEXTURE_2D, cloudTexFlat);
+    glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "texture3D"), 0); // Assign 3d flatterned texture to texture unit 0
 
     glActiveTexture(GL_TEXTURE1); // Texture unit 1
     glBindTexture(GL_TEXTURE_2D, backgroundTexture);
@@ -220,6 +219,8 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
     glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "framebufferDepthTexture"), 2);
 
     // Set the max and min corners
+    minCorner = glm::vec3(-1.0);
+    maxCorner = glm::vec3(1.0);
     mRenderShader->setUniformVec("minPos", minCorner);
     mRenderShader->setUniformVec("maxPos", maxCorner);
     float fTextDim = (float)textureDim;
@@ -234,9 +235,9 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
     glViewport(0, 0, w->width, w->height);
 }
 
-void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
+void rayMarch::RayMarch::draw(window::Window *w, GLuint cloudTexFlat, GLuint backgroundTexture, GLuint backgroundDepth)
 {
-    genMask(w, backgroundTexture, backgroundDepth);
+    genMask(w, cloudTexFlat, backgroundTexture, backgroundDepth);
 
     glfwMakeContextCurrent(w->getContext());
 

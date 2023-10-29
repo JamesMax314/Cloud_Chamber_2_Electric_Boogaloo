@@ -47,19 +47,31 @@ struct Intersection {
 
 vec3 BoxCoords(vec2 texturecoords){
 //Converts between texture coords and spatial coordinates in the box
+    float floorFix = 0.000001;
     vec3 boxcoords = vec3(0.0);
-    boxcoords.x = mod(texturecoords.x, 1.0/sqrt(N));
-    boxcoords.y = mod(texturecoords.y, 1.0/sqrt(N));
-    boxcoords.z = (texturecoords.x-boxcoords.x) + 0.1*(texturecoords.y-boxcoords.y);
+    vec2 zFactors = vec2(0.0, 0.0);
+
+    // Goes zero to one every 1/sqrt(N)
+    boxcoords.x = mod(texturecoords.x, 1.0/sqrt(N)) * sqrt(N);
+    boxcoords.y = mod(texturecoords.y, 1.0/sqrt(N)) * sqrt(N);
+
+    // Bottom to top then left to right
+    zFactors.x = floor(texturecoords.x * sqrt(N) + floorFix) * 1.0/sqrt(N);
+    zFactors.y = floor(texturecoords.y * sqrt(N) + floorFix) * 1.0/N;
+
+    boxcoords.z = zFactors.x + zFactors.y;
     return 2.0*boxcoords-1.0;
 }
 
 vec2 TexCoords(vec3 boxcoords){
 //Converts between box coordinates and texture coordinates
+    float floorFix = 0.000001;
     vec3 newboxcoords = (boxcoords+1.0)/2.0;
     vec2 texcoords = vec2(0.0);
-    texcoords.x = newboxcoords.x + (1.0/N)*mod(newboxcoords.z, 1.0/N);
-    texcoords.y = newboxcoords.y + (1.0/N)*mod(newboxcoords.z, 1.0/sqrt(N));
+
+    // Bottom to top then left to right
+    texcoords.x = floor(newboxcoords.z * sqrt(N) + floorFix) * 1.0/sqrt(N) + newboxcoords.x * 1.0/sqrt(N);
+    texcoords.y = mod(floor(newboxcoords.z * N + floorFix), sqrt(N)) * 1.0/sqrt(N) + newboxcoords.y * 1.0/sqrt(N);
     return texcoords;
 }
 
