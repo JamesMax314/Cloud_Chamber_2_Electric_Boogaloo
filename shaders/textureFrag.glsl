@@ -264,6 +264,30 @@ float random(vec2 st)
     return 2.0*fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123)-1.0;
 } 
 
+// SDF for track bounding boxes
+float sdfCuboid(vec3 p, vec3 minCorner, vec3 maxCorner)
+{
+    vec3 c = (minCorner + maxCorner) * 0.5;;
+    vec3 s = (maxCorner - minCorner);
+    float x = max
+    (   p.x - c.x - s.x / 2.,
+        c.x - p.x - s.x / 2.
+    );
+    float y = max
+    (   p.y - c.y - s.y / 2.,
+        c.y - p.y - s.y / 2.
+    );
+    
+    float z = max
+    (   p.z - c.z - s.z / 2.,
+        c.z - p.z - s.z / 2.
+    );
+    float d = x;
+    d = max(d,y);
+    d = max(d,z);
+    return d;
+}
+
 float N = 100.0; //Grid size in each direction
 
 
@@ -302,13 +326,18 @@ void main()
     vec3 boxpos = BoxCoords(texturePos); //Convert to position in box space
     
     vec3 drift = vec3(0.0, 0.0, 0.0008);
-    vec3 u = 0.001*curlnoise(boxpos, 0.1*time) + drift; //Calculate the velocity field at this point 
+    // vec3 u = 0.001*curlnoise(boxpos, 0.1*time) + drift; //Calculate the velocity field at this point 
+    vec3 u = drift; //Calculate the velocity field at this point 
 
     vec3 prev_box_pos = boxpos - u*dT; //Step back position using semi-lagrangian discretisation
 
-    vec2 prev_tex_pos = TexCoords(prev_box_pos); //Map the previous position to the density texture
+    if (sdfCuboid(prev_box_pos, vec3(-1.0), vec3(1.0)) < 0.0) {
+      vec2 prev_tex_pos = TexCoords(prev_box_pos); //Map the previous position to the density texture
+      densityVal = texture(texture2D, prev_tex_pos); //Get the density value at that point
+    } else {
+      densityVal = vec4(0.0, 0.0, 0.0, 1.0);
+    }
 
-    densityVal = texture(texture2D, prev_tex_pos); //Get the density value at that point
     // densityVal = vec4(prev_tex_pos.x, prev_tex_pos.y, 1.0, 1.0); //Get the density value at that point
     // densityVal = vec4(texturePos.x, texturePos.y, 1.0, 1.0); //Get the density value at that point
     // densityVal = vec4((boxpos.x+1.0)/2.0, (boxpos.y+1.0)/2.0, (boxpos.z+1.0)/2.0, 1.0); //Get the density value at that point

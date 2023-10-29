@@ -233,7 +233,7 @@ void app::App::mainLoop()
     // sim.update(&w);
     // track_sim.update(&w);
 
-    // glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     // frameBufferBackBubbles.clear();
     // densitySim.update(&w);
 
@@ -308,7 +308,7 @@ void app::App::mainLoop()
     // ray_marcher.draw(&w);
 
     float dT = 0.001;
-    // densityCompShader.setUniform("dT", dT);
+    densityCompShader.setUniform("dT", dT);
     densitySim.update(&w);
 
     glfwSwapBuffers(w.getContext());

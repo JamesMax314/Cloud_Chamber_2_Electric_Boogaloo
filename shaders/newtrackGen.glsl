@@ -282,12 +282,12 @@ void main(){
     float dist = 10.0;
     
     for(int i =0; i<1000; i++){
-	vec3 pos = boxcoords-trackPoints[0];
-	if(length(pos) < dist){
-	    closest_pos = pos;
-	    dist = length(pos);
-	}
+      vec3 pos = boxcoords-trackPoints[0];
+      if(length(pos) < dist){
+          closest_pos = pos;
+          dist = length(pos);
+      }
     }
     
-    densityVal.x += fbm(closest_pos, 0.0, grad)/(dist*dist);
+    densityVal.r += fbm(closest_pos, 0.0, grad)/(dist*dist);
 }
