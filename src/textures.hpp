@@ -7,6 +7,10 @@
 #define GLFW_INCLUDE_ES3
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#define GLM_FORCE_PURE
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
@@ -29,6 +33,7 @@ namespace texture
         void initColour(int width, int height);
         void initDepth(int width, int height);
         void setInterp(GLuint interpMode);
+        void setColour(glm::vec4 colour);
 
         GLuint getRef();
     };

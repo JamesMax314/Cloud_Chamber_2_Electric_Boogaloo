@@ -62,6 +62,8 @@ void frame::Frame::checkConfig()
                 printf("Unknown Error\n");
                 break;
         }
+    } else {
+        printf("Initialized Framebuffer\n");
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -87,9 +89,7 @@ void frame::Frame::setRenderTexture(texture::Texture *colourTexture, texture::Te
 
 void frame::Frame::clear()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void frame::Frame::activate()

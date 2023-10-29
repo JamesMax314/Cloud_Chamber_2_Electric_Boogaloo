@@ -57,5 +57,4 @@ classDiagram
 ```
 
 # TODO:
-- [ ] Make rays not a subclass of sim;
-- [ ] Rays should take a reference to the gpu data for particle tracks when it generates its density grid;
+- [ ] Initialize the textures before setting them as unifomrs

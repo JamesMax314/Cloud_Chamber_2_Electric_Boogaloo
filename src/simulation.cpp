@@ -191,6 +191,7 @@ void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *
     flattenedCloudTexIn = new texture::Texture();
     flattenedCloudTexOut = new texture::Texture();
     flattenedCloudTexIn->initColour(cloudTexDim, cloudTexDim);
+    // flattenedCloudTexIn->setColour(glm::vec4(1.0));
     flattenedCloudTexOut->initColour(cloudTexDim, cloudTexDim);
     frameBufferCloudDen.init(flattenedCloudTexOut);
 
@@ -234,12 +235,16 @@ void simulation::DensitySim::update(window::Window* w)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     // Bind cloud texture in to read from
-    glActiveTexture(GL_TEXTURE5); // Texture unit 0
+    glActiveTexture(GL_TEXTURE0); // Texture unit 0
     glBindTexture(GL_TEXTURE_2D, flattenedCloudTexIn->getRef());
-    glUniform1i(glGetUniformLocation(mCompShader->mProgram, "texture2D"), 5);
+    glUniform1i(glGetUniformLocation(mCompShader->mProgram, "texture2D"), 0);
+
+    printf("Setup draw\n");
 
     // Draw call
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
+
+    printf("Draw complete \n");
 
     // Deactivate VAO
     glBindVertexArray(0);
@@ -247,12 +252,42 @@ void simulation::DensitySim::update(window::Window* w)
     // Swap reading and wirthin textures
     std::swap(flattenedCloudTexIn, flattenedCloudTexOut);
     frameBufferCloudDen.setRenderTexture(flattenedCloudTexOut);
+    printf("Swapped \n");
 
     // Reset window dimensions
     glViewport(0, 0, w->width, w->height);
 
     // Deactivate FBO
     frameBufferCloudDen.deactivate();
+
+
+
+
+
+        // Bind VAO
+    glBindVertexArray(VAO);
+
+    // Activate compute shader
+    mCompShader->activate();
+
+    // Set window dimensions
+    glViewport(0, 0, cloudTexDim, cloudTexDim);
+
+    // Bind render quad 
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Bind cloud texture in to read from
+    glActiveTexture(GL_TEXTURE0); // Texture unit 0
+    glBindTexture(GL_TEXTURE_2D, flattenedCloudTexIn->getRef());
+    glUniform1i(glGetUniformLocation(mCompShader->mProgram, "texture2D"), 0);
+
+    // Draw call
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
+
+    // Deactivate VAO
+    glBindVertexArray(0);
     
     // glfwSwapBuffers(w->getContext());
 }
@@ -286,9 +321,9 @@ void simulation::DensitySim::addTrack(window::Window* w, std::vector<glm::vec3> 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     // Bind cloud texture in to read from
-    glActiveTexture(GL_TEXTURE5); // Texture unit 5
+    glActiveTexture(GL_TEXTURE0); // Texture unit 0
     glBindTexture(GL_TEXTURE_2D, flattenedCloudTexIn->getRef());
-    glUniform1i(glGetUniformLocation(mCompShader->mProgram, "texture2D"), 5);
+    glUniform1i(glGetUniformLocation(mTrackShader->mProgram, "texture2D"), 0);
 
     // Draw call
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
@@ -305,4 +340,6 @@ void simulation::DensitySim::addTrack(window::Window* w, std::vector<glm::vec3> 
 
     // Deactivate FBO
     frameBufferCloudDen.deactivate();
+
+    printf("Track Added\n");
 }

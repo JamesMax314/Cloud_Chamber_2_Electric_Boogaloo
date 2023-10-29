@@ -202,9 +202,17 @@ void app::App::init()
     frameBufferBackBubbles.init(&bubbleColourTex, &bubbleDepthTex);
 
     densitySim.init(&densityCompShader, &trackGenShader);
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        printf("Error %u \n", error);
+    }
     densitySim.addTrack(&w, track_verts);
+    error = glGetError();
+    if (error != GL_NO_ERROR) {
+        printf("Error %u \n", error);
+    }
 
-    glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_DEPTH_TEST);
 }
 
 void app::App::mainLoop()
@@ -212,92 +220,96 @@ void app::App::mainLoop()
 
     //Generate new track
     
-    double p = uniform_dist(rand_gen);
-    densitySim.update(&w);
+    // double p = uniform_dist(rand_gen);
  
-    if(p < 0.004){
-	std::cout<<"Track created"<<std::endl;
-	std::vector<simulation::Position> origin = utils::genRandomPoints(1);
-	track::Track new_track(glm::vec3(0.0));
-    	std::vector<glm::vec3> temp_track_verts = new_track.get_vertices();
-	track_sim.addVerts(temp_track_verts);
-    }
+    // if(p < 0.004){
+	// std::cout<<"Track created"<<std::endl;
+	// std::vector<simulation::Position> origin = utils::genRandomPoints(1);
+	// track::Track new_track(glm::vec3(0.0));
+    // 	std::vector<glm::vec3> temp_track_verts = new_track.get_vertices();
+	// track_sim.addVerts(temp_track_verts);
+    // }
 
-    sim.update(&w);
-    track_sim.update(&w);
+    // sim.update(&w);
+    // track_sim.update(&w);
 
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    frameBufferBackBubbles.clear();
+    // glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    // frameBufferBackBubbles.clear();
+    // densitySim.update(&w);
 
-    float dt = 1;
+    // float dt = 1;
 
-    // Move camera
-    if (fb != 0) {
-        cam.move(0.0f, 0.0f, fb*motionSpeed*dt);
-    }
-    if (lr != 0) {
-        cam.move(lr*motionSpeed*dt, 0.0f, 0.0f);
-    }
-    if (ud != 0) {
-        cam.move(0.0f, -ud*motionSpeed*dt, 0.0f);
-    }
+    // // Move camera
+    // if (fb != 0) {
+    //     cam.move(0.0f, 0.0f, fb*motionSpeed*dt);
+    // }
+    // if (lr != 0) {
+    //     cam.move(lr*motionSpeed*dt, 0.0f, 0.0f);
+    // }
+    // if (ud != 0) {
+    //     cam.move(0.0f, -ud*motionSpeed*dt, 0.0f);
+    // }
 
-    // Rotate Camera
-    if (deltaX != 0.0 || deltaY != 0.0) {
-        cam.rotate(deltaX, deltaY);
-        deltaX = 0;
-        deltaY = 0;
-    }
+    // // Rotate Camera
+    // if (deltaX != 0.0 || deltaY != 0.0) {
+    //     cam.rotate(deltaX, deltaY);
+    //     deltaX = 0;
+    //     deltaY = 0;
+    // }
 
-    // Compute the current view and perspective matrices
-    float aspectRatio = w.getAspect();
-    glm::mat4 viewMat = cam.getViewMat();
-    glm::mat4 inverseViewMat = glm::inverse(cam.getViewMat());
-    float nearClip = 0.01f;
-    float farClip = 5.0f;
-    float fovRad = glm::radians(45.0f);
-    glm::mat4 projection = glm::perspective(fovRad, aspectRatio, nearClip, farClip);
+    // // Compute the current view and perspective matrices
+    // float aspectRatio = w.getAspect();
+    // glm::mat4 viewMat = cam.getViewMat();
+    // glm::mat4 inverseViewMat = glm::inverse(cam.getViewMat());
+    // float nearClip = 0.01f;
+    // float farClip = 5.0f;
+    // float fovRad = glm::radians(45.0f);
+    // glm::mat4 projection = glm::perspective(fovRad, aspectRatio, nearClip, farClip);
 
-    time += 0.001;
-    sim.mCompShader->setUniform("time", time);
-    track_sim.mCompShader->setUniform("time", time);
-    ray_marcher.mCompShader->setUniform("time", time);
-    ray_marcher.mRenderShader->setUniformVec("view", viewMat);
-    sim.mRenderShader->setUniformVec("view", viewMat);
-    track_sim.mRenderShader->setUniformVec("view", viewMat);
-    ray_marcher.mRenderShader->setUniformVec("projection", projection);
-    sim.mRenderShader->setUniformVec("projection", projection);
-    track_sim.mRenderShader->setUniformVec("projection", projection);
-    // Need to do this with a callback
-    ray_marcher.mRenderShader->setUniform("aspect", aspectRatio);
-    ray_marcher.mRenderShader->setUniform("nearClip", nearClip);
-    ray_marcher.mRenderShader->setUniform("farClip", farClip);
-    ray_marcher.mRenderShader->setUniform("fovRad", fovRad);
+    // time += 0.001;
+    // sim.mCompShader->setUniform("time", time);
+    // track_sim.mCompShader->setUniform("time", time);
+    // ray_marcher.mCompShader->setUniform("time", time);
+    // ray_marcher.mRenderShader->setUniformVec("view", viewMat);
+    // sim.mRenderShader->setUniformVec("view", viewMat);
+    // track_sim.mRenderShader->setUniformVec("view", viewMat);
+    // ray_marcher.mRenderShader->setUniformVec("projection", projection);
+    // sim.mRenderShader->setUniformVec("projection", projection);
+    // track_sim.mRenderShader->setUniformVec("projection", projection);
+    // // Need to do this with a callback
+    // ray_marcher.mRenderShader->setUniform("aspect", aspectRatio);
+    // ray_marcher.mRenderShader->setUniform("nearClip", nearClip);
+    // ray_marcher.mRenderShader->setUniform("farClip", farClip);
+    // ray_marcher.mRenderShader->setUniform("fovRad", fovRad);
 
-    basicShader.setUniformVec("view", viewMat);
-    basicShader.setUniformVec("projection", projection);
+    // basicShader.setUniformVec("view", viewMat);
+    // basicShader.setUniformVec("projection", projection);
 
-    glm::vec3 lightPos = glm::vec3(2.0, 0.0, 0.0);
-    glm::vec3 lightColour = glm::vec3(1.0, 1.0, 1.0);
-    ray_marcher.mRenderShader->setUniformVec("lightPos", lightPos);
-    ray_marcher.mRenderShader->setUniformVec("lightColour", lightColour);
+    // glm::vec3 lightPos = glm::vec3(2.0, 0.0, 0.0);
+    // glm::vec3 lightColour = glm::vec3(1.0, 1.0, 1.0);
+    // ray_marcher.mRenderShader->setUniformVec("lightPos", lightPos);
+    // ray_marcher.mRenderShader->setUniformVec("lightColour", lightColour);
 
-    glViewport(0, 0, w.width, w.height);
-    frameBufferBackBubbles.activate();
-    sim.draw(&w);
-    //track_sim.draw(&w); //Draw track particles
-    boundingBox.draw(w.getContext());
-    frameBufferBackBubbles.deactivate();
-
-    // ray_marcher.draw(&w);
-    //ray.draw(&w);
+    // glViewport(0, 0, w.width, w.height);
+    // frameBufferBackBubbles.activate();
+    // sim.draw(&w);
+    // //track_sim.draw(&w); //Draw track particles
     // boundingBox.draw(w.getContext());
+    // frameBufferBackBubbles.deactivate();
 
-    track_sim.updateFeedbackVec();
-    ray_marcher.update(track_sim.feedbackVec);
-    ray_marcher.draw(&w, bubbleColourTex.m_textureRef, bubbleDepthTex.m_textureRef);
+    // // ray_marcher.draw(&w);
+    // //ray.draw(&w);
+    // // boundingBox.draw(w.getContext());
+
+    // track_sim.updateFeedbackVec();
+    // ray_marcher.update(track_sim.feedbackVec);
+    // ray_marcher.draw(&w, bubbleColourTex.m_textureRef, bubbleDepthTex.m_textureRef);
 
     // ray_marcher.draw(&w);
+
+    float dT = 0.001;
+    // densityCompShader.setUniform("dT", dT);
+    densitySim.update(&w);
 
     glfwSwapBuffers(w.getContext());
 
