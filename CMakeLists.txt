@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5.1)
 project (client)
 option(JS_ONLY "Compiles to native JS (No WASM)" OFF)
 
-add_definitions(-std=c++17 -O3)
+add_definitions(-std=c++17 -O3 --profiling)
 include_directories(include)
 
 file(GLOB SOURCES src/*.cpp)

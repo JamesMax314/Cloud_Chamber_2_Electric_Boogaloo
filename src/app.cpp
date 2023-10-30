@@ -220,21 +220,21 @@ void app::App::mainLoop()
 
     //Generate new track
     
-    // double p = uniform_dist(rand_gen);
+    double p = uniform_dist(rand_gen);
  
-    // if(p < 0.004){
-	// std::cout<<"Track created"<<std::endl;
-	// std::vector<simulation::Position> origin = utils::genRandomPoints(1);
-	// track::Track new_track(glm::vec3(0.0));
-    // 	std::vector<glm::vec3> temp_track_verts = new_track.get_vertices();
-	// track_sim.addVerts(temp_track_verts);
-    // }
+    if(p < 0.05){
+        std::cout<<"Track created"<<std::endl;
+        std::vector<simulation::Position> origin = utils::genRandomPoints(1);
+        track::Track new_track(glm::vec3(0.0));
+        std::vector<glm::vec3> temp_track_verts = new_track.get_vertices();
+        densitySim.addTrack(&w, temp_track_verts);
+    }
 
     // track_sim.update(&w);
 
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    float dt = 1;
+    float dt = 0.01;
 
     // Move camera
     if (fb != 0) {
@@ -296,8 +296,8 @@ void app::App::mainLoop()
     boundingBox.draw(w.getContext());
     frameBufferBackBubbles.deactivate();
 
-    float dT = 0.001;
-    // densityCompShader.setUniform("dT", dT);
+    float dT = 1.0;
+    densityCompShader.setUniform("dT", dT);
     densitySim.update(&w);
 
     // // ray_marcher.draw(&w);

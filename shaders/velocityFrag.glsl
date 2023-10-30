@@ -1,14 +1,7 @@
 #version 300 es
-precision mediump float;
-
-uniform vec3 trackPoints[1000];
-uniform int trackID;
-uniform sampler2D texture2D; //The density texture at the previous time step 
-
-float N = 100.0; //Grid size in each direction
 
 in vec2 texturePos;
-out vec4 densityVal;
+out vec3 velocity;
 
 vec4 permute(vec4 x) {
      vec4 xm = mod(x, 289.0);
@@ -217,8 +210,7 @@ vec3 p3 = vec3(0.0, 0.0, 0.0);
 
 float fbm(vec3 pos, float alpha, out vec3 grad)
 {
-//Compute fractal brownian motion noise using psrd
-    int N = 6;
+    int N = 3;
 
     vec3 p = vec3(0.0);
     float w = 1.0; //Weight of noise
@@ -240,6 +232,27 @@ float fbm(vec3 pos, float alpha, out vec3 grad)
 
 }
 
+vec3 offset2 = vec3(1000.0, 0.0, 0.0);
+vec3 offset3 = vec3(0.0, 0.0, 1000.0);
+
+vec3 curlnoise(vec3 pos, float alpha)
+{
+
+
+    vec3 grad1;
+    vec3 grad2;
+    vec3 grad3;
+    float n1 = fbm(pos, alpha, grad1);
+    float n2 = fbm(pos+offset2, alpha, grad2);
+    float n3 = fbm(pos+offset3, alpha, grad3);
+
+    float w = sqrt(n1*n1 + n2*n2 + n3*n3);
+
+    vec3 velocity = w*vec3((grad3.y-grad2.z),(grad1.z-grad3.x),(grad2.x-grad1.y));
+
+    return velocity;
+
+}
 
 vec3 BoxCoords(vec2 texturecoords){
 //Converts between texture coords and spatial coordinates in the box
@@ -259,36 +272,8 @@ vec3 BoxCoords(vec2 texturecoords){
     return 2.0*boxcoords-1.0;
 }
 
-vec2 TexCoords(vec3 boxcoords){
-//Converts between box coordinates and texture coordinates
-    float floorFix = 0.000001;
-    vec3 newboxcoords = (boxcoords+1.0)/2.0;
-    vec2 texcoords = vec2(0.0);
-
-    // Bottom to top then left to right
-    texcoords.x = floor(newboxcoords.z * sqrt(N) + floorFix) * 1.0/sqrt(N) + newboxcoords.x * 1.0/sqrt(N);
-    texcoords.y = mod(floor(newboxcoords.z * N + floorFix), sqrt(N)) * 1.0/sqrt(N) + newboxcoords.y * 1.0/sqrt(N);
-    return texcoords;
-}
-
 void main(){
-
-    vec3 boxcoords = BoxCoords(texturePos);
-
-    vec3 grad;
-    densityVal = texture(texture2D, texturePos);
-
-    vec3 closest_pos;
-    float dist = 10.0;
+    vec3 boxpos = BoxCoords(texturePos); //Convert to position in box space
     
-    for(int i =0; i<1000; i++){
-      vec3 pos = boxcoords-trackPoints[0];
-      if(length(pos) < 0.2){
-          closest_pos = pos;
-          //dist = length(pos);
-	    densityVal.r += 1.0;
-      }
-    }
-    
-    //densityVal.r += 1.0/(dist*dist); //fbm(closest_pos, 0.0, grad)/(dist*dist);
+    velocity = curlnoise(boxpos, 0.0); //Calculate the velocity field at this point 
 }

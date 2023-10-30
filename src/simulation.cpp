@@ -239,12 +239,8 @@ void simulation::DensitySim::update(window::Window* w)
     glBindTexture(GL_TEXTURE_2D, flattenedCloudTexIn->getRef());
     glUniform1i(glGetUniformLocation(mCompShader->mProgram, "texture2D"), 0);
 
-    printf("Setup draw\n");
-
     // Draw call
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
-
-    printf("Draw complete \n");
 
     // Deactivate VAO
     glBindVertexArray(0);
@@ -252,7 +248,6 @@ void simulation::DensitySim::update(window::Window* w)
     // Swap reading and wirthin textures
     std::swap(flattenedCloudTexIn, flattenedCloudTexOut);
     frameBufferCloudDen.setRenderTexture(flattenedCloudTexOut);
-    printf("Swapped \n");
 
     // Reset window dimensions
     glViewport(0, 0, w->width, w->height);
@@ -341,5 +336,4 @@ void simulation::DensitySim::addTrack(window::Window* w, std::vector<glm::vec3> 
     // Deactivate FBO
     frameBufferCloudDen.deactivate();
 
-    printf("Track Added\n");
 }
