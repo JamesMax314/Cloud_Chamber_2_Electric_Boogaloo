@@ -124,16 +124,20 @@ namespace simulation {
         const int cloudTexDim = 1000;
 
         shaders::Shader* mTrackShader;
+        shaders::Shader* mBakeShader;
 
         texture::Texture* flattenedCloudTexIn;
         texture::Texture* flattenedCloudTexOut;
+        texture::Texture* bakedCurlTex;
 
         frame::Frame frameBufferCloudDen;
 
         DensitySim();
         ~DensitySim();
-        void init(shaders::Shader *compShader, shaders::Shader *trackShader);
+        void init(shaders::Shader *compShader, shaders::Shader *trackShader, shaders::Shader *bakeShader);
         void update(window::Window* w);
         void addTrack(window::Window* w, std::vector<glm::vec3> &positions);
+
+        void bakeCurl(window::Window* w);
     };
 }

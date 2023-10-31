@@ -73,13 +73,14 @@ vec2 TexCoords(vec3 boxcoords){
 void main()
 {
     vec3 boxpos = BoxCoords(texturePos); //Convert to position in box space
-    vec4 u = texture(texture2D, boxpos); //Calculate the velocity field at this point 
+    // vec4 u = texture(texture2D, texturePos); //Calculate the velocity field at this point 
+    vec4 u = vec4(0.0, 0.5, 0.0, 0.0);
 
-    vec3 prev_box_pos = boxpos - u*dT; //Step back position using semi-lagrangian discretisation
+    vec3 prev_box_pos = boxpos - u.xyz*dT*0.002; //Step back position using semi-lagrangian discretisation
 
     if (sdfCuboid(prev_box_pos, vec3(-1.0), vec3(1.0)) < 0.0) {
       vec2 prev_tex_pos = TexCoords(prev_box_pos); //Map the previous position to the density texture
-      densityVal = texture(texture2D, prev_tex_pos); //Get the density value at that point
+      densityVal = texture(texture2D, prev_tex_pos)-0.001; //Get the density value at that point
     } else {
       densityVal = vec4(0.0, 0.0, 0.0, 1.0);
     }

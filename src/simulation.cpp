@@ -185,18 +185,25 @@ simulation::DensitySim::~DensitySim()
     delete flattenedCloudTexOut;
 }
 
-void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *trackShader)
+void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *trackShader, shaders::Shader *bakeShader)
 {
     // Initialise a colour texture to render the volume to
     flattenedCloudTexIn = new texture::Texture();
     flattenedCloudTexOut = new texture::Texture();
+    bakedCurlTex = new texture::Texture();
+
+    // flattenedCloudTexIn->setInterp(GL_NEAREST);
+    // flattenedCloudTexOut->setInterp(GL_NEAREST);
+    // bakedCurlTex->setInterp(GL_NEAREST);
+
     flattenedCloudTexIn->initColour(cloudTexDim, cloudTexDim);
-    // flattenedCloudTexIn->setColour(glm::vec4(1.0));
     flattenedCloudTexOut->initColour(cloudTexDim, cloudTexDim);
+    bakedCurlTex->initColour(cloudTexDim, cloudTexDim);
     frameBufferCloudDen.init(flattenedCloudTexOut);
 
     mCompShader = compShader;
     mTrackShader = trackShader;
+    mBakeShader = bakeShader;
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &billboard_vertex_buffer);
@@ -239,6 +246,11 @@ void simulation::DensitySim::update(window::Window* w)
     glBindTexture(GL_TEXTURE_2D, flattenedCloudTexIn->getRef());
     glUniform1i(glGetUniformLocation(mCompShader->mProgram, "texture2D"), 0);
 
+    // Bind curl texture in to read from
+    glActiveTexture(GL_TEXTURE1); // Texture unit 0
+    glBindTexture(GL_TEXTURE_2D, flattenedCloudTexIn->getRef());
+    glUniform1i(glGetUniformLocation(mCompShader->mProgram, "velocity2D"), 1);
+
     // Draw call
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
 
@@ -255,11 +267,7 @@ void simulation::DensitySim::update(window::Window* w)
     // Deactivate FBO
     frameBufferCloudDen.deactivate();
 
-
-
-
-
-        // Bind VAO
+    // Bind VAO
     glBindVertexArray(VAO);
 
     // Activate compute shader
@@ -283,8 +291,6 @@ void simulation::DensitySim::update(window::Window* w)
 
     // Deactivate VAO
     glBindVertexArray(0);
-    
-    // glfwSwapBuffers(w->getContext());
 }
 
 void simulation::DensitySim::addTrack(window::Window* w, std::vector<glm::vec3> &positions)
@@ -301,11 +307,11 @@ void simulation::DensitySim::addTrack(window::Window* w, std::vector<glm::vec3> 
 
     // Activate compute shader
     mTrackShader->activate();
+
+    // Set positions uniform
     mTrackShader->setUniformArrVec("trackPoints", positions.data(), positions.size());
     int trackID = 0;
     mTrackShader->setUniform("trackID", trackID);
-
-    // Set positions uniform
 
     // Set window dimensions
     glViewport(0, 0, cloudTexDim, cloudTexDim);
@@ -335,5 +341,45 @@ void simulation::DensitySim::addTrack(window::Window* w, std::vector<glm::vec3> 
 
     // Deactivate FBO
     frameBufferCloudDen.deactivate();
+}
 
+
+// Bake the curl noise to bakedCurlTex
+void simulation::DensitySim::bakeCurl(window::Window* w)
+{
+    // Make context current
+    glfwMakeContextCurrent(w->getContext());
+
+    // Bind FBO
+    frameBufferCloudDen.setRenderTexture(bakedCurlTex);
+    frameBufferCloudDen.activate();
+    frameBufferCloudDen.clear();
+
+    // Bind VAO
+    glBindVertexArray(VAO);
+
+    // Activate compute shader
+    mBakeShader->activate();
+
+    // Set window dimensions
+    glViewport(0, 0, cloudTexDim, cloudTexDim);
+
+    // Bind render quad 
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Draw call
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
+
+    // Deactivate VAO
+    glBindVertexArray(0);
+
+    frameBufferCloudDen.setRenderTexture(flattenedCloudTexOut);
+
+    // Reset window dimensions
+    glViewport(0, 0, w->width, w->height);
+
+    // Deactivate FBO
+    frameBufferCloudDen.deactivate();
 }

@@ -1,7 +1,10 @@
 #version 300 es
+precision mediump float;
 
 in vec2 texturePos;
-out vec3 velocity;
+out vec4 velocity;
+
+float N = 100.0; //Grid size in each direction
 
 vec4 permute(vec4 x) {
      vec4 xm = mod(x, 289.0);
@@ -274,6 +277,7 @@ vec3 BoxCoords(vec2 texturecoords){
 
 void main(){
     vec3 boxpos = BoxCoords(texturePos); //Convert to position in box space
-    
-    velocity = curlnoise(boxpos, 0.0); //Calculate the velocity field at this point 
+    float scale = 0.1;
+    velocity = vec4(scale*curlnoise(boxpos, 0.0), 1.0); //Calculate the velocity field at this point 
+    // velocity = vec4(texturePos.x, texturePos.y, 1.0, 1.0);
 }
