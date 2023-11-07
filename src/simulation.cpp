@@ -205,7 +205,7 @@ void simulation::DensitySim::update(window::Window* w)
     GLsync copy_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     glClientWaitSync(copy_fence, 0, 50e6);
     glDeleteSync(copy_fence);
-    glBindBuffer(GL_COPY_READ_BUFFER, StreamBufferID[this->stream_buffer]);
+    glBindBuffer(GL_COPY_READ_BUFFER, StreamBufferID[(this->stream_buffer-(N_stream_buffers-1))]);
     glGetBufferSubData(GL_COPY_READ_BUFFER, 0, this->feedbackVec.size()*sizeof(glm::vec3), this->feedbackVec.data());
 
     this->feedback_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -217,7 +217,7 @@ void simulation::DensitySim::update(window::Window* w)
 
 void simulation::DensitySim::update_feedbackVec(){
     // Get particle positions
-    glBindBuffer(GL_COPY_READ_BUFFER, StreamBufferID[this->stream_buffer]);
+    glBindBuffer(GL_COPY_READ_BUFFER, StreamBufferID[this->stream_buffer-(N_stream_buffers-1)]);
     glGetBufferSubData(GL_COPY_READ_BUFFER, 0, this->feedbackVec.size()*sizeof(glm::vec3), this->feedbackVec.data());
 
 }
