@@ -79,7 +79,7 @@ namespace simulation {
         shaders::Shader* mCompShader;
         shaders::Shader* mRenderShader;
 
-	unsigned int nVerts = 200000;
+	unsigned int nVerts = 5000;
         std::vector<glm::vec3> mStartPos;
         std::vector<unsigned int> mIndices;
         std::vector<glm::vec3> feedbackVec;
@@ -100,8 +100,26 @@ namespace simulation {
         void update(window::Window* w);
         void fillBuffers();
         void loadUniforms();
-        void updateFeedbackVec();
         void draw(window::Window* w);
-	void addVerts(std::vector<simulation::Position>& new_verts);
     };
+
+    class DensitySim: public Sim{
+	public:
+
+        void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
+
+	const int N_stream_buffers = 2;
+	std::array<GLuint, 2> StreamBufferID;	
+	int stream_buffer = 0;
+
+	GLsync feedback_fence;
+
+	void update(window::Window* w);
+	void update_feedbackVec();
+	void addVerts(std::vector<simulation::Position>& new_verts);
+	void fillBuffers();
+	
+    };
+
+
 }

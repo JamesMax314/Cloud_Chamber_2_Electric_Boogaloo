@@ -350,7 +350,8 @@ void app::App::mainLoop()
     //ray.draw(&w);
     // boundingBox.draw(w.getContext());
 
-    track_sim.updateFeedbackVec();
+    glClientWaitSync(track_sim.feedback_fence, 0, 33e6);
+    glDeleteSync(track_sim.feedback_fence);
     ray_marcher.update(track_sim.feedbackVec);
     ray_marcher.draw(&w, textureOut, depthOut);
 

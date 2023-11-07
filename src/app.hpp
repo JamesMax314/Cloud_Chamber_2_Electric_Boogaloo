@@ -46,7 +46,7 @@ namespace app {
         camera::Camera cam;
 
         simulation::Sim sim;
-        simulation::Sim track_sim;
+        simulation::DensitySim track_sim;
         rayMarch::RayMarch ray_marcher;
         rayMarch::RayMarch ray;
 

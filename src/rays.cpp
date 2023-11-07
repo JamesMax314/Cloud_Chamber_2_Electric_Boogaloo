@@ -91,8 +91,8 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
     // printf("%f %f %f\n", feedbackVec[0][0], feedbackVec[0][1], feedbackVec[0][2]);
 
 
-    minCorner = feedbackVec[0];
-    maxCorner = feedbackVec[0];
+    minCorner = feedbackVec.at(0);
+    maxCorner = feedbackVec.at(0);
 
     // Find bounding box
     for (int i=0; i<feedbackVec.size()-1; i++) {
