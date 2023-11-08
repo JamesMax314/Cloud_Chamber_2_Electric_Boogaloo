@@ -274,7 +274,7 @@ void app::App::mainLoop()
     double p = uniform_dist(rand_gen);
  
     if(p < 0.004){
-	std::cout<<"Track created"<<std::endl;
+	//std::cout<<"Track created"<<std::endl;
 	std::vector<simulation::Position> origin = utils::genRandomPoints(1);
 	track::Track new_track(glm::vec3(0.0));
     	std::vector<glm::vec3> temp_track_verts = new_track.get_vertices();
