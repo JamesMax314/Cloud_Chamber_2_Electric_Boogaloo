@@ -79,7 +79,7 @@ namespace simulation {
         shaders::Shader* mCompShader;
         shaders::Shader* mRenderShader;
 
-	unsigned int nVerts = 5000;
+	unsigned int nVerts = 10000;
         std::vector<glm::vec3> mStartPos;
         std::vector<unsigned int> mIndices;
         std::vector<glm::vec3> feedbackVec;

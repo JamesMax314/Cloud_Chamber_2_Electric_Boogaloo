@@ -140,7 +140,7 @@ void simulation::DensitySim::addVerts(std::vector<simulation::Position>& new_ver
     for (int i = 0; i < new_verts.size(); i++){
 	newVerts.push_back(new_verts.at(i));
     }
-    std::cout<<newVerts.size()<<std::endl;
+    //std::cout<<newVerts.size()<<std::endl;
 }
 
 void simulation::DensitySim::update(window::Window* w)
@@ -156,7 +156,7 @@ void simulation::DensitySim::update(window::Window* w)
 
 
     if(newVerts.size() > 0){
-	int n_new_Verts = newVerts.size();
+        int n_new_Verts = newVerts.size();
 
     	if(current_index + 1 + n_new_Verts < nVerts){//Check if buffer has enough memory
     	    glBufferSubData(GL_ARRAY_BUFFER, (current_index+1)*sizeof(simulation::Position), n_new_Verts*sizeof(simulation::Position), newVerts.data());
@@ -166,7 +166,7 @@ void simulation::DensitySim::update(window::Window* w)
     	    glBufferSubData(GL_ARRAY_BUFFER, (current_index+1)*sizeof(simulation::Position), spare_space*sizeof(simulation::Position), newVerts.data());
     	    glBufferSubData(GL_ARRAY_BUFFER, 0, (n_new_Verts-spare_space)*sizeof(simulation::Position), &newVerts.at(spare_space-1));
     	}
-	newVerts.clear();
+        newVerts.clear();
 
     	current_index = (current_index + n_new_Verts)%nVerts;
     }
@@ -205,7 +205,7 @@ void simulation::DensitySim::update(window::Window* w)
     GLsync copy_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     glClientWaitSync(copy_fence, 0, 50e6);
     glDeleteSync(copy_fence);
-    glBindBuffer(GL_COPY_READ_BUFFER, StreamBufferID[(this->stream_buffer-(N_stream_buffers-1))]);
+    glBindBuffer(GL_COPY_READ_BUFFER, StreamBufferID[(this->stream_buffer+1)%N_stream_buffers]);
     glGetBufferSubData(GL_COPY_READ_BUFFER, 0, this->feedbackVec.size()*sizeof(glm::vec3), this->feedbackVec.data());
 
     this->feedback_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -217,21 +217,31 @@ void simulation::DensitySim::update(window::Window* w)
 
 void simulation::DensitySim::update_feedbackVec(){
     // Get particle positions
-    glBindBuffer(GL_COPY_READ_BUFFER, StreamBufferID[this->stream_buffer-(N_stream_buffers-1)]);
+    glBindBuffer(GL_COPY_READ_BUFFER, StreamBufferID[(this->stream_buffer+1)%N_stream_buffers]);
     glGetBufferSubData(GL_COPY_READ_BUFFER, 0, this->feedbackVec.size()*sizeof(glm::vec3), this->feedbackVec.data());
 
 }
 
 void simulation::DensitySim::fillBuffers()
 {
-    Sim::fillBuffers();
-
     // Bind all the model arrays to the appropriate buffers
     glBindVertexArray(VAO);
 
+    glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
+    glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), &feedbackVec.front(), GL_STREAM_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Create VBO for output on even-numbered frames and input on odd-numbered frames:
+    glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferB);
+    glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), (void*)0, GL_DYNAMIC_READ);
+
+    // Bind all the model arrays to the appropriate buffers
+
     for(int index=0; index<N_stream_buffers; index++){
 	glBindBuffer(GL_ARRAY_BUFFER, StreamBufferID[index]); 
-    	glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), NULL, GL_STREAM_READ);
+    	glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), &feedbackVec.front(), GL_STREAM_READ);
     }
 
 }
@@ -240,8 +250,7 @@ void simulation::DensitySim::fillBuffers()
 void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
 {
     for (int i = 0; i < nVerts; i++){
-	current_index = (current_index+i)%nVerts;
-	this->feedbackVec.push_back(simulation::Position(2.0));
+	this->feedbackVec.push_back(simulation::Position(10.0));
     }
     
     this->isTrack = isTrack;
@@ -249,7 +258,7 @@ void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *
     mRenderShader = renderShader;
     mStartPos = startPos;
     for (int i = 0; i < mStartPos.size(); i++){
-	current_index = (current_index+i)%nVerts;
+	current_index = (current_index+1)%nVerts;
 	this->feedbackVec.at(current_index) = mStartPos.at(i);
     }
     glGenVertexArrays(1, &VAO);
