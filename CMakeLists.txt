@@ -16,7 +16,7 @@ set(OBJECT_DEPENDS ../shaders)
 file(COPY "${CMAKE_SOURCE_DIR}/ui/" DESTINATION "${CMAKE_SOURCE_DIR}/public")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/public")
 # set(EMCC_LINKER_FLAGS "--preload-file ${CMAKE_SOURCE_DIR}/src/shaders")
-set(EMCC_LINKER_FLAGS "-fsanitize=undefined")
+set(EMCC_LINKER_FLAGS "-fsanitize=address -sALLOW_MEMORY_GROWTH")
 add_executable(ccSim ${HEADDERS} ${SOURCES})
 set_source_files_properties(main.cpp OBJECT_DEPENDS ${CMAKE_SOURCE_DIR}/shaders)
 
