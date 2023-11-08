@@ -24,9 +24,9 @@ void rayMarch::RayMarch::init(shaders::Shader *compShader, shaders::Shader *rend
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
     glBindVertexArray(0);
 
-    fillBuffers();
+    texture3D.insert(texture3D.begin(), flattenedDim, 0.0);
 
-    texture3D = new float[pow(textureDim, 3)];//std::vector<std::vector<std::vector<float>>>(textureDim, std::vector<std::vector<float>>(textureDim, std::vector<float>(textureDim, 0)));
+    fillBuffers();
 }
 
 rayMarch::RayMarch::RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
@@ -91,32 +91,32 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
     // printf("%f %f %f\n", feedbackVec[0][0], feedbackVec[0][1], feedbackVec[0][2]);
 
 
-    minCorner = feedbackVec.at(0);
-    maxCorner = feedbackVec.at(0);
+    minCorner = glm::vec3(-1.0);
+    maxCorner = glm::vec3(1.0);
 
     // Find bounding box
-    for (int i=0; i<feedbackVec.size()-1; i++) {
-        int subcount = 0;
-        for (int j=0; j<3; j++) {
-            if (feedbackVec.at(i)[j] < minCorner[j] && feedbackVec.at(i)[j]!= 0) {
-                minCorner[j] = feedbackVec.at(i)[j];
-            }
-            if (feedbackVec.at(i)[j] > maxCorner[j] && feedbackVec.at(i)[j]!= 0) {
-                maxCorner[j] = feedbackVec.at(i)[j];
-            }
-        }
-    }
+    //for (int i=0; i<feedbackVec.size()-1; i++) {
+    //    int subcount = 0;
+    //    for (int j=0; j<3; j++) {
+    //        if (feedbackVec.at(i)[j] < minCorner[j] && feedbackVec.at(i)[j]!= 0) {
+    //            minCorner[j] = feedbackVec.at(i)[j];
+    //        }
+    //        if (feedbackVec.at(i)[j] > maxCorner[j] && feedbackVec.at(i)[j]!= 0) {
+    //            maxCorner[j] = feedbackVec.at(i)[j];
+    //        }
+    //    }
+    //}
 
     // Compute density texture
-    glm::vec3 stepSize = (maxCorner - minCorner) / (float)(textureDim-1);
+    glm::vec3 stepSize =  (maxCorner - minCorner)/ (float)(textureDim-1);
     // printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
     // printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
 
     for (int i1=0; i1<textureDim; i1++) {
         for (int i2=0; i2<textureDim; i2++) {
             for (int i3=0; i3<textureDim; i3++) {
-                if (texture3D[i1 + i2*textureDim + i3*textureDim*textureDim] > 0) {
-                    texture3D[i1 + i2*textureDim + i3*textureDim*textureDim] -= 0.05;
+                if (texture3D.at(i1 + i2*textureDim + i3*textureDim*textureDim) >= 0.05) {
+                    texture3D.at(i1 + i2*textureDim + i3*textureDim*textureDim) -= 0.05;
                 }
             }
         }
@@ -127,9 +127,11 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
 
         index3D = glm::floor((feedbackVec.at(i) - minCorner) / stepSize);
         int index = index3D.x + index3D.y*textureDim + index3D.z*textureDim*textureDim;
-        if (texture3D[index] < maxTexVal) {
-            texture3D[index] += 0.1;
-        }
+	if(index >=0 and index<pow(textureDim,3)){
+	    if (texture3D.at(index) < maxTexVal) {
+                texture3D.at(index) += 0.1;
+            }
+	}
     }
 }
 
@@ -170,7 +172,7 @@ void rayMarch::RayMarch::draw(window::Window* w)
     // Bind and populate Texture
     glActiveTexture(GL_TEXTURE0); // Texture unit 0
     glBindTexture(GL_TEXTURE_3D, texture_buffer);
-    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, texture3D);
+    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, &texture3D);
     glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "texture3D"), 0);
 
     // Set the max and min corners
@@ -208,7 +210,7 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
     // Bind and populate Texture
     glActiveTexture(GL_TEXTURE0); // Texture unit 0
     glBindTexture(GL_TEXTURE_3D, texture_buffer);
-    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, texture3D);
+    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, &texture3D);
     glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "texture3D"), 0); // Assign 3d texture to texture unit 0
 
     glActiveTexture(GL_TEXTURE1); // Texture unit 1

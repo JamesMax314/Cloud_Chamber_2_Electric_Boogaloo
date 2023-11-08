@@ -39,10 +39,12 @@ namespace rayMarch {
 
         int numParticlesPerTrack = 5000;
         int textureDim = 128;
+	int flattenedDim = pow(textureDim, 3);
         int renderWidth = 1080;
         int renderHeight = 720;
         float maxTexVal = 20;
-        float* texture3D;
+	
+        std::vector<float> texture3D;
 
         RayMarch();
         RayMarch(shaders::Shader *shader);
