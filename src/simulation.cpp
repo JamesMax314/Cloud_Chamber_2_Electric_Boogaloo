@@ -11,7 +11,7 @@ simulation::Sim::Sim(shaders::Shader *shader)
 void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
 {
     for (int i = 0; i < nVerts; i++){
-	current_index = (current_index+i)%nVerts;
+	current_index = (current_index+1)%nVerts;
 	feedbackVec.push_back(simulation::Position(2.0));
     }
     
@@ -20,7 +20,7 @@ void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderS
     mRenderShader = renderShader;
     mStartPos = startPos;
     for (int i = 0; i < mStartPos.size(); i++){
-	current_index = (current_index+i)%nVerts;
+	current_index = (current_index+1)%nVerts;
 	feedbackVec.at(current_index) = mStartPos.at(i);
     }
     glGenVertexArrays(1, &VAO);
@@ -82,14 +82,14 @@ void simulation::Sim::fillBuffers()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
-    glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), &feedbackVec.front(), GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), feedbackVec.data(), GL_STREAM_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     // Create VBO for output on even-numbered frames and input on odd-numbered frames:
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferB);
-    glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), (void*)0, GL_STREAM_READ);
+    glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), feedbackVec.data(), GL_STREAM_READ);
 
     // Bind rendering buffers
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
@@ -194,21 +194,21 @@ void simulation::DensitySim::update(window::Window* w)
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 0);    
 
-    glBindBuffer(GL_COPY_READ_BUFFER, ParticleBufferA);
-    int next_stream_buffer = (this->stream_buffer + 1)%N_stream_buffers; //switch active stream buffer
-    glBindBuffer(GL_COPY_WRITE_BUFFER, StreamBufferID[next_stream_buffer]);
+    GLsync copy_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+    glClientWaitSync(copy_fence, 0, 100e6);
+    glDeleteSync(copy_fence);
+
+    glBindBuffer(GL_COPY_READ_BUFFER, ParticleBufferB);
+    glBindBuffer(GL_COPY_WRITE_BUFFER, StreamBufferID.at(write_buffer_index));
     glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, nVerts*sizeof(simulation::Position));
     glBindBuffer(GL_COPY_WRITE_BUFFER,0);
-    this->stream_buffer = next_stream_buffer;
-    this->update_feedbackVec();
 
-    GLsync copy_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-    glClientWaitSync(copy_fence, 0, 50e6);
-    glDeleteSync(copy_fence);
-    glBindBuffer(GL_COPY_READ_BUFFER, StreamBufferID[(this->stream_buffer+1)%N_stream_buffers]);
-    glGetBufferSubData(GL_COPY_READ_BUFFER, 0, this->feedbackVec.size()*sizeof(glm::vec3), this->feedbackVec.data());
+    GLsync VBO_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+    glClientWaitSync(VBO_fence, 0, 100e6);
+    glDeleteSync(VBO_fence);
 
-    this->feedback_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+    read_buffer_index = (read_buffer_index+1)%N_stream_buffers;
+    write_buffer_index = (write_buffer_index+1)%N_stream_buffers;
 
     std::swap(ParticleBufferA, ParticleBufferB);
     glDisable(GL_RASTERIZER_DISCARD);
@@ -217,8 +217,9 @@ void simulation::DensitySim::update(window::Window* w)
 
 void simulation::DensitySim::update_feedbackVec(){
     // Get particle positions
-    glBindBuffer(GL_COPY_READ_BUFFER, StreamBufferID[(this->stream_buffer+1)%N_stream_buffers]);
-    glGetBufferSubData(GL_COPY_READ_BUFFER, 0, this->feedbackVec.size()*sizeof(glm::vec3), this->feedbackVec.data());
+
+    glBindBuffer(GL_COPY_READ_BUFFER, StreamBufferID.at(read_buffer_index));
+    glGetBufferSubData(GL_COPY_READ_BUFFER, 0, this->feedbackVec.size()*sizeof(simulation::Position), this->feedbackVec.data());
 
 }
 
@@ -228,7 +229,7 @@ void simulation::DensitySim::fillBuffers()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
-    glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), &feedbackVec.front(), GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), feedbackVec.data(), GL_STREAM_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
@@ -240,8 +241,8 @@ void simulation::DensitySim::fillBuffers()
     // Bind all the model arrays to the appropriate buffers
 
     for(int index=0; index<N_stream_buffers; index++){
-	glBindBuffer(GL_ARRAY_BUFFER, StreamBufferID[index]); 
-    	glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), &feedbackVec.front(), GL_STREAM_READ);
+	glBindBuffer(GL_ARRAY_BUFFER, StreamBufferID.at(index)); 
+    	glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), feedbackVec.data(), GL_STREAM_READ);
     }
 
 }
@@ -250,7 +251,7 @@ void simulation::DensitySim::fillBuffers()
 void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
 {
     for (int i = 0; i < nVerts; i++){
-	this->feedbackVec.push_back(simulation::Position(10.0));
+	this->feedbackVec.push_back(simulation::Position(2.0));
     }
     
     this->isTrack = isTrack;
@@ -266,7 +267,7 @@ void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *
     glGenBuffers(1, &ParticleBufferB);
     glGenBuffers(1, &billboard_vertex_buffer);
     for(int index=0; index<N_stream_buffers; index++){
-	glGenBuffers(1, &StreamBufferID[index]);
+	glGenBuffers(1, &StreamBufferID.at(index));
     }
 
     fillBuffers();

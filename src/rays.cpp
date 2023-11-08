@@ -91,8 +91,8 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
     // printf("%f %f %f\n", feedbackVec[0][0], feedbackVec[0][1], feedbackVec[0][2]);
 
 
-    minCorner = glm::vec3(-1.0);
-    maxCorner = glm::vec3(1.0);
+    minCorner = glm::vec3(-0.9);
+    maxCorner = glm::vec3(0.9);
 
     // Find bounding box
     //for (int i=0; i<feedbackVec.size()-1; i++) {
@@ -112,24 +112,27 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
     // printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
     // printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
 
-    for (int i1=0; i1<textureDim; i1++) {
-        for (int i2=0; i2<textureDim; i2++) {
-            for (int i3=0; i3<textureDim; i3++) {
-                if (texture3D.at(i1 + i2*textureDim + i3*textureDim*textureDim) >= 0.05) {
-                    texture3D.at(i1 + i2*textureDim + i3*textureDim*textureDim) -= 0.05;
-                }
-            }
-        }
-    }
+    texture3D.clear();
+    texture3D.insert(texture3D.begin(), flattenedDim, 0.0); //reset the texture to empty
+
+    //for (int i1=0; i1<textureDim; i1++) {
+    //    for (int i2=0; i2<textureDim; i2++) {
+    //        for (int i3=0; i3<textureDim; i3++) {
+    //            if (texture3D.at(i1 + i2*textureDim + i3*textureDim*textureDim) >= 0.05) {
+    //                texture3D.at(i1 + i2*textureDim + i3*textureDim*textureDim) -= 0.05;
+    //            }
+    //        }
+    //    }
+    //}
 
     for (int i=0; i<feedbackVec.size()-1; i++) {
         glm::ivec3 index3D;
 
-        index3D = glm::floor((feedbackVec.at(i) - minCorner) / stepSize);
+        index3D = glm::floor(glm::vec3(0.00001) + (feedbackVec.at(i) - minCorner) / stepSize);
         int index = index3D.x + index3D.y*textureDim + index3D.z*textureDim*textureDim;
 	if(index >=0 and index<pow(textureDim,3)){
 	    if (texture3D.at(index) < maxTexVal) {
-                texture3D.at(index) += 0.1;
+                texture3D.at(index) += 2.0;
             }
 	}
     }
@@ -145,8 +148,8 @@ void rayMarch::RayMarch::fillBuffers()
     // Specify how to up/down sample
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, textureDim, textureDim, textureDim, 0, GL_RED, GL_FLOAT, NULL);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, textureDim, textureDim, textureDim, 0, GL_RED, GL_FLOAT, texture3D.data());
 }
 
 void rayMarch::RayMarch::loadUniforms()
@@ -172,8 +175,9 @@ void rayMarch::RayMarch::draw(window::Window* w)
     // Bind and populate Texture
     glActiveTexture(GL_TEXTURE0); // Texture unit 0
     glBindTexture(GL_TEXTURE_3D, texture_buffer);
-    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, &texture3D);
+    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, texture3D.data());
     glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "texture3D"), 0);
+    glGetError();
 
     // Set the max and min corners
     mRenderShader->setUniformVec("minPos", minCorner);

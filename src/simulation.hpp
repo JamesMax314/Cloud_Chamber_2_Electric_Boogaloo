@@ -79,10 +79,10 @@ namespace simulation {
         shaders::Shader* mCompShader;
         shaders::Shader* mRenderShader;
 
-	unsigned int nVerts = 10000;
+	unsigned int nVerts = 20000;
         std::vector<glm::vec3> mStartPos;
         std::vector<unsigned int> mIndices;
-        std::vector<glm::vec3> feedbackVec;
+        std::vector<simulation::Position> feedbackVec;
         std::vector<glm::vec3> newVerts;
 
         // Intagers that are used to reference buffer arrays in gpu ram
@@ -108,11 +108,10 @@ namespace simulation {
 
         void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
 
-	const int N_stream_buffers = 2;
-	std::array<GLuint, 2> StreamBufferID;	
-	int stream_buffer = 0;
-
-	GLsync feedback_fence;
+	const int N_stream_buffers = 4;
+	std::array<GLuint, 4> StreamBufferID;	
+	int write_buffer_index= 0;
+	int read_buffer_index = 2;
 
 	void update(window::Window* w);
 	void update_feedbackVec();
