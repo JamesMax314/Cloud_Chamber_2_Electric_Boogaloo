@@ -281,8 +281,8 @@ void app::App::mainLoop()
 	track_sim.addVerts(temp_track_verts);
     }
 
-    sim.update(&w);
     track_sim.update(&w);
+    sim.update(&w);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
