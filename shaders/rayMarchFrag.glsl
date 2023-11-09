@@ -2,7 +2,7 @@
 precision mediump float;
 
 in vec4 fragPos;
-in vec2 texCoords;
+in vec2 screenCoords;
 out vec4 FragColor;
 
 uniform mediump sampler3D texture3D; // Cloud texture
@@ -207,14 +207,15 @@ float sphereTexture(in vec3 pos)
 }
 
 // Need to move this into a world function
-float texture(in vec3 pos) 
+float get_texture(in vec3 pos) 
 {
     // return sphereTexture(pos);
     if (sdfCuboid(pos, boundingCubeMin, boundingCubeMax) < 0.0) {
         if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
             vec3 stepSize = (maxPos - minPos) / (texDim-1.0); // texture dim - 1 add as uniform
             vec3 texCoords = (pos-minPos) / (stepSize*texDim);
-            float den = texture(texture3D, texCoords).r;
+            vec4 denvec = texture(texture3D, texCoords);
+			float den = denvec.r;
             if (den < threshold) {
                 den = 0.0;
             }
@@ -272,7 +273,7 @@ float lightMarch(in vec3 rayPosition) {
         }
         
         position += lightDir*step*randomStepModifier(rayPosition.xy);
-        subDen += texture(position)*step*randomStepModifier(rayPosition.xy);
+        subDen += get_texture(position)*step*randomStepModifier(rayPosition.xy);
     }
 
     float transmittance = exp(-subDen);
@@ -289,7 +290,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
 
     // Used to draw light location
     float lampIntensity = 0.0;
-    float backgroundDepth = depthToDistance(texture(framebufferDepthTexture, texCoords).x);
+    float backgroundDepth = depthToDistance(texture(framebufferDepthTexture, screenCoords).x);
 
 
     // Determine distance to traverse cloud box
@@ -318,7 +319,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
                 break;
             }
 
-            float density = texture(rayPosition);
+            float density = get_texture(rayPosition);
 
             // Get light scattering factor
             vec3 lightDir = lightPos-rayPosition;

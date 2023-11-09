@@ -22,7 +22,7 @@ void draw() {
 int main()
 {
     application.init();
-    while (1) {
+    while (!glfwWindowShouldClose(application.w.getContext())) {
         draw();
     }
     // window::Window mWindow = window::Window();

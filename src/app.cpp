@@ -133,7 +133,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
     if (key == GLFW_KEY_ESCAPE) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        glfwSetWindowShouldClose(window, GLFW_TRUE); // Close the window when ESC is pressed
+        //glfwSetWindowShouldClose(window, GLFW_TRUE); // Close the window when ESC is pressed
     }
 }
 
@@ -180,9 +180,9 @@ void app::App::init()
     std::vector<simulation::Position> track_verts;
 
     for(int i =0; i<2; i++){
-	tracks.emplace_back(origin.at(i));
-	std::vector<glm::vec3> temp_track_verts = tracks.at(i).get_vertices();
-	track_verts.insert(track_verts.end(), temp_track_verts.begin(), temp_track_verts.end());
+		tracks.emplace_back(origin.at(i));
+		std::vector<glm::vec3> temp_track_verts = tracks.at(i).get_vertices();
+		track_verts.insert(track_verts.end(), temp_track_verts.begin(), temp_track_verts.end());
     }
 
     ray_marcher.init(&fancyShader, &rayShader, &postProcessShader);
@@ -278,12 +278,12 @@ void app::App::mainLoop()
     double p = uniform_dist(rand_gen);
  
     if(p < 0.004){
-	std::cout<<"Track created"<<std::endl;
-	std::vector<simulation::Position> origin = utils::genRandomPoints(1);
-	track::Track new_track(glm::vec3(0.0));
+		std::cout<<"Track created"<<std::endl;
+		std::vector<simulation::Position> origin = utils::genRandomPoints(1);
+		track::Track new_track(glm::vec3(0.0));
     	std::vector<glm::vec3> temp_track_verts = new_track.get_vertices();
-	track_sim.addVerts(temp_track_verts);
-	printf("newVerts size = %u \n", track_sim.newVerts.size());
+		track_sim.addVerts(temp_track_verts);
+		printf("newVerts size = %u \n", track_sim.newVerts.size());
     }
 
     sim.update(&w);
