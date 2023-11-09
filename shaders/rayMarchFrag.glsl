@@ -2,7 +2,7 @@
 precision mediump float;
 
 in vec4 fragPos;
-in vec2 screenCoords;
+in vec2 texCoords;
 out vec4 FragColor;
 
 uniform mediump sampler3D texture3D; // Cloud texture
@@ -213,8 +213,8 @@ float get_texture(in vec3 pos)
     if (sdfCuboid(pos, boundingCubeMin, boundingCubeMax) < 0.0) {
         if (sdfCuboid(pos, minPos, maxPos) < 0.0) {
             vec3 stepSize = (maxPos - minPos) / (texDim-1.0); // texture dim - 1 add as uniform
-            vec3 texCoords = (pos-minPos) / (stepSize*texDim);
-            vec4 denvec = texture(texture3D, texCoords);
+            vec3 texCoords3D = (pos-minPos) / (stepSize*texDim);
+            vec4 denvec = texture(texture3D, texCoords3D);
 			float den = denvec.r;
             if (den < threshold) {
                 den = 0.0;
@@ -290,7 +290,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
 
     // Used to draw light location
     float lampIntensity = 0.0;
-    float backgroundDepth = depthToDistance(texture(framebufferDepthTexture, screenCoords).x);
+    float backgroundDepth = depthToDistance(texture(framebufferDepthTexture, texCoords).x);
 
 
     // Determine distance to traverse cloud box
