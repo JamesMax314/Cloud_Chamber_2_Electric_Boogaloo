@@ -214,7 +214,7 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
     // Bind and populate Texture
     glActiveTexture(GL_TEXTURE0); // Texture unit 0
     glBindTexture(GL_TEXTURE_3D, texture_buffer);
-    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, &texture3D);
+    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, textureDim, textureDim, textureDim, GL_RED, GL_FLOAT, texture3D.data());
     glUniform1i(glGetUniformLocation(mRenderShader->mProgram, "texture3D"), 0); // Assign 3d texture to texture unit 0
 
     glActiveTexture(GL_TEXTURE1); // Texture unit 1

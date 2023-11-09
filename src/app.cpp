@@ -131,6 +131,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             ud = 0;
         }
     }
+    if (key == GLFW_KEY_ESCAPE) {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetWindowShouldClose(window, GLFW_TRUE); // Close the window when ESC is pressed
+    }
 }
 
 
@@ -360,18 +364,19 @@ void app::App::mainLoop()
     // ray_marcher.draw(&w);
 
     glfwSwapBuffers(w.getContext());
+    glfwPollEvents();
 
-    if(drawFPS % 10 == 0)
-    {
-        now = emscripten_performance_now() / 1000;
-        EM_ASM(document.getElementById("FPSVal").innerHTML = $0;, (int)(10/(now-t)));
-        t = now;
-    }
+    // if(drawFPS % 10 == 0)
+    // {
+    //     now = emscripten_performance_now() / 1000;
+    //     EM_ASM(document.getElementById("FPSVal").innerHTML = $0;, (int)(10/(now-t)));
+    //     t = now;
+    // }
 
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        printf("Error %u \n", error);
-    }
+    // GLenum error = glGetError();
+    // if (error != GL_NO_ERROR) {
+    //     printf("Error %u \n", error);
+    // }
 
     drawFPS++;
 }

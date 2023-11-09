@@ -1,10 +1,6 @@
 #pragma once
 
-#include <emscripten.h>
-#include <emscripten/val.h>
-#include <emscripten/html5.h>
-#include <emscripten/bind.h>
-#define GLFW_INCLUDE_ES3
+// #define GLFW_INCLUDE_ES3
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>

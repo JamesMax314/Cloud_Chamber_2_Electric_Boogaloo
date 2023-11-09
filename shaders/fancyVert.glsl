@@ -1,4 +1,4 @@
-#version 300 es
+#version 400 core
 
 in vec3 Position;
 out vec3 vPosition;
