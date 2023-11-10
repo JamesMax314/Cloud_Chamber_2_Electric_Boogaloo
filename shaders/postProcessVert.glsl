@@ -4,11 +4,9 @@ layout(location = 0) in vec3 inPos;
 out vec4 fragPos;
 out vec2 texCoords;
 
-vec4 aPos;
-
 void main()
 {
-    aPos = vec4(inPos, 1.0);
+    vec4 aPos = vec4(inPos, 1.0);
     gl_Position = aPos;
     fragPos = aPos;
 

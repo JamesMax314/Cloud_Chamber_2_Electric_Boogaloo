@@ -11,6 +11,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "shaders.hpp"
+#include "textures.hpp"
+#include "frame.hpp"
 #include "window.hpp"
 
 namespace simulation {
@@ -79,13 +81,17 @@ namespace simulation {
         unsigned int shaderProgramIndex;
         shaders::Shader* mCompShader;
         shaders::Shader* mRenderShader;
+        shaders::Shader* mBakeShader;
 
 	unsigned int nVerts = 20000;
+		int curl_noise_resolution = 1000;
         std::vector<glm::vec3> mStartPos;
         std::vector<unsigned int> mIndices;
         std::vector<simulation::Position> feedbackVec;
         std::vector<glm::vec3> newVerts;
+		texture::Texture* bakedCurlTex;
 
+        frame::Frame frameBufferCloudDen;
         // Intagers that are used to reference buffer arrays in gpu ram
         GLuint VAO;
         GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer;
@@ -95,8 +101,9 @@ namespace simulation {
 
         Sim();
         Sim(shaders::Shader *shader);
-        Sim(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
-        void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
+        Sim(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *bakeShader, std::vector<simulation::Position> startPos, int isTrack);
+        void init(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *bakeShader, std::vector<simulation::Position> startPos, int isTrack);
+		void bakeCurl(window::Window* w);
 
         void update(window::Window* w);
         void fillBuffers();
@@ -107,7 +114,7 @@ namespace simulation {
     class DensitySim: public Sim{
 	public:
 
-        void init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
+        void init(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *bakeShader, std::vector<simulation::Position> startPos, int isTrack);
 
 	const int N_stream_buffers = 4;
 	std::array<GLuint, 4> StreamBufferID;	
