@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)

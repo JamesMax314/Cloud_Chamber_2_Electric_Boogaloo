@@ -130,11 +130,11 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
 
         index3D = glm::floor(glm::vec3(0.00001) + (feedbackVec.at(i) - minCorner) / stepSize);
         int index = index3D.x + index3D.y*textureDim + index3D.z*textureDim*textureDim;
-	if(index >=0 and index<pow(textureDim,3)){
-	    if (texture3D.at(index) < maxTexVal) {
-                texture3D.at(index) += 2.0;
-            }
-	}
+        if(index >=0 and index<pow(textureDim,3)){
+            if (texture3D.at(index) < maxTexVal) {
+                    texture3D.at(index) += 2.0;
+                }
+        }
     }
 }
 
@@ -196,7 +196,7 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
     glViewport(0, 0, renderWidth, renderHeight);
 
     // Render to low res texture
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    // glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     glClear(GL_COLOR_BUFFER_BIT);
 
     mRenderShader->activate();
@@ -235,9 +235,9 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
 
     glBindVertexArray(0);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glViewport(0, 0, w->width, w->height);
+    // glViewport(0, 0, w->width, w->height);
 }
 
 void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)

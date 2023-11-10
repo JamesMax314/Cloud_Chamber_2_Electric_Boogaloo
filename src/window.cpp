@@ -15,8 +15,8 @@ GLFWwindow* window::setupWindow(int width, int height) {
     // std::cout << "I'm apple machine" << std::endl;
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-
-    GLFWwindow* window = glfwCreateWindow(1000, 1000, "Clouds", nullptr, nullptr);
+    
+    GLFWwindow* window = glfwCreateWindow(width/2, height/2, "Clouds", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -74,8 +74,8 @@ void window::Window::addMesh(drawable::Drawable *mesh)
 
 float window::Window::getAspect()
 {
-    width = 1000;
-    height = 1000;
+    // width = 1000;
+    // height = 1000;
     glViewport(0, 0, width, height);
     float aspect = (float)width / (float)height;
     return aspect;
