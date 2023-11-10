@@ -49,6 +49,11 @@ void simulation::Sim::update(window::Window* w)
     // Set up the advection shader:
     mCompShader->activate();
     mCompShader->setUniform("is_track_vert", this->isTrack);
+	
+	// Bind curl texture in to read from
+    glActiveTexture(GL_TEXTURE1); // Texture unit 0
+    glBindTexture(GL_TEXTURE_2D, bakedCurlTex->getRef());
+    glUniform1i(glGetUniformLocation(mCompShader->mProgram, "velocity2D"), 1);
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);

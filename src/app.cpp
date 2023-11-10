@@ -164,6 +164,8 @@ void app::App::init()
 	const char* velocityVert = "../shaders/velocityVert.glsl";
     const char* velocityFrag = "../shaders/velocityFrag.glsl";
 
+    const char* advectionShaderFile = "../shaders/advectionVert.glsl";
+
     glfwMakeContextCurrent(w.getContext());
     glfwSetCursorPosCallback(w.getContext(), cursorPosCallback);
     glfwSetInputMode(w.getContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -176,6 +178,7 @@ void app::App::init()
     basicShader.init(basicVert, basicFrag);
     postProcessShader.init(vertexPostProcess, fragmentPostProcess);
 	curlBakeShader.init(velocityVert, velocityFrag);
+    advectionShader.init(advectionShaderFile);
 
     std::vector<simulation::Position> origin = utils::genRandomPoints(2);
     
@@ -189,11 +192,11 @@ void app::App::init()
     }
 
     ray_marcher.init(&fancyShader, &rayShader, &postProcessShader);
-    track_sim.init(&fancyShader, &quadShader, &curlBakeShader, track_verts, 1);
+    track_sim.init(&advectionShader, &quadShader, &curlBakeShader, track_verts, 1);
 	track_sim.bakeCurl(&w);
 
     std::vector<simulation::Position> bg_verts = utils::genRandomPoints(10000);
-    sim.init(&fancyShader, &quadShader, &curlBakeShader, bg_verts, 0);
+    sim.init(&advectionShader, &quadShader, &curlBakeShader, bg_verts, 0);
 	sim.bakeCurl(&w);
 
     boundingBox.init(&basicShader, boxVerts, boxInds);
@@ -202,6 +205,9 @@ void app::App::init()
     //glEnable(GL_DEPTH_TEST);
     initBuffers();
     // ray.init(&fancyShader, &rayShader, track_verts);
+	
+	
+	//reference_time = std::chrono::high_resolution_clock::now();
 }
 
 void app::App::initBuffers()
@@ -326,7 +332,9 @@ void app::App::mainLoop()
     glm::mat4 projection = glm::perspective(fovRad, aspectRatio, nearClip, farClip);
 
     time += 0.001;
-    sim.mCompShader->setUniform("time", time);
+	float dT = 0.001;
+
+    sim.mCompShader->setUniform("dT", dT);
     track_sim.mCompShader->setUniform("time", time);
     ray_marcher.mCompShader->setUniform("time", time);
     ray_marcher.mRenderShader->setUniformVec("view", viewMat);
