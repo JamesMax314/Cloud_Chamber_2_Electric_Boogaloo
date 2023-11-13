@@ -1,9 +1,10 @@
 #version 400 core
 precision mediump float;
 
-in vec3 fragPos;
-out vec4 FragColor;
-uniform float t;
+in vec2 texturePos;
+out vec4 velocity;
+
+float N = 100.0; //Grid size in each direction
 
 vec4 permute(vec4 x) {
      vec4 xm = mod(x, 289.0);
@@ -206,11 +207,77 @@ float psrdnoise(vec3 x, vec3 period, float alpha, out vec3 gradient)
   return 39.5 * n;
 }
 
-void main()
+vec3 p1 = vec3(0.0, 0.0, 0.0);
+vec3 p2 = vec3(0.0, 0.0, 0.0);
+vec3 p3 = vec3(0.0, 0.0, 0.0);    
+
+float fbm(vec3 pos, float alpha, out vec3 grad)
 {
-    //FragColor = vec4(abs(fragPos[0]), abs(fragPos[1]), 0.2f, 1.0f);
-    vec3 grad;
-    vec3 p = vec3(0.0, 0.0, 0.0);
-    psrdnoise(fragPos, p, 0.0, grad);
-    FragColor = vec4(abs(grad[0]), abs(grad[1]), abs(grad[2]), 1.0f);
+    int N = 3;
+
+    vec3 p = vec3(0.0);
+    float w = 1.0; //Weight of noise
+    float s = 2.0; //Scale of noise
+    float n = 0.0; //Output noise value
+
+    vec3 g;
+    vec3 gsum = vec3(0.0);
+
+    for(int i = 0; i<N ; i++){
+        n += w * psrdnoise(s*pos + 0.13*gsum, p, s*alpha, g);
+        gsum += w*g;
+        s *= 2.0;
+        w *= pow(s,-1.0/3.0);
+    }
+
+    grad = gsum;
+    return n;
+
+}
+
+vec3 offset2 = vec3(1000.0, 0.0, 0.0);
+vec3 offset3 = vec3(0.0, 0.0, 1000.0);
+
+vec3 curlnoise(vec3 pos, float alpha)
+{
+
+
+    vec3 grad1;
+    vec3 grad2;
+    vec3 grad3;
+    float n1 = fbm(pos, alpha, grad1);
+    float n2 = fbm(pos+offset2, alpha, grad2);
+    float n3 = fbm(pos+offset3, alpha, grad3);
+
+    float w = sqrt(n1*n1 + n2*n2 + n3*n3);
+
+    vec3 velocity = w*vec3((grad3.y-grad2.z),(grad1.z-grad3.x),(grad2.x-grad1.y));
+
+    return velocity;
+
+}
+
+vec3 BoxCoords(vec2 texturecoords){
+//Converts between texture coords and spatial coordinates in the box
+    float floorFix = 0.000001;
+    vec3 boxcoords = vec3(0.0);
+    vec2 zFactors = vec2(0.0, 0.0);
+
+    // Goes zero to one every 1/sqrt(N)
+    boxcoords.x = mod(texturecoords.x, 1.0/sqrt(N)) * sqrt(N);
+    boxcoords.y = mod(texturecoords.y, 1.0/sqrt(N)) * sqrt(N);
+
+    // Bottom to top then left to right
+    zFactors.x = floor(texturecoords.x * sqrt(N) + floorFix) * 1.0/sqrt(N);
+    zFactors.y = floor(texturecoords.y * sqrt(N) + floorFix) * 1.0/N;
+
+    boxcoords.z = zFactors.x + zFactors.y;
+    return 2.0*boxcoords-1.0;
+}
+
+void main(){
+    vec3 boxpos = BoxCoords(texturePos); //Convert to position in box space
+    float scale = 0.1;
+    velocity = vec4(scale*curlnoise(boxpos, 0.0), 1.0); //Calculate the velocity field at this point 
+    // velocity = vec4(texturePos.x, texturePos.y, 1.0, 1.0);
 }

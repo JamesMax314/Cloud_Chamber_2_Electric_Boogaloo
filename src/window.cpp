@@ -16,7 +16,7 @@ GLFWwindow* window::setupWindow(int width, int height) {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    GLFWwindow* window = glfwCreateWindow(width, height, "Clouds", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1000, 1000, "Clouds", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -46,10 +46,10 @@ void window::framebuffer_size_callback(GLFWwindow* window, int width, int height
 
 window::Window::Window()
 {
-    this->width = EM_ASM_INT({return document.getElementById("canvas").width}, 100);
-    this->height = EM_ASM_INT({return document.getElementById("canvas").height}, 100);
+    this->width = 1000;//EM_ASM_INT({return document.getElementById("canvas").width}, 100);
+    this->height = 1000;//EM_ASM_INT({return document.getElementById("canvas").height}, 100);
     win = setupWindow(width, height);
-    glfwSetFramebufferSizeCallback(win, framebuffer_size_callback);
+    // glfwSetFramebufferSizeCallback(win, framebuffer_size_callback);
 }
 
 void window::Window::renderFrame()
@@ -74,8 +74,8 @@ void window::Window::addMesh(drawable::Drawable *mesh)
 
 float window::Window::getAspect()
 {
-    width = EM_ASM_INT({return document.getElementById("canvas").width}, 100);
-    height = EM_ASM_INT({return document.getElementById("canvas").height}, 100);
+    width = 1000;
+    height = 1000;
     glViewport(0, 0, width, height);
     float aspect = (float)width / (float)height;
     return aspect;

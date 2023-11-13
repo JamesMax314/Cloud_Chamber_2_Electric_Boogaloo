@@ -6,9 +6,6 @@
 #include <vector>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <emscripten/val.h>
-#include <emscripten/html5.h>
-#include <emscripten/bind.h>
 #define GLM_FORCE_PURE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

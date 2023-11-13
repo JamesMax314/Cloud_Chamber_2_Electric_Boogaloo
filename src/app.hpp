@@ -1,10 +1,6 @@
 #pragma once
 
-#include <emscripten.h>
-#include <emscripten/val.h>
-#include <emscripten/html5.h>
-#include <emscripten/bind.h>
-#define GLFW_INCLUDE_ES3
+// #define GLFW_INCLUDE_ES3
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
@@ -15,6 +11,7 @@
 #include <memory>
 #include <cmath>
 #include <random>
+#include <chrono>
 
 #include "window.hpp"
 #include "shaders.hpp"
@@ -38,7 +35,9 @@ namespace app {
         shaders::Shader quadShader;
         shaders::Shader rayShader;
         shaders::Shader basicShader;
-        shaders::Shader postProcessShader;
+    	shaders::Shader curlBakeShader;    
+		shaders::Shader postProcessShader;
+        shaders::Compute advectionShader;
 
         float pos = 0;
         glm::vec3 position = glm::vec3(0.0, 0.0, 0.0);
@@ -56,7 +55,6 @@ namespace app {
 	std::uniform_real_distribution<double> uniform_dist;
 
         double t = 0;
-        double now;
         int drawFPS = 0;
 
         bool keys[GLFW_KEY_LAST] = { false };

@@ -47,7 +47,6 @@ void rayMarch::RayMarch::genFBO()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, renderWidth, renderHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, cloudTex, 0);
 
@@ -130,11 +129,12 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
 
         index3D = glm::floor(glm::vec3(0.00001) + (feedbackVec.at(i) - minCorner) / stepSize);
         int index = index3D.x + index3D.y*textureDim + index3D.z*textureDim*textureDim;
-	if(index >=0 and index<pow(textureDim,3)){
-	    if (texture3D.at(index) < maxTexVal) {
-                texture3D.at(index) += 2.0;
-            }
-	}
+
+		if(index >=0 and index<pow(textureDim,3)){
+			if (texture3D.at(index) < maxTexVal) {
+				texture3D.at(index) += 2.0;
+			}
+		}
     }
 }
 
@@ -192,7 +192,7 @@ void rayMarch::RayMarch::draw(window::Window* w)
 
 void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
-    glfwMakeContextCurrent(w->getContext());
+    //glfwMakeContextCurrent(w->getContext());
     glViewport(0, 0, renderWidth, renderHeight);
 
     // Render to low res texture
@@ -242,9 +242,12 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
 
 void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
+    glfwMakeContextCurrent(w->getContext());
+
     genMask(w, backgroundTexture, backgroundDepth);
 
-    glfwMakeContextCurrent(w->getContext());
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
     mPostProcessShader->activate();
 

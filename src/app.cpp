@@ -131,6 +131,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             ud = 0;
         }
     }
+    if (key == GLFW_KEY_ESCAPE) {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        //glfwSetWindowShouldClose(window, GLFW_TRUE); // Close the window when ESC is pressed
+    }
 }
 
 
@@ -157,6 +161,10 @@ void app::App::init()
     const char* vertexPostProcess = "../shaders/postProcessVert.glsl";
     const char* fragmentPostProcess = "../shaders/postProcessFrag.glsl";
 
+	const char* velocityVert = "../shaders/velocityVert.glsl";
+    const char* velocityFrag = "../shaders/velocityFrag.glsl";
+
+    const char* advectionShaderFile = "../shaders/advectionVert.glsl";
 
     glfwMakeContextCurrent(w.getContext());
     glfwSetCursorPosCallback(w.getContext(), cursorPosCallback);
@@ -169,6 +177,8 @@ void app::App::init()
     rayShader.init(rayMarchVert, rayMarchFrag);
     basicShader.init(basicVert, basicFrag);
     postProcessShader.init(vertexPostProcess, fragmentPostProcess);
+	curlBakeShader.init(velocityVert, velocityFrag);
+    advectionShader.init(advectionShaderFile);
 
     std::vector<simulation::Position> origin = utils::genRandomPoints(2);
     
@@ -176,23 +186,28 @@ void app::App::init()
     std::vector<simulation::Position> track_verts;
 
     for(int i =0; i<2; i++){
-	tracks.emplace_back(origin.at(i));
-	std::vector<glm::vec3> temp_track_verts = tracks.at(i).get_vertices();
-	track_verts.insert(track_verts.end(), temp_track_verts.begin(), temp_track_verts.end());
+		tracks.emplace_back(origin.at(i));
+		std::vector<glm::vec3> temp_track_verts = tracks.at(i).get_vertices();
+		track_verts.insert(track_verts.end(), temp_track_verts.begin(), temp_track_verts.end());
     }
 
     ray_marcher.init(&fancyShader, &rayShader, &postProcessShader);
-    track_sim.init(&fancyShader, &quadShader, track_verts, 1);
+    track_sim.init(&advectionShader, &quadShader, &curlBakeShader, track_verts, 1);
+	track_sim.bakeCurl(&w);
 
     std::vector<simulation::Position> bg_verts = utils::genRandomPoints(10000);
-    sim.init(&fancyShader, &quadShader, bg_verts, 0);
+    sim.init(&advectionShader, &quadShader, &curlBakeShader, bg_verts, 0);
+	sim.bakeCurl(&w);
 
     boundingBox.init(&basicShader, boxVerts, boxInds);
     boundingBox.drawType = GL_LINES;
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
     initBuffers();
     // ray.init(&fancyShader, &rayShader, track_verts);
+	
+	
+	//reference_time = std::chrono::high_resolution_clock::now();
 }
 
 void app::App::initBuffers()
@@ -274,12 +289,12 @@ void app::App::mainLoop()
     double p = uniform_dist(rand_gen);
  
     if(p < 0.004){
-	std::cout<<"Track created"<<std::endl;
-	std::vector<simulation::Position> origin = utils::genRandomPoints(1);
-	track::Track new_track(glm::vec3(0.0));
+		std::cout<<"Track created"<<std::endl;
+		std::vector<simulation::Position> origin = utils::genRandomPoints(1);
+		track::Track new_track(glm::vec3(0.0));
     	std::vector<glm::vec3> temp_track_verts = new_track.get_vertices();
-	track_sim.addVerts(temp_track_verts);
-	printf("newVerts size = %u \n", track_sim.newVerts.size());
+		track_sim.addVerts(temp_track_verts);
+		printf("newVerts size = %u \n", track_sim.newVerts.size());
     }
 
     sim.update(&w);
@@ -317,7 +332,9 @@ void app::App::mainLoop()
     glm::mat4 projection = glm::perspective(fovRad, aspectRatio, nearClip, farClip);
 
     time += 0.001;
-    sim.mCompShader->setUniform("time", time);
+	float dT = 0.001;
+
+    sim.mCompShader->setUniform("dT", dT);
     track_sim.mCompShader->setUniform("time", time);
     ray_marcher.mCompShader->setUniform("time", time);
     ray_marcher.mRenderShader->setUniformVec("view", viewMat);
@@ -360,18 +377,19 @@ void app::App::mainLoop()
     // ray_marcher.draw(&w);
 
     glfwSwapBuffers(w.getContext());
+    glfwPollEvents();
 
-    if(drawFPS % 10 == 0)
-    {
-        now = emscripten_performance_now() / 1000;
-        EM_ASM(document.getElementById("FPSVal").innerHTML = $0;, (int)(10/(now-t)));
-        t = now;
-    }
+    // if(drawFPS % 10 == 0)
+    // {
+    //     now = emscripten_performance_now() / 1000;
+    //     EM_ASM(document.getElementById("FPSVal").innerHTML = $0;, (int)(10/(now-t)));
+    //     t = now;
+    // }
 
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        printf("Error %u \n", error);
-    }
+    // GLenum error = glGetError();
+    // if (error != GL_NO_ERROR) {
+    //     printf("Error %u \n", error);
+    // }
 
     drawFPS++;
 }

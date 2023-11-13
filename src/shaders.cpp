@@ -122,7 +122,7 @@ GLuint shaders::genShaderProgram(const char *vertexShaderFile)
         printf("- Vertex Shader Compiled; \n");
     }
 
-    const char *passThroughFrag = "#version 300 es\n"
+    const char *passThroughFrag = "#version 400 core\n"
         "precision mediump float;\n"
         "in float outValue;\n"
         "out float outData;\n"
@@ -204,7 +204,7 @@ GLuint shaders::genCompProgram(const char *compShaderFile)
         printf("- Vertex Shader Compiled; \n");
     }
 
-    const char *passThroughFrag = "#version 300 es\n"
+    const char *passThroughFrag = "#version 400 core\n"
         "precision mediump float;\n"
         "in vec3 vPosition;\n"
         "out vec4 FragColor;\n"

@@ -8,31 +8,39 @@ simulation::Sim::Sim(shaders::Shader *shader)
 {
 }
 
-void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
+void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *bakeShader, std::vector<simulation::Position> startPos, int isTrack)
 {
+	bakedCurlTex = new texture::Texture();
+	bakedCurlTex->initColour(curl_noise_resolution, curl_noise_resolution);
+	frameBufferCloudDen.init(bakedCurlTex);
+
     for (int i = 0; i < nVerts; i++){
-	current_index = (current_index+1)%nVerts;
-	feedbackVec.push_back(simulation::Position(2.0));
+		current_index = (current_index+1)%nVerts;
+		feedbackVec.push_back(simulation::Position(2.0));
     }
     
     this->isTrack = isTrack;
     mCompShader = compShader;
     mRenderShader = renderShader;
+	mBakeShader = bakeShader;
     mStartPos = startPos;
+
     for (int i = 0; i < mStartPos.size(); i++){
-	current_index = (current_index+1)%nVerts;
-	feedbackVec.at(current_index) = mStartPos.at(i);
+		current_index = (current_index+1)%nVerts;
+		feedbackVec.at(current_index) = mStartPos.at(i);
     }
+
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &ParticleBufferA);
     glGenBuffers(1, &ParticleBufferB);
     glGenBuffers(1, &billboard_vertex_buffer);
+    glGenBuffers(1, &baking_vertex_buffer);
     fillBuffers();
 }
 
-simulation::Sim::Sim(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
+simulation::Sim::Sim(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *bakeShader, std::vector<simulation::Position> startPos, int isTrack)
 {
-    init(compShader, renderShader, startPos, isTrack);
+    init(compShader, renderShader, bakeShader, startPos, isTrack);
 }
 
 void simulation::Sim::update(window::Window* w)
@@ -42,6 +50,11 @@ void simulation::Sim::update(window::Window* w)
     // Set up the advection shader:
     mCompShader->activate();
     mCompShader->setUniform("is_track_vert", this->isTrack);
+	
+	// Bind curl texture in to read from
+    glActiveTexture(GL_TEXTURE1); // Texture unit 0
+    glBindTexture(GL_TEXTURE_2D, bakedCurlTex->getRef());
+    glUniform1i(glGetUniformLocation(mCompShader->mProgram, "velocity2D"), 1);
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
@@ -69,6 +82,7 @@ void simulation::Sim::update(window::Window* w)
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 0);    
 
+	glFlush();
 
     std::swap(ParticleBufferA, ParticleBufferB);
     glDisable(GL_RASTERIZER_DISCARD);
@@ -95,6 +109,9 @@ void simulation::Sim::fillBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_cube), g_vertex_buffer_data_cube, GL_STATIC_DRAW);
 
+    glBindBuffer(GL_ARRAY_BUFFER, baking_vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
@@ -115,7 +132,7 @@ void simulation::Sim::draw(window::Window* w)
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
+	
     // Bind positions
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
@@ -133,6 +150,42 @@ void simulation::Sim::draw(window::Window* w)
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 36, nVerts);
 
     glBindVertexArray(0);
+}
+
+// Bake the curl noise to bakedCurlTex
+void simulation::Sim::bakeCurl(window::Window* w)
+{
+    // Make context current
+    glfwMakeContextCurrent(w->getContext());
+
+    // Bind FBO
+    frameBufferCloudDen.setRenderTexture(bakedCurlTex);
+    frameBufferCloudDen.activate();
+    frameBufferCloudDen.clear();
+
+    // Bind VAO
+    glBindVertexArray(VAO);
+
+    // Activate compute shader
+    mBakeShader->activate();
+
+    // Set window dimensions
+    glViewport(0, 0, curl_noise_resolution, curl_noise_resolution);
+
+    // Bind quad to bake curl noise 
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, baking_vertex_buffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	
+    // Draw call
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
+
+    // Deactivate VAO
+    glBindVertexArray(0);
+
+    // Reset window dimensions
+    glViewport(0, 0, w->width, w->height);
+
 }
 
 void simulation::DensitySim::addVerts(std::vector<simulation::Position>& new_verts){
@@ -241,33 +294,50 @@ void simulation::DensitySim::fillBuffers()
     // Bind all the model arrays to the appropriate buffers
 
     for(int index=0; index<N_stream_buffers; index++){
-	glBindBuffer(GL_ARRAY_BUFFER, StreamBufferID.at(index)); 
+		glBindBuffer(GL_ARRAY_BUFFER, StreamBufferID.at(index)); 
     	glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), feedbackVec.data(), GL_STREAM_READ);
     }
+
+    // Bind rendering buffers
+    glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_cube), g_vertex_buffer_data_cube, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, baking_vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
 }
 
 
-void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack)
+void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *bakeShader, std::vector<simulation::Position> startPos, int isTrack)
 {
+
+	bakedCurlTex = new texture::Texture();	
+	bakedCurlTex->initColour(curl_noise_resolution, curl_noise_resolution);
+	frameBufferCloudDen.init(bakedCurlTex);
+
     for (int i = 0; i < nVerts; i++){
-	this->feedbackVec.push_back(simulation::Position(2.0));
+		this->feedbackVec.push_back(simulation::Position(2.0));
     }
     
     this->isTrack = isTrack;
     mCompShader = compShader;
     mRenderShader = renderShader;
+	mBakeShader = bakeShader;
     mStartPos = startPos;
+
     for (int i = 0; i < mStartPos.size(); i++){
-	current_index = (current_index+1)%nVerts;
-	this->feedbackVec.at(current_index) = mStartPos.at(i);
+		current_index = (current_index+1)%nVerts;
+		this->feedbackVec.at(current_index) = mStartPos.at(i);
     }
+
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &ParticleBufferA);
     glGenBuffers(1, &ParticleBufferB);
     glGenBuffers(1, &billboard_vertex_buffer);
+    glGenBuffers(1, &baking_vertex_buffer);
+
     for(int index=0; index<N_stream_buffers; index++){
-	glGenBuffers(1, &StreamBufferID.at(index));
+		glGenBuffers(1, &StreamBufferID.at(index));
     }
 
     fillBuffers();

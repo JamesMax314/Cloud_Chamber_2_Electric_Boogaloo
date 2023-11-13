@@ -1,4 +1,4 @@
-#version 300 es
+#version 400 core
 precision mediump float;
 
 in vec4 fragPos;
@@ -25,5 +25,5 @@ void main() {
     // backTex.xyz = backTex.xyz + clouds.xyz;
 
     // vec3 outCol = backTex.xyz+clouds;
-    FragColor = vec4(col, 0.0);
+    FragColor = vec4(col, 1.0);
 }
