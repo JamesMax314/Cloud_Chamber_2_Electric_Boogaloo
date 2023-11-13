@@ -34,6 +34,7 @@ void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderS
     glGenBuffers(1, &ParticleBufferA);
     glGenBuffers(1, &ParticleBufferB);
     glGenBuffers(1, &billboard_vertex_buffer);
+    glGenBuffers(1, &baking_vertex_buffer);
     fillBuffers();
 }
 
@@ -106,6 +107,9 @@ void simulation::Sim::fillBuffers()
 
     // Bind rendering buffers
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_cube), g_vertex_buffer_data_cube, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, baking_vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -128,7 +132,7 @@ void simulation::Sim::draw(window::Window* w)
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
+	
     // Bind positions
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, ParticleBufferA);
@@ -168,11 +172,11 @@ void simulation::Sim::bakeCurl(window::Window* w)
     // Set window dimensions
     glViewport(0, 0, curl_noise_resolution, curl_noise_resolution);
 
-    // Bind render quad 
+    // Bind quad to bake curl noise 
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, baking_vertex_buffer);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
+	
     // Draw call
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
 
@@ -296,7 +300,9 @@ void simulation::DensitySim::fillBuffers()
 
     // Bind rendering buffers
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-//    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_cube), g_vertex_buffer_data_cube, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_cube), g_vertex_buffer_data_cube, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, baking_vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
 }
@@ -328,6 +334,7 @@ void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *
     glGenBuffers(1, &ParticleBufferA);
     glGenBuffers(1, &ParticleBufferB);
     glGenBuffers(1, &billboard_vertex_buffer);
+    glGenBuffers(1, &baking_vertex_buffer);
 
     for(int index=0; index<N_stream_buffers; index++){
 		glGenBuffers(1, &StreamBufferID.at(index));

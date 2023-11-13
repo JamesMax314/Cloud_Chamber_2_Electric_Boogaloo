@@ -94,7 +94,7 @@ namespace simulation {
         frame::Frame frameBufferCloudDen;
         // Intagers that are used to reference buffer arrays in gpu ram
         GLuint VAO;
-        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer;
+        GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer, baking_vertex_buffer;
 	
 	int isTrack;
 	unsigned int current_index = 0;
