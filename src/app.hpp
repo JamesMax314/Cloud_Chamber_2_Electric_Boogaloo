@@ -67,6 +67,8 @@ namespace app {
 
 	float time = 0.0;
 
+		float now;
+
         App();
 
         void init();

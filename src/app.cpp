@@ -379,17 +379,17 @@ void app::App::mainLoop()
     glfwSwapBuffers(w.getContext());
     glfwPollEvents();
 
-    // if(drawFPS % 10 == 0)
-    // {
-    //     now = emscripten_performance_now() / 1000;
-    //     EM_ASM(document.getElementById("FPSVal").innerHTML = $0;, (int)(10/(now-t)));
-    //     t = now;
-    // }
+    if(drawFPS % 10 == 0)
+    {
+        now = emscripten_performance_now() / 1000;
+        EM_ASM(document.getElementById("FPSVal").innerHTML = $0;, (int)(10/(now-t)));
+        t = now;
+    }
 
-    // GLenum error = glGetError();
-    // if (error != GL_NO_ERROR) {
-    //     printf("Error %u \n", error);
-    // }
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        printf("Error %u \n", error);
+    }
 
     drawFPS++;
 }
