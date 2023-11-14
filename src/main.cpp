@@ -1,4 +1,8 @@
-// #define GLFW_INCLUDE_ES3
+#include <emscripten.h>
+#include <emscripten/val.h>
+#include <emscripten/html5.h>
+#include <emscripten/bind.h>
+#define GLFW_INCLUDE_ES3
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
@@ -23,7 +27,7 @@ int main()
 {
     application.init();
     while (!glfwWindowShouldClose(application.w.getContext())) {
-        draw();
+		emscripten_set_main_loop(draw, 0, 1);
     }
     // window::Window mWindow = window::Window();
     // while (!glfwWindowShouldClose(mWindow.getContext())) {
