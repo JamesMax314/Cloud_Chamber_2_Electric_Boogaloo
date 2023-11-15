@@ -17,14 +17,18 @@
 #include "shaders.hpp"
 #include "app.hpp"
 
+app::App* application;
+void app_draw(){
+	application->mainLoop();
+}
 
 int main()
 {
-	app::App application;
+	application = new app::App();
+	application->init();
 	
-    application.init();
-    while (!glfwWindowShouldClose(application.w.getContext())) {
-		emscripten_set_main_loop(draw, 0, 1);
+    while (!application->w.shouldClose()) {
+		emscripten_set_main_loop(&app_draw, 0, 1);
     }
     // window::Window mWindow = window::Window();
     // while (!glfwWindowShouldClose(mWindow.getContext())) {
@@ -33,6 +37,9 @@ int main()
 
     // }
     glfwTerminate();
+
+	delete(application);
     
     return 0;
 }
+

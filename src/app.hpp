@@ -69,8 +69,6 @@ namespace app {
 
 		float now;
 
-        App();
-
         void init();
         void initBuffers();
         void mainLoop();
