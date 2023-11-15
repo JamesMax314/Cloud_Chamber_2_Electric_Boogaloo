@@ -1,6 +1,10 @@
 #pragma once
 
-// #define GLFW_INCLUDE_ES3
+#include <emscripten.h>
+#include <emscripten/val.h>
+#include <emscripten/html5.h>
+#include <emscripten/bind.h>
+#define GLFW_INCLUDE_ES3
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
@@ -61,7 +65,11 @@ namespace app {
 
         float motionSpeed = 0.01;
 
-	float time = 0.0;
+		float time = 0.0;
+
+		float now;
+
+        App();
 
         void init();
         void initBuffers();

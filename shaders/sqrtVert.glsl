@@ -1,4 +1,4 @@
-#version 400 core
+#version 300 es
 
 in float inValue;
 out float outValue;
