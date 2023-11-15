@@ -202,83 +202,15 @@ void app::App::init()
     boundingBox.init(&basicShader, boxVerts, boxInds);
     boundingBox.drawType = GL_LINES;
 
+    bubbleColourTex.initColour(w.width, w.height);
+    bubbleDepthTex.initDepth(w.width, w.height);
+    frameBufferBackBubbles.init(&bubbleColourTex, &bubbleDepthTex);
+
     //glEnable(GL_DEPTH_TEST);
-    initBuffers();
     // ray.init(&fancyShader, &rayShader, track_verts);
 	
 	
 	//reference_time = std::chrono::high_resolution_clock::now();
-}
-
-void app::App::initBuffers()
-{
-    // Initialise frame buffer object
-    // Bind FBO
-    // Gen texture
-    // bind texture
-    // glTexImage2D to specify we want a colour and depth buffer texture
-    // Specify interpolation
-    // Unbind texture
-    // glFramebufferTexture2D to bind texture to FBO
-    // Check FBO complete 
-    // Unbind FBO
-
-    glGenFramebuffers(1, &FBO);
-    glGenTextures(1, &textureOut);
-    glGenTextures(1, &depthOut);
-
-    // Setup FBO
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-
-    // Setup texture
-    glBindTexture(GL_TEXTURE_2D, textureOut);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w.width, w.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureOut, 0);
-
-    // Setup depth buffer
-    glBindTexture(GL_TEXTURE_2D, depthOut);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, w.width, w.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    
-    // Attach the depth texture to the FBO
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthOut, 0);
-    
-    // Check configuration
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (status != GL_FRAMEBUFFER_COMPLETE) {
-	    std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-        switch (status) {
-            case GL_FRAMEBUFFER_UNDEFINED:
-                printf("GL_FRAMEBUFFER_UNDEFINED\n");
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                printf("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n");
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                printf("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT\n");
-                break;
-            case GL_FRAMEBUFFER_UNSUPPORTED:
-                printf("GL_FRAMEBUFFER_UNSUPPORTED\n");
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-                printf("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFE\n");
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-                printf("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER\n");
-                break;
-            // Handle other possible status codes as needed
-            default:
-                printf("Unknown Error\n");
-                break;
-        }
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0); 
 }
 
 void app::App::mainLoop()
@@ -301,6 +233,9 @@ void app::App::mainLoop()
     track_sim.update(&w);
 
     glClear(GL_COLOR_BUFFER_BIT);
+    frameBufferBackBubbles.activate();
+    frameBufferBackBubbles.clear();
+    frameBufferBackBubbles.deactivate();
 
     float dt = 1;
 
@@ -357,12 +292,11 @@ void app::App::mainLoop()
     ray_marcher.mRenderShader->setUniformVec("lightPos", lightPos);
     ray_marcher.mRenderShader->setUniformVec("lightColour", lightColour);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    frameBufferBackBubbles.activate();
     sim.draw(&w);
     //track_sim.draw(&w); //Draw track particles
     boundingBox.draw(w.getContext());
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    frameBufferBackBubbles.deactivate();
 
     // ray_marcher.draw(&w);
     //ray.draw(&w);
@@ -372,7 +306,7 @@ void app::App::mainLoop()
     //glDeleteSync(track_sim.feedback_fence);
     track_sim.update_feedbackVec();
     ray_marcher.update(track_sim.feedbackVec);
-    ray_marcher.draw(&w, textureOut, depthOut);
+    ray_marcher.draw(&w, bubbleColourTex.m_textureRef, bubbleDepthTex.m_textureRef);
 
     // ray_marcher.draw(&w);
 

@@ -87,42 +87,17 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
 {
     // should pass by ref
 
-    // printf("%f %f %f\n", feedbackVec[0][0], feedbackVec[0][1], feedbackVec[0][2]);
-
-
     minCorner = glm::vec3(-0.9);
     maxCorner = glm::vec3(0.9);
 
-    // Find bounding box
-    //for (int i=0; i<feedbackVec.size()-1; i++) {
-    //    int subcount = 0;
-    //    for (int j=0; j<3; j++) {
-    //        if (feedbackVec.at(i)[j] < minCorner[j] && feedbackVec.at(i)[j]!= 0) {
-    //            minCorner[j] = feedbackVec.at(i)[j];
-    //        }
-    //        if (feedbackVec.at(i)[j] > maxCorner[j] && feedbackVec.at(i)[j]!= 0) {
-    //            maxCorner[j] = feedbackVec.at(i)[j];
-    //        }
-    //    }
-    //}
-
     // Compute density texture
     glm::vec3 stepSize =  (maxCorner - minCorner)/ (float)(textureDim-1);
-    // printf("Min %f, %f, %f \n", minCorner[0], minCorner[1], minCorner[2]);
-    // printf("Max %f, %f, %f \n", maxCorner[0], maxCorner[1], maxCorner[2]);
 
-    texture3D.clear();
-    texture3D.insert(texture3D.begin(), flattenedDim, 0.0); //reset the texture to empty
-
-    //for (int i1=0; i1<textureDim; i1++) {
-    //    for (int i2=0; i2<textureDim; i2++) {
-    //        for (int i3=0; i3<textureDim; i3++) {
-    //            if (texture3D.at(i1 + i2*textureDim + i3*textureDim*textureDim) >= 0.05) {
-    //                texture3D.at(i1 + i2*textureDim + i3*textureDim*textureDim) -= 0.05;
-    //            }
-    //        }
-    //    }
-    //}
+    for (int i1=0; i1<texture3D.size(); i1++) {
+        if (texture3D.at(i1) >= 0.05) {
+            texture3D.at(i1) -= 0.05;
+        }
+    }
 
     for (int i=0; i<feedbackVec.size()-1; i++) {
         glm::ivec3 index3D;
@@ -247,7 +222,6 @@ void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuin
     genMask(w, backgroundTexture, backgroundDepth);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 
     mPostProcessShader->activate();
 

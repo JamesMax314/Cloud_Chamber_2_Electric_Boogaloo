@@ -43,6 +43,11 @@ namespace app {
 		shaders::Shader postProcessShader;
         shaders::Compute advectionShader;
 
+        texture::Texture bubbleColourTex;
+        texture::Texture bubbleDepthTex;
+
+        frame::Frame frameBufferBackBubbles;
+
         float pos = 0;
         glm::vec3 position = glm::vec3(0.0, 0.0, 0.0);
 
