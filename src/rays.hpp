@@ -55,8 +55,8 @@ namespace rayMarch {
         void update(std::vector<glm::vec3> &feedbackVec);
         void fillBuffers();
         void loadUniforms();
-        void draw(window::Window* w);
-        void genMask(window::Window* w, GLuint backgroundTexture, GLuint backgroundDepth);
-        void draw(window::Window* w, GLuint backgroundTexture, GLuint backgroundDepth);
+        void draw(window::Window &w);
+        void genMask(window::Window &w, GLuint backgroundTexture, GLuint backgroundDepth);
+        void draw(window::Window &w, GLuint backgroundTexture, GLuint backgroundDepth);
     };
 }

@@ -156,9 +156,9 @@ void rayMarch::RayMarch::loadUniforms()
 {
 }
 
-void rayMarch::RayMarch::draw(window::Window* w)
+void rayMarch::RayMarch::draw(window::Window &w)
 {
-    glfwMakeContextCurrent(w->getContext());
+    glfwMakeContextCurrent(w.getContext());
 
     mRenderShader->activate();
 
@@ -190,7 +190,7 @@ void rayMarch::RayMarch::draw(window::Window* w)
     glBindVertexArray(0);
 }
 
-void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
+void rayMarch::RayMarch::genMask(window::Window &w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
     //glfwMakeContextCurrent(w->getContext());
     glViewport(0, 0, renderWidth, renderHeight);
@@ -237,12 +237,12 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glViewport(0, 0, w->width, w->height);
+    glViewport(0, 0, w.width, w.height);
 }
 
-void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
+void rayMarch::RayMarch::draw(window::Window &w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
-    glfwMakeContextCurrent(w->getContext());
+    glfwMakeContextCurrent(w.getContext());
 
     genMask(w, backgroundTexture, backgroundDepth);
 
