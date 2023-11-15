@@ -35,7 +35,7 @@ int main()
     //     glfwPollEvents();
 
     // }
-    // glfwTerminate();
+    glfwTerminate();
     
     return 0;
 }
