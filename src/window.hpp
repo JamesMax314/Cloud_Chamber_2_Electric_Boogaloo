@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <memory>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #define GLM_FORCE_PURE
@@ -15,16 +16,15 @@
 #include "shaders.hpp"
 
 namespace window {
-    GLFWwindow* setupWindow(int width, int height);
 
-    void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+    void framebuffer_size_callback(int width, int height);
 
     class Window {
         public:
 
         int height, width;
 
-        GLFWwindow* win;
+		GLFWwindow* win;
         GLuint lightUBO;
 
         bool rebufferLights;
@@ -41,9 +41,9 @@ namespace window {
 
         void renderFrame();
 
-        void addMesh(drawable::Drawable *mesh);
+        void addMesh(drawable::Drawable* mesh);
         float getAspect();
 
-        GLFWwindow* getContext();
+		GLFWwindow* getContext();
     };
 }
