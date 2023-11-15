@@ -1,5 +1,6 @@
 #include "window.hpp"
 
+
 void window::framebuffer_size_callback(int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
@@ -43,25 +44,25 @@ window::Window::Window()
     // glfwSetFramebufferSizeCallback(win, framebuffer_size_callback);
 }
 
-void window::Window::renderFrame()
-{
-    rebufferLights = true;
+//void window::Window::renderFrame()
+//{
+//    rebufferLights = true;
+//
+//    for (int i=0; i<meshes.size(); i++) {
+//        if (meshes[i]->mShader) {
+//            // Setup mesh uniforms
+//
+//            meshes[i]->draw(win);
+//        }
+//    }
+//
+//    glfwSwapBuffers(win);
+//}
 
-    for (int i=0; i<meshes.size(); i++) {
-        if (meshes[i]->mShader) {
-            // Setup mesh uniforms
-
-            meshes[i]->draw(win);
-        }
-    }
-
-    glfwSwapBuffers(win);
-}
-
-void window::Window::addMesh(drawable::Drawable* mesh)
-{
-    meshes.push_back(mesh);
-}
+//void window::Window::addMesh(drawable::Drawable* mesh)
+//{
+//    meshes.push_back(mesh);
+//}
 
 float window::Window::getAspect()
 {
@@ -72,7 +73,25 @@ float window::Window::getAspect()
     return aspect;
 }
 
-GLFWwindow* window::Window::getContext()
+void window::Window::makeContextCurrent()
 {
-    return win;
+	glfwMakeContextCurrent(this->win);
+}
+
+GLFWcursorposfun window::Window::setCursorPosCallback(GLFWcursorposfun callback){
+    GLFWcursorposfun glfw_cursorpos_fun = glfwSetCursorPosCallback(this->win, callback);
+    glfwSetInputMode(this->win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	return glfw_cursorpos_fun;
+}
+	
+GLFWkeyfun window::Window::setKeyCallback(GLFWkeyfun callback){ 
+	return glfwSetKeyCallback(this->win, callback);
+}
+
+void window::Window::swapBuffers(){
+    glfwSwapBuffers(this->win);
+}
+
+int window::Window::shouldClose(){
+	return glfwWindowShouldClose(this->win);
 }

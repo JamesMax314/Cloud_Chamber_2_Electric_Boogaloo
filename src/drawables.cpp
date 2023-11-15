@@ -59,9 +59,9 @@ void drawable::Drawable::loadUniforms()
 
 }
 
-void drawable::Drawable::draw(GLFWwindow* w)
+void drawable::Drawable::draw(window::Window &w)
 {
-    glfwMakeContextCurrent(w);
+	w.makeContextCurrent();
     mShader->activate();
     // printf("activated shader\n");
 

@@ -12,7 +12,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "drawables.hpp"
 #include "shaders.hpp"
 
 namespace window {
@@ -35,15 +34,19 @@ namespace window {
 
         float aspect;
 
-        std::vector<drawable::Drawable*> meshes;
+        //std::vector<drawable::Drawable*> meshes;
 
         Window();
 
         void renderFrame();
 
-        void addMesh(drawable::Drawable* mesh);
+        //void addMesh(drawable::Drawable* mesh);
         float getAspect();
 
-		GLFWwindow* getContext();
+		void makeContextCurrent();
+		GLFWcursorposfun setCursorPosCallback(GLFWcursorposfun callback );
+		GLFWkeyfun setKeyCallback(GLFWkeyfun callback); 
+		void swapBuffers();
+		int shouldClose();
     };
 }

@@ -158,7 +158,7 @@ void rayMarch::RayMarch::loadUniforms()
 
 void rayMarch::RayMarch::draw(window::Window &w)
 {
-    glfwMakeContextCurrent(w.getContext());
+	w.makeContextCurrent();
 
     mRenderShader->activate();
 
@@ -192,7 +192,6 @@ void rayMarch::RayMarch::draw(window::Window &w)
 
 void rayMarch::RayMarch::genMask(window::Window &w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
-    //glfwMakeContextCurrent(w->getContext());
     glViewport(0, 0, renderWidth, renderHeight);
 
     // Render to low res texture
@@ -242,7 +241,7 @@ void rayMarch::RayMarch::genMask(window::Window &w, GLuint backgroundTexture, GL
 
 void rayMarch::RayMarch::draw(window::Window &w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
-    glfwMakeContextCurrent(w.getContext());
+	w.makeContextCurrent();
 
     genMask(w, backgroundTexture, backgroundDepth);
 

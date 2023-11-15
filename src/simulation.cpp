@@ -43,9 +43,9 @@ simulation::Sim::Sim(shaders::Shader *compShader, shaders::Shader *renderShader,
     init(compShader, renderShader, bakeShader, startPos, isTrack);
 }
 
-void simulation::Sim::update(window::Window* w)
+void simulation::Sim::update(window::Window &w)
 {
-    glfwMakeContextCurrent(w->getContext());
+	w.makeContextCurrent();
 
     // Set up the advection shader:
     mCompShader->activate();
@@ -121,9 +121,9 @@ void simulation::Sim::loadUniforms()
 }
 
 
-void simulation::Sim::draw(window::Window* w)
+void simulation::Sim::draw(window::Window &w)
 {
-    glfwMakeContextCurrent(w->getContext());
+	w.makeContextCurrent();
     mRenderShader->activate();
 
     glBindVertexArray(VAO);
@@ -153,10 +153,10 @@ void simulation::Sim::draw(window::Window* w)
 }
 
 // Bake the curl noise to bakedCurlTex
-void simulation::Sim::bakeCurl(window::Window* w)
+void simulation::Sim::bakeCurl(window::Window &w)
 {
     // Make context current
-    glfwMakeContextCurrent(w->getContext());
+	w.makeContextCurrent();
 
     // Bind FBO
     frameBufferCloudDen.setRenderTexture(bakedCurlTex);
@@ -184,7 +184,7 @@ void simulation::Sim::bakeCurl(window::Window* w)
     glBindVertexArray(0);
 
     // Reset window dimensions
-    glViewport(0, 0, w->width, w->height);
+    glViewport(0, 0, w.width, w.height);
 
 }
 
@@ -196,9 +196,10 @@ void simulation::DensitySim::addVerts(std::vector<simulation::Position>& new_ver
     //std::cout<<newVerts.size()<<std::endl;
 }
 
-void simulation::DensitySim::update(window::Window* w)
+void simulation::DensitySim::update(window::Window &w)
 {
-    glfwMakeContextCurrent(w->getContext());
+
+	w.makeContextCurrent();
 
     // Set up the advection shader:
     mCompShader->activate();

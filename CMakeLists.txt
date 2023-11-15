@@ -9,7 +9,7 @@ file(GLOB HEADDERS src/*.hpp)
 
 set(CMAKE_CXX_FLAGS "-Wall -Wno-unused-variable") #-Wextra
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+#set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_BUILD_TYPE Debug)
