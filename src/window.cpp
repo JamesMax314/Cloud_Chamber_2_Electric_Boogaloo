@@ -35,13 +35,17 @@ window::Window::Window()
 
     // Initialize GLEW
     glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
+	GLenum err = glewInit();
+    if (err != GLEW_OK) {
         std::cerr << "Failed to initialize GLEW" << std::endl;
         glfwTerminate();
     }
 
     printf("Initialising WEBGL context!\n");
     // glfwSetFramebufferSizeCallback(win, framebuffer_size_callback);
+}
+window::Window::~Window(){
+	glfwDestroyWindow(this->win);
 }
 
 //void window::Window::renderFrame()

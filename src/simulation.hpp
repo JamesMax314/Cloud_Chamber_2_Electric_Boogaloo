@@ -89,7 +89,7 @@ namespace simulation {
         std::vector<unsigned int> mIndices;
         std::vector<simulation::Position> feedbackVec;
         std::vector<glm::vec3> newVerts;
-		texture::Texture* bakedCurlTex;
+		texture::Texture bakedCurlTex;
 
         frame::Frame frameBufferCloudDen;
         // Intagers that are used to reference buffer arrays in gpu ram

@@ -10,9 +10,8 @@ simulation::Sim::Sim(shaders::Shader *shader)
 
 void simulation::Sim::init(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *bakeShader, std::vector<simulation::Position> startPos, int isTrack)
 {
-	bakedCurlTex = new texture::Texture();
-	bakedCurlTex->initColour(curl_noise_resolution, curl_noise_resolution);
-	frameBufferCloudDen.init(bakedCurlTex);
+	bakedCurlTex.initColour(curl_noise_resolution, curl_noise_resolution);
+	frameBufferCloudDen.init(&bakedCurlTex);
 
     for (int i = 0; i < nVerts; i++){
 		current_index = (current_index+1)%nVerts;
@@ -53,7 +52,7 @@ void simulation::Sim::update(window::Window &w)
 	
 	// Bind curl texture in to read from
     glActiveTexture(GL_TEXTURE1); // Texture unit 0
-    glBindTexture(GL_TEXTURE_2D, bakedCurlTex->getRef());
+    glBindTexture(GL_TEXTURE_2D, bakedCurlTex.getRef());
     glUniform1i(glGetUniformLocation(mCompShader->mProgram, "velocity2D"), 1);
 
     glBindVertexArray(VAO);
@@ -159,7 +158,7 @@ void simulation::Sim::bakeCurl(window::Window &w)
 	w.makeContextCurrent();
 
     // Bind FBO
-    frameBufferCloudDen.setRenderTexture(bakedCurlTex);
+    frameBufferCloudDen.setRenderTexture(&bakedCurlTex);
     frameBufferCloudDen.activate();
     frameBufferCloudDen.clear();
 
@@ -312,9 +311,8 @@ void simulation::DensitySim::fillBuffers()
 void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *bakeShader, std::vector<simulation::Position> startPos, int isTrack)
 {
 
-	bakedCurlTex = new texture::Texture();	
-	bakedCurlTex->initColour(curl_noise_resolution, curl_noise_resolution);
-	frameBufferCloudDen.init(bakedCurlTex);
+	bakedCurlTex.initColour(curl_noise_resolution, curl_noise_resolution);
+	frameBufferCloudDen.init(&bakedCurlTex);
 
     for (int i = 0; i < nVerts; i++){
 		this->feedbackVec.push_back(simulation::Position(2.0));

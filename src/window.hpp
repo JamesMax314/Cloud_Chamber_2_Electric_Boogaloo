@@ -37,6 +37,7 @@ namespace window {
         //std::vector<drawable::Drawable*> meshes;
 
         Window();
+        ~Window();
 
         void renderFrame();
 

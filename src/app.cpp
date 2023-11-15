@@ -56,10 +56,6 @@ std::vector<GLuint> boxInds {
         4, 5, 7
     };
 
-app::App::App()
-{
-}
-
 bool keys[GLFW_KEY_LAST] = { false };
 
 int lr = 0;

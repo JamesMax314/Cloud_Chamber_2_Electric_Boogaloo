@@ -13,17 +13,14 @@
 #include "shaders.hpp"
 #include "app.hpp"
 
-app::App application;
-
-void draw() {
-    application.mainLoop();
-}
 
 int main()
 {
+	app::App application;
+	
     application.init();
     while (!application.w.shouldClose()) {
-        draw();
+        application.mainLoop();
     }
     // window::Window mWindow = window::Window();
     // while (!glfwWindowShouldClose(mWindow.getContext())) {
@@ -31,7 +28,7 @@ int main()
     //     glfwPollEvents();
 
     // }
-    // glfwTerminate();
+    glfwTerminate();
     
     return 0;
 }

@@ -63,8 +63,6 @@ namespace app {
 
 	float time = 0.0;
 
-        App();
-
         void init();
         void initBuffers();
         void mainLoop();
