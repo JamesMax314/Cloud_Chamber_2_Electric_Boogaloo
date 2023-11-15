@@ -83,8 +83,8 @@ namespace simulation {
         shaders::Shader* mRenderShader;
         shaders::Shader* mBakeShader;
 
-	unsigned int nVerts = 20000;
-		int curl_noise_resolution = 1000;
+		unsigned int nVerts = 20000;
+		int curl_noise_resolution = 4096;
         std::vector<glm::vec3> mStartPos;
         std::vector<unsigned int> mIndices;
         std::vector<simulation::Position> feedbackVec;

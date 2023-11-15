@@ -200,6 +200,7 @@ void app::App::init()
     // ray.init(&fancyShader, &rayShader, track_verts);
 	
 	
+	now = emscripten_performance_now()/1000;
 	//reference_time = std::chrono::high_resolution_clock::now();
 }
 
@@ -276,7 +277,8 @@ void app::App::initBuffers()
 
 void app::App::mainLoop()
 {
-
+	reference_time = now;
+	now = emscripten_performance_now()/1000;
     //Generate new track
     
     double p = uniform_dist(rand_gen);
@@ -325,7 +327,7 @@ void app::App::mainLoop()
     glm::mat4 projection = glm::perspective(fovRad, aspectRatio, nearClip, farClip);
 
     time += 0.001;
-	float dT = 0.001;
+	float dT = now-reference_time;
 
     sim.mCompShader->setUniform("dT", dT);
     track_sim.mCompShader->setUniform("time", time);

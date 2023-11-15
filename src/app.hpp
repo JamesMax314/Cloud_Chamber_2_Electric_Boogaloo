@@ -68,6 +68,7 @@ namespace app {
 		float time = 0.0;
 
 		float now;
+		float reference_time;
 
         void init();
         void initBuffers();

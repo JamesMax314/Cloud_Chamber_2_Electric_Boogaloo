@@ -312,6 +312,7 @@ void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *
 {
 
 	bakedCurlTex.initColour(curl_noise_resolution, curl_noise_resolution);
+	bakedCurlTex.setInterp(GL_NEAREST);
 	frameBufferCloudDen.init(&bakedCurlTex);
 
     for (int i = 0; i < nVerts; i++){
