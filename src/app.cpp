@@ -233,9 +233,6 @@ void app::App::mainLoop()
     track_sim.update(&w);
 
     glClear(GL_COLOR_BUFFER_BIT);
-    frameBufferBackBubbles.activate();
-    frameBufferBackBubbles.clear();
-    frameBufferBackBubbles.deactivate();
 
     float dt = 1;
 
@@ -293,6 +290,7 @@ void app::App::mainLoop()
     ray_marcher.mRenderShader->setUniformVec("lightColour", lightColour);
 
     frameBufferBackBubbles.activate();
+    frameBufferBackBubbles.clear();
     sim.draw(&w);
     //track_sim.draw(&w); //Draw track particles
     boundingBox.draw(w.getContext());

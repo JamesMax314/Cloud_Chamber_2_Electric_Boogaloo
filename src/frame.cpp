@@ -92,6 +92,16 @@ void frame::Frame::clear()
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 }
 
+void frame::Frame::clearColour()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void frame::Frame::clearDepth()
+{
+    glClear(GL_DEPTH_BUFFER_BIT);
+}
+
 void frame::Frame::activate()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);

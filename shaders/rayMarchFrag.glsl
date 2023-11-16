@@ -24,7 +24,7 @@ uniform mat4 view;
 const float PI = 3.14159265359;
 const float threshold = 0.0;
 
-float maxTransmissionSamples = 32.0;
+float maxTransmissionSamples = 120.0;
 float maxLightSamples = 32.0;
 
 float lightFactor = 10.0;
@@ -328,7 +328,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             float lightBeamMult = lightBeamFactor(rayPosition);
 
             // Get light energy and opacity
-            if (density > 0.0) {
+            if (density > 0.01) {
                 float lightTransmittance = lightMarch(rayPosition);
                 lightEnergy += lightFactor * density * step * transmittance * lightTransmittance * phase * lightBeamMult;
                 transmittance *= exp(-density * step * fogFactor);

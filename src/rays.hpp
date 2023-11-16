@@ -12,6 +12,8 @@
 #include "simulation.hpp"
 #include "shaders.hpp"
 #include "window.hpp"
+#include "frame.hpp"
+#include "textures.hpp"
 
 namespace rayMarch {
 
@@ -39,23 +41,24 @@ namespace rayMarch {
 
         int numParticlesPerTrack = 5000;
         int textureDim = 128;
-	int flattenedDim = pow(textureDim, 3);
+	    int flattenedDim = pow(textureDim, 3);
         int renderWidth = 1080;
         int renderHeight = 720;
         float maxTexVal = 20;
 	
         std::vector<float> texture3D;
 
+        frame::Frame cloud_frame;
+        texture::Texture cloud_texture;
+
         RayMarch();
         RayMarch(shaders::Shader *shader);
         RayMarch(shaders::Shader *compShader, shaders::Shader *renderShader, std::vector<simulation::Position> startPos, int isTrack);
         void init(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *postProcessShader);
 
-        void genFBO();
         void update(std::vector<glm::vec3> &feedbackVec);
         void fillBuffers();
         void loadUniforms();
-        void draw(window::Window* w);
         void genMask(window::Window* w, GLuint backgroundTexture, GLuint backgroundDepth);
         void draw(window::Window* w, GLuint backgroundTexture, GLuint backgroundDepth);
     };

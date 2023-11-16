@@ -33,6 +33,8 @@ namespace frame
         void setRenderTexture(texture::Texture* colourTexture, texture::Texture* depthTexture);
 
         void clear();
+        void clearColour();
+        void clearDepth();
         void activate();
         void deactivate();
 
