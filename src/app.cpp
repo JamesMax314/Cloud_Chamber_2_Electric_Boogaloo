@@ -286,9 +286,9 @@ void app::App::mainLoop()
 
     frameBufferBackBubbles.activate();
     frameBufferBackBubbles.clear();
-    sim.draw(&w);
+    sim.draw(w);
     //track_sim.draw(&w); //Draw track particles
-    boundingBox.draw(w.getContext());
+    boundingBox.draw(w);
     frameBufferBackBubbles.deactivate();
 
     // ray_marcher.draw(&w);
@@ -300,7 +300,7 @@ void app::App::mainLoop()
     track_sim.update_feedbackVec();
     ray_marcher.update(track_sim.feedbackVec);
 
-    ray_marcher.draw(&w, bubbleColourTex.m_textureRef, bubbleDepthTex.m_textureRef);
+    ray_marcher.draw(w, bubbleColourTex.m_textureRef, bubbleDepthTex.m_textureRef);
 
     // ray_marcher.draw(&w);
 

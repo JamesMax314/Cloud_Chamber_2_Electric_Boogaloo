@@ -47,8 +47,8 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
     glm::vec3 stepSize =  (maxCorner - minCorner)/ (float)(textureDim-1);
 
     for (int i1=0; i1<texture3D.size(); i1++) {
-        if (texture3D.at(i1) >= 0.05) {
-            texture3D.at(i1) -= 0.05;
+        if (texture3D.at(i1) >= 0.5) {
+            texture3D.at(i1) -= 0.5;
         }
     }
 
