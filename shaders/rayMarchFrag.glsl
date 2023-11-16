@@ -24,7 +24,7 @@ uniform mat4 view;
 const float PI = 3.14159265359;
 const float threshold = 0.0;
 
-float maxTransmissionSamples = 32.0;
+float maxTransmissionSamples = 128.0;
 float maxLightSamples = 16.0;
 
 float lightFactor = 10.0;
@@ -207,6 +207,10 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
     float transmittance = 1.0;
     float lightEnergy = 0.0;
 
+    float course_step_multiplier = 4.0;
+    bool is_course = true;
+    int course_countdown = 0;
+
     // Used to draw light location
     float lampIntensity = 0.0;
     float backgroundDepth = depthToDistance(texture(framebufferDepthTexture, texCoords).x);
@@ -216,15 +220,16 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
 
     if (intersect.intersectFound) {
         // if outside cloudbox then start ray at edge of cloud box
-        float step;
+        float fine_step;
         if (intersect.tNear > 0.0) {
             rayPosition = intersect.minIntersect;
-            step = (intersect.tFar-intersect.tNear) / maxTransmissionSamples;
+            fine_step = (intersect.tFar-intersect.tNear) / maxTransmissionSamples;
         } else {
             float tCurrent = getTCurrent(ro, rd, rayPosition);
-            step = (intersect.tFar-tCurrent) / maxTransmissionSamples;
+            fine_step = (intersect.tFar-tCurrent) / maxTransmissionSamples;
         }
 
+        float step = fine_step*course_step_multiplier;
 
         for (int i = 0; i < int(maxTransmissionSamples); i++) {
             // Check if ray has left cloud box
@@ -242,6 +247,14 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             }
 
             float density = get_texture(rayPosition);
+            if (density > 1.0 && course_countdown == 0) {
+                rayPosition -= rd*step*randomStepModifier(rd.xy);
+                step = fine_step;
+                rayPosition += rd*step*randomStepModifier(rd.xy);
+                course_countdown = 10;
+            } else if (density < 1.0 && course_countdown > 0) {
+                course_countdown --;
+            }
 
             // Get light scattering factor
             vec3 lightDir = lightPos-rayPosition;
