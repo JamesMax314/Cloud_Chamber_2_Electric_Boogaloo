@@ -56,10 +56,6 @@ std::vector<GLuint> boxInds {
         4, 5, 7
     };
 
-app::App::App()
-{
-}
-
 bool keys[GLFW_KEY_LAST] = { false };
 
 int lr = 0;
@@ -137,8 +133,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
 }
 
-
-
 void app::App::init()
 {
     const char* vertexShaderFile = "../shaders/triangleVert.glsl";
@@ -166,10 +160,9 @@ void app::App::init()
 
     const char* advectionShaderFile = "../shaders/advectionVert.glsl";
 
-    glfwMakeContextCurrent(w.getContext());
-    glfwSetCursorPosCallback(w.getContext(), cursorPosCallback);
-    glfwSetInputMode(w.getContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetKeyCallback(w.getContext(), keyCallback);
+	w.makeContextCurrent();
+	w.setCursorPosCallback(cursorPosCallback);
+	w.setKeyCallback(keyCallback);
 
     fancyShader.init(fancyShaderFile);
     //fancyShader.init(statcVert);
@@ -193,11 +186,11 @@ void app::App::init()
 
     ray_marcher.init(&fancyShader, &rayShader, &postProcessShader);
     track_sim.init(&advectionShader, &quadShader, &curlBakeShader, track_verts, 1);
-	track_sim.bakeCurl(&w);
+	track_sim.bakeCurl(w);
 
     std::vector<simulation::Position> bg_verts = utils::genRandomPoints(10000);
     sim.init(&advectionShader, &quadShader, &curlBakeShader, bg_verts, 0);
-	sim.bakeCurl(&w);
+	sim.bakeCurl(w);
 
     boundingBox.init(&basicShader, boxVerts, boxInds);
     boundingBox.drawType = GL_LINES;
@@ -210,12 +203,14 @@ void app::App::init()
     // ray.init(&fancyShader, &rayShader, track_verts);
 	
 	
+	now = emscripten_performance_now()/1000;
 	//reference_time = std::chrono::high_resolution_clock::now();
 }
 
 void app::App::mainLoop()
 {
-
+	reference_time = now;
+	now = emscripten_performance_now()/1000;
     //Generate new track
     
     double p = uniform_dist(rand_gen);
@@ -229,8 +224,8 @@ void app::App::mainLoop()
 		printf("newVerts size = %u \n", track_sim.newVerts.size());
     }
 
-    sim.update(&w);
-    track_sim.update(&w);
+    sim.update(w);
+    track_sim.update(w);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -264,7 +259,7 @@ void app::App::mainLoop()
     glm::mat4 projection = glm::perspective(fovRad, aspectRatio, nearClip, farClip);
 
     time += 0.001;
-	float dT = 0.001;
+	float dT = now-reference_time;
 
     sim.mCompShader->setUniform("dT", dT);
     track_sim.mCompShader->setUniform("time", time);
@@ -301,14 +296,15 @@ void app::App::mainLoop()
     // boundingBox.draw(w.getContext());
 
     //glClientWaitSync(track_sim.feedback_fence, 0, 33e6);
-    //glDeleteSync(track_sim.feedback_fence);
+    //glDeleteSyncetrack_sim.feedback_fence);
     track_sim.update_feedbackVec();
     ray_marcher.update(track_sim.feedbackVec);
+
     ray_marcher.draw(&w, bubbleColourTex.m_textureRef, bubbleDepthTex.m_textureRef);
 
     // ray_marcher.draw(&w);
 
-    glfwSwapBuffers(w.getContext());
+	w.swapBuffers();
     glfwPollEvents();
 
     if(drawFPS % 10 == 0)

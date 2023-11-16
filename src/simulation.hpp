@@ -83,13 +83,13 @@ namespace simulation {
         shaders::Shader* mRenderShader;
         shaders::Shader* mBakeShader;
 
-	unsigned int nVerts = 20000;
-		int curl_noise_resolution = 1000;
+		unsigned int nVerts = 20000;
+		int curl_noise_resolution = 4096;
         std::vector<glm::vec3> mStartPos;
         std::vector<unsigned int> mIndices;
         std::vector<simulation::Position> feedbackVec;
         std::vector<glm::vec3> newVerts;
-		texture::Texture* bakedCurlTex;
+		texture::Texture bakedCurlTex;
 
         frame::Frame frameBufferCloudDen;
         // Intagers that are used to reference buffer arrays in gpu ram
@@ -103,12 +103,12 @@ namespace simulation {
         Sim(shaders::Shader *shader);
         Sim(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *bakeShader, std::vector<simulation::Position> startPos, int isTrack);
         void init(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *bakeShader, std::vector<simulation::Position> startPos, int isTrack);
-		void bakeCurl(window::Window* w);
+		void bakeCurl(window::Window &w);
 
-        void update(window::Window* w);
+        void update(window::Window &w);
         void fillBuffers();
         void loadUniforms();
-        void draw(window::Window* w);
+        void draw(window::Window &w);
     };
 
     class DensitySim: public Sim{
@@ -121,7 +121,7 @@ namespace simulation {
 	int write_buffer_index= 0;
 	int read_buffer_index = 2;
 
-	void update(window::Window* w);
+	void update(window::Window &w);
 	void update_feedbackVec();
 	void addVerts(std::vector<simulation::Position>& new_verts);
 	void fillBuffers();

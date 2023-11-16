@@ -277,7 +277,7 @@ vec3 BoxCoords(vec2 texturecoords){
 
 void main(){
     vec3 boxpos = BoxCoords(texturePos); //Convert to position in box space
-    float scale = 0.1;
+    float scale = 0.01;
     velocity = vec4(scale*curlnoise(boxpos, 0.0), 1.0); //Calculate the velocity field at this point 
     // velocity = vec4(texturePos.x, texturePos.y, 1.0, 1.0);
 }

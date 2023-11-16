@@ -7,7 +7,6 @@ include_directories(include)
 
 file(GLOB SOURCES src/*.cpp)
 file(GLOB HEADDERS src/*.hpp)
-# find_package(OpenGL REQUIRED)
 add_subdirectory(lib/glm EXCLUDE_FROM_ALL)
 
 set(OBJECT_DEPENDS ../shaders)

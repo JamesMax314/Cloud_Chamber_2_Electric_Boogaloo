@@ -84,9 +84,8 @@ void rayMarch::RayMarch::loadUniforms()
 {
 }
 
-void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
+void rayMarch::RayMarch::genMask(window::Window &w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
-    //glfwMakeContextCurrent(w->getContext());
     glViewport(0, 0, renderWidth, renderHeight);
 
     // Render to low res texture
@@ -131,12 +130,12 @@ void rayMarch::RayMarch::genMask(window::Window *w, GLuint backgroundTexture, GL
 
     cloud_frame.deactivate();
 
-    glViewport(0, 0, w->width, w->height);
+    glViewport(0, 0, w.width, w.height);
 }
 
-void rayMarch::RayMarch::draw(window::Window *w, GLuint backgroundTexture, GLuint backgroundDepth)
+void rayMarch::RayMarch::draw(window::Window &w, GLuint backgroundTexture, GLuint backgroundDepth)
 {
-    glfwMakeContextCurrent(w->getContext());
+	w.makeContextCurrent();
 
     genMask(w, backgroundTexture, backgroundDepth);
 

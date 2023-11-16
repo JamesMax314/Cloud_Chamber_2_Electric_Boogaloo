@@ -70,11 +70,10 @@ namespace app {
 
         float motionSpeed = 0.01;
 
-	float time = 0.0;
+		float time = 0.0;
 
 		float now;
-
-        App();
+		float reference_time;
 
         void init();
         void initBuffers();

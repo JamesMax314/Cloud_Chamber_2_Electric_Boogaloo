@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <memory>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #define GLM_FORCE_PURE
@@ -11,20 +12,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "drawables.hpp"
 #include "shaders.hpp"
 
 namespace window {
-    GLFWwindow* setupWindow(int width, int height);
 
-    void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+    void framebuffer_size_callback(int width, int height);
 
     class Window {
         public:
 
         int height, width;
 
-        GLFWwindow* win;
+		GLFWwindow* win;
         GLuint lightUBO;
 
         bool rebufferLights;
@@ -35,15 +34,20 @@ namespace window {
 
         float aspect;
 
-        std::vector<drawable::Drawable*> meshes;
+        //std::vector<drawable::Drawable*> meshes;
 
         Window();
+        ~Window();
 
         void renderFrame();
 
-        void addMesh(drawable::Drawable *mesh);
+        //void addMesh(drawable::Drawable* mesh);
         float getAspect();
 
-        GLFWwindow* getContext();
+		void makeContextCurrent();
+		GLFWcursorposfun setCursorPosCallback(GLFWcursorposfun callback );
+		GLFWkeyfun setKeyCallback(GLFWkeyfun callback); 
+		void swapBuffers();
+		int shouldClose();
     };
 }
