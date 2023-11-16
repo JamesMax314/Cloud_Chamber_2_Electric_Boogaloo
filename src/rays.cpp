@@ -48,8 +48,8 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
 
 #pragma omp parallel for
     for (int i1=0; i1<texture3D.size(); i1++) {
-        if (texture3D.at(i1) >= 0.5) {
-            texture3D.at(i1) -= 0.5;
+        if (texture3D.at(i1) >= 0.25) {
+            texture3D.at(i1) -= 0.25;
         }
     }
 
