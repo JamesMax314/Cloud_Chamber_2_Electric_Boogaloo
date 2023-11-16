@@ -62,7 +62,7 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
 
 		if(index >=0 and index<pow(textureDim,3)){
 			if (texture3D.at(index) < maxTexVal) {
-				texture3D.at(index) += 2.0;
+				texture3D.at(index) += 1.0;
 			}
 		}
     }

@@ -24,7 +24,7 @@ uniform mat4 view;
 const float PI = 3.14159265359;
 const float threshold = 0.0;
 
-float maxTransmissionSamples = 64.0;
+float maxTransmissionSamples = 32.0;
 float maxLightSamples = 16.0;
 
 float lightFactor = 10.0;
