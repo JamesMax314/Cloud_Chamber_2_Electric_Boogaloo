@@ -24,8 +24,11 @@ uniform mat4 view;
 const float PI = 3.14159265359;
 const float threshold = 0.0;
 
-float maxTransmissionSamples = 128.0;
-float maxLightSamples = 16.0;
+float maxTransmissionSamples = 64.0;
+float maxLightSamples = 32.0;
+float coarse_step_multiplier = 2.0;
+int reset_step_count = 4;
+
 
 float lightFactor = 10.0;
 float fogFactor = 10.0;
@@ -180,9 +183,14 @@ float lightMarch(in vec3 rayPosition) {
     vec3 position = rayPosition;
 
     Intersection intersect = rayCubeIntersectionPoints(rayPosition, lightDir, minPos, maxPos);
+    float tCurrent = getTCurrent(rayPosition, lightDir, rayPosition);
+    float fine_step = (intersect.tFar-tCurrent) / maxLightSamples;
+    float step = fine_step*coarse_step_multiplier;
+    int coarse_countdown = 0;
+    bool is_coarse = true;
 
     float subDen = 0.0;
-    float step = (intersect.tFar-intersect.tNear) / maxLightSamples;
+    float sub_den_tmp = 0.0;
 
     for (int j=0; j<int(maxLightSamples); j++) {
         // Check whether light ray has left the cloud box
@@ -190,9 +198,28 @@ float lightMarch(in vec3 rayPosition) {
         if (tCurrent > intersect.tFar) {
             break;
         }
+
+        float random_step = randomStepModifier(rayPosition.xy);
+        position += lightDir*step*random_step;
+        sub_den_tmp = get_texture(position);
+
+        if (sub_den_tmp > 0.5 && is_coarse) {
+            position -= lightDir*step*random_step;
+            step = fine_step;
+            position += lightDir*step*random_step;
+            sub_den_tmp = get_texture(position);
+            coarse_countdown = reset_step_count;
+            is_coarse = false;
+        } else if (sub_den_tmp < 0.5 && coarse_countdown > 0) {
+            coarse_countdown --;
+        }
+
+        if (coarse_countdown == 0 && !is_coarse) {
+            step = coarse_step_multiplier*fine_step;
+            is_coarse = true;
+        }
         
-        position += lightDir*step*randomStepModifier(rayPosition.xy);
-        subDen += get_texture(position)*step*randomStepModifier(rayPosition.xy);
+        subDen += sub_den_tmp*step*random_step;
     }
 
     float transmittance = exp(-subDen);
@@ -207,9 +234,8 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
     float transmittance = 1.0;
     float lightEnergy = 0.0;
 
-    float course_step_multiplier = 4.0;
-    bool is_course = true;
-    int course_countdown = 0;
+    bool is_coarse = true;
+    int coarse_countdown = 0;
 
     // Used to draw light location
     float lampIntensity = 0.0;
@@ -229,7 +255,7 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             fine_step = (intersect.tFar-tCurrent) / maxTransmissionSamples;
         }
 
-        float step = fine_step*course_step_multiplier;
+        float step = fine_step*coarse_step_multiplier;
 
         for (int i = 0; i < int(maxTransmissionSamples); i++) {
             // Check if ray has left cloud box
@@ -239,7 +265,8 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             }
 
             // Update position with random step to avoid banding
-            rayPosition += rd*step*randomStepModifier(rd.xy);
+            float random_step = randomStepModifier(rayPosition.xy);
+            rayPosition += rd*step*random_step;
 
             // Stop if hits background bubble
             if (getDepth(ro, rayPosition) > backgroundDepth) {
@@ -247,13 +274,20 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             }
 
             float density = get_texture(rayPosition);
-            if (density > 1.0 && course_countdown == 0) {
-                rayPosition -= rd*step*randomStepModifier(rd.xy);
+            if (density > 1.0 && is_coarse) {
+                rayPosition -= rd*step*random_step;
                 step = fine_step;
-                rayPosition += rd*step*randomStepModifier(rd.xy);
-                course_countdown = 10;
-            } else if (density < 1.0 && course_countdown > 0) {
-                course_countdown --;
+                rayPosition += rd*step*random_step;
+                density = get_texture(rayPosition);
+                coarse_countdown = reset_step_count;
+                is_coarse = false;
+            } else if (density < 1.0 && coarse_countdown > 0) {
+                coarse_countdown --;
+            }
+
+            if (coarse_countdown == 0 && !is_coarse) {
+                step = coarse_step_multiplier*fine_step;
+                is_coarse = true;
             }
 
             // Get light scattering factor
