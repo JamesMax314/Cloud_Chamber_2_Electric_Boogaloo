@@ -40,10 +40,10 @@ namespace rayMarch {
         glm::vec3 maxCorner;
 
         int numParticlesPerTrack = 5000;
-        int textureDim = 128;
+        int textureDim = 90;
 	    int flattenedDim = pow(textureDim, 3);
-        int renderWidth = 1080;
-        int renderHeight = 720;
+        int renderWidth = 720;
+        int renderHeight = 480;
         float maxTexVal = 20;
 	
         std::vector<float> texture3D;

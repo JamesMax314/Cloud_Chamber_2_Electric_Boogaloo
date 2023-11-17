@@ -24,9 +24,10 @@ uniform mat4 view;
 const float PI = 3.14159265359;
 const float threshold = 0.0;
 
-float maxTransmissionSamples = 64.0;
-float maxLightSamples = 32.0;
-float coarse_step_multiplier = 2.0;
+float maxTransmissionSamples = 120.0;
+float maxLightSamples = 6.0;
+float light_fine_step_size = 0.02;
+float coarse_step_multiplier = 3.0;
 int reset_step_count = 4;
 
 
@@ -182,44 +183,25 @@ float lightMarch(in vec3 rayPosition) {
     vec3 lightDir = normalize(lightPos-rayPosition);
     vec3 position = rayPosition;
 
-    Intersection intersect = rayCubeIntersectionPoints(rayPosition, lightDir, minPos, maxPos);
-    float tCurrent = getTCurrent(rayPosition, lightDir, rayPosition);
-    float fine_step = (intersect.tFar-tCurrent) / maxLightSamples;
-    float step = fine_step*coarse_step_multiplier;
-    int coarse_countdown = 0;
-    bool is_coarse = true;
+    float fine_step = light_fine_step_size;//(intersect.tFar-tCurrent) / maxLightSamples;
+    float step = fine_step;
+
+    float step_size_icrement = (coarse_step_multiplier-1.0)*fine_step/maxLightSamples;
 
     float subDen = 0.0;
     float sub_den_tmp = 0.0;
 
+    // Increase light step distance each step
     for (int j=0; j<int(maxLightSamples); j++) {
         // Check whether light ray has left the cloud box
-        float tCurrent = getTCurrent(rayPosition, lightDir, position);
-        if (tCurrent > intersect.tFar) {
-            break;
-        }
 
         float random_step = randomStepModifier(rayPosition.xy);
         position += lightDir*step*random_step;
         sub_den_tmp = get_texture(position);
-
-        if (sub_den_tmp > 0.5 && is_coarse) {
-            position -= lightDir*step*random_step;
-            step = fine_step;
-            position += lightDir*step*random_step;
-            sub_den_tmp = get_texture(position);
-            coarse_countdown = reset_step_count;
-            is_coarse = false;
-        } else if (sub_den_tmp < 0.5 && coarse_countdown > 0) {
-            coarse_countdown --;
-        }
-
-        if (coarse_countdown == 0 && !is_coarse) {
-            step = coarse_step_multiplier*fine_step;
-            is_coarse = true;
-        }
         
         subDen += sub_den_tmp*step*random_step;
+
+        step += step_size_icrement;
     }
 
     float transmittance = exp(-subDen);
@@ -274,14 +256,14 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             }
 
             float density = get_texture(rayPosition);
-            if (density > 1.0 && is_coarse) {
+            if (density > 0.4 && is_coarse) {
                 rayPosition -= rd*step*random_step;
                 step = fine_step;
                 rayPosition += rd*step*random_step;
                 density = get_texture(rayPosition);
                 coarse_countdown = reset_step_count;
                 is_coarse = false;
-            } else if (density < 1.0 && coarse_countdown > 0) {
+            } else if (density < 0.4 && coarse_countdown > 0) {
                 coarse_countdown --;
             }
 
@@ -299,7 +281,8 @@ vec4 ray_march(in vec3 ro, in vec3 rd)
             // Get light energy and opacity
             if (density > 0.01) {
                 float lightTransmittance = lightMarch(rayPosition);
-                lightEnergy += lightFactor * density * step * transmittance * lightTransmittance * phase * lightBeamMult;
+                float cloud_retro_reflectance = 1.0 - exp(-density*step);
+                lightEnergy += lightFactor * density * step * transmittance * (lightTransmittance+cloud_retro_reflectance) * phase * lightBeamMult;
                 transmittance *= exp(-density * step * fogFactor);
             } else {
                 // Draw lamp location on screen
