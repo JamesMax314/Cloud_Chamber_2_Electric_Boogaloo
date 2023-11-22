@@ -1,5 +1,9 @@
 #pragma once
 
+#include <emscripten.h>
+#include <emscripten/val.h>
+#include <emscripten/html5.h>
+#include <emscripten/bind.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>

@@ -46,12 +46,14 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
     // Compute density texture
     glm::vec3 stepSize =  (maxCorner - minCorner)/ (float)(textureDim-1);
 
+//#pragma omp parallel for
     for (int i1=0; i1<texture3D.size(); i1++) {
-        if (texture3D.at(i1) >= 0.5) {
-            texture3D.at(i1) -= 0.5;
+        if (texture3D.at(i1) >= 0.25) {
+            texture3D.at(i1) -= 0.25;
         }
     }
 
+//#pragma omp parallel for
     for (int i=0; i<feedbackVec.size()-1; i++) {
         glm::ivec3 index3D;
 
@@ -60,7 +62,7 @@ void rayMarch::RayMarch::update(std::vector<glm::vec3> &feedbackVec)
 
 		if(index >=0 and index<pow(textureDim,3)){
 			if (texture3D.at(index) < maxTexVal) {
-				texture3D.at(index) += 2.0;
+				texture3D.at(index) += 1.0;
 			}
 		}
     }

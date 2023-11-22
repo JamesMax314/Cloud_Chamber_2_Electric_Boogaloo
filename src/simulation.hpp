@@ -116,10 +116,7 @@ namespace simulation {
 
         void init(shaders::Shader *compShader, shaders::Shader *renderShader, shaders::Shader *bakeShader, std::vector<simulation::Position> startPos, int isTrack);
 
-	const int N_stream_buffers = 4;
-	std::array<GLuint, 4> StreamBufferID;	
-	int write_buffer_index= 0;
-	int read_buffer_index = 2;
+	unsigned int nVerts = 10000;
 
 	void update(window::Window &w);
 	void update_feedbackVec();
