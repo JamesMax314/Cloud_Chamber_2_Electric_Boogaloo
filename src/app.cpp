@@ -291,18 +291,10 @@ void app::App::mainLoop()
     boundingBox.draw(w);
     frameBufferBackBubbles.deactivate();
 
-    // ray_marcher.draw(&w);
-    //ray.draw(&w);
-    // boundingBox.draw(w.getContext());
-
-    //glClientWaitSync(track_sim.feedback_fence, 0, 33e6);
-    //glDeleteSyncetrack_sim.feedback_fence);
-    //track_sim.update_feedbackVec();
     ray_marcher.update(track_sim.feedbackVec);
 
     ray_marcher.draw(w, bubbleColourTex.m_textureRef, bubbleDepthTex.m_textureRef);
 
-    // ray_marcher.draw(&w);
 
 	w.swapBuffers();
     glfwPollEvents();
