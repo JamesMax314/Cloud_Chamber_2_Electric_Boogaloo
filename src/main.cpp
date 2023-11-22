@@ -28,7 +28,7 @@ int main()
 	application->init();
 	
     while (!application->w.shouldClose()) {
-		emscripten_set_main_loop(&app_draw, 1000, 1);
+		emscripten_set_main_loop(&app_draw, 0, 1);
     }
     // window::Window mWindow = window::Window();
     // while (!glfwWindowShouldClose(mWindow.getContext())) {

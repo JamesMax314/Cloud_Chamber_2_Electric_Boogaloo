@@ -297,7 +297,7 @@ void app::App::mainLoop()
 
     //glClientWaitSync(track_sim.feedback_fence, 0, 33e6);
     //glDeleteSyncetrack_sim.feedback_fence);
-    track_sim.update_feedbackVec();
+    //track_sim.update_feedbackVec();
     ray_marcher.update(track_sim.feedbackVec);
 
     ray_marcher.draw(w, bubbleColourTex.m_textureRef, bubbleDepthTex.m_textureRef);

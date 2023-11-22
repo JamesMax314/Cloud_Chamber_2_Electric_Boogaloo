@@ -247,32 +247,15 @@ void simulation::DensitySim::update(window::Window &w)
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 0);    
 
-    GLsync copy_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-    glClientWaitSync(copy_fence, 0, 100e6);
-    glDeleteSync(copy_fence);
+    GLsync VBO_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	GLenum vbo_sync = glClientWaitSync(VBO_fence, 0, 10e6);
+	glDeleteSync(VBO_fence);
 
     glBindBuffer(GL_COPY_READ_BUFFER, ParticleBufferB);
-    glBindBuffer(GL_COPY_WRITE_BUFFER, StreamBufferID.at(write_buffer_index));
-    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, nVerts*sizeof(simulation::Position));
-    glBindBuffer(GL_COPY_WRITE_BUFFER,0);
-
-    GLsync VBO_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-    glClientWaitSync(VBO_fence, 0, 100e6);
-    glDeleteSync(VBO_fence);
-
-    read_buffer_index = (read_buffer_index+1)%N_stream_buffers;
-    write_buffer_index = (write_buffer_index+1)%N_stream_buffers;
+    glGetBufferSubData(GL_COPY_READ_BUFFER, 0, this->feedbackVec.size()*sizeof(simulation::Position), this->feedbackVec.data());
 
     std::swap(ParticleBufferA, ParticleBufferB);
     glDisable(GL_RASTERIZER_DISCARD);
-
-}
-
-void simulation::DensitySim::update_feedbackVec(){
-    // Get particle positions
-
-    glBindBuffer(GL_COPY_READ_BUFFER, StreamBufferID.at(read_buffer_index));
-    glGetBufferSubData(GL_COPY_READ_BUFFER, 0, this->feedbackVec.size()*sizeof(simulation::Position), this->feedbackVec.data());
 
 }
 
@@ -292,11 +275,6 @@ void simulation::DensitySim::fillBuffers()
     glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), (void*)0, GL_DYNAMIC_READ);
 
     // Bind all the model arrays to the appropriate buffers
-
-    for(int index=0; index<N_stream_buffers; index++){
-		glBindBuffer(GL_ARRAY_BUFFER, StreamBufferID.at(index)); 
-    	glBufferData(GL_ARRAY_BUFFER, nVerts*sizeof(simulation::Position), feedbackVec.data(), GL_STREAM_READ);
-    }
 
     // Bind rendering buffers
     glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
@@ -335,10 +313,6 @@ void simulation::DensitySim::init(shaders::Shader *compShader, shaders::Shader *
     glGenBuffers(1, &ParticleBufferB);
     glGenBuffers(1, &billboard_vertex_buffer);
     glGenBuffers(1, &baking_vertex_buffer);
-
-    for(int index=0; index<N_stream_buffers; index++){
-		glGenBuffers(1, &StreamBufferID.at(index));
-    }
 
     fillBuffers();
 }
