@@ -85,13 +85,7 @@
 
     <div id="dev_console_box">
         <style>
-            .dev_console_button:hover {
-                background-color: rgb(200, 89, 89);
-            }
 
-            .dev_console_button:active {
-                background-color: rgb(200, 150, 150);
-            }
 
             .content {
                 display: block;
@@ -108,28 +102,35 @@
         </style>
         <button class="dev_console_button">SETTINGS</button>
         <div class="content">
-            <div class="vertical">
-                <div class="horizontal">
-                    <p>Graphics<p>
+            <div class="padding">
+            <div class="border-div">
+                <div class="vertical">
+                    <div class="horizontal">
+                        <h3>Graphics<h3>
+                    </div>
+                    <div class="horizontal">
+                        <nav>
+                            <input type="radio" id="x1" name="x"/>
+                            <label for="x1">LOW</label>
+                            
+                            <input type="radio" id="x2" name="x"/>
+                            <label for="x2">MEDIUM</label>
+                            
+                            <input type="radio" id="x3" name="x"/>
+                            <label for="x3">HIGH</label>
+                        </nav>
+                    </div>
                 </div>
-                <div class="horizontal">
-                    <button>Low</button>
-                </div>
-                <div class="horizontal">
-                    <button>Medium</button>
-                </div>
-                <div class="horizontal">
-                    <button>High</button>
+
+                <div class="vertical">
+                    <div class="horizontal">
+                        <p>Graphics Settings<p>
+                    </div>
+                    <div class="horizontal">
+                        <button>High</button>
+                    </div>
                 </div>
             </div>
-
-            <div class="vertical">
-                <div class="horizontal">
-                    <p>Graphics Settings<p>
-                </div>
-                <div class="horizontal">
-                    <button>High</button>
-                </div>
             </div>
         </div>
 

@@ -65,7 +65,7 @@ body {
 
 .TrackTableData:hover {
     background-color: var(--highlight-col); 
-    color: #36213E;
+    color: var(--background_col);
 }
 
 #infoBox {
@@ -126,26 +126,6 @@ ul{
     border-bottom-left-radius:4px;
     border-bottom-right-radius:4px;
   }
-  label:before{
-    height:2px;
-    width:20px;
-    background:white;
-    display:inline-block;
-    content:"";
-    box-shadow:0px -5px 0px 0px  white,
-               0px -10px 0px 0px white;
-    margin-right:10px;
-    transition:all .5s;
-    position:relative;
-    opacity:0.5;
-  }
-  label{
-    display:block;
-    background:rgb(22, 160, 133);
-    padding:10px;
-    color:white;  
-    cursor:pointer; 
-  }
 
   input[type="checkbox"]{
     visibility:hidden;
@@ -166,10 +146,11 @@ ul{
   background-color: var(--secondary_col);
   color: var(--text_col);
   border: none;
-  text-decoration: none;
+  font-weight: bold;
+  font-size: 20px;
   border-radius: 2px;
-  height: 36px;
-  width: 105px;
+  height: 34px;
+  width: 120px;
   transition: background-color 0.1s;
 }
 
@@ -180,13 +161,51 @@ ul{
 
 /* Style the collapsible content. Note: hidden by default */
 .content {
-  padding: 0 18px;
+  padding: 0px 0px;
   background-color: var(--secondary_col);
   color: var(--text_col);
   max-height: 0;
   border-radius:5px; 
   overflow: hidden;
-  padding-top: 0px;
-  padding-bottom: 0px;
   transition: max-height 0.2s ease-out;
+}
+
+.padding {
+  padding: 10px 10px;
+}
+
+.border-div {
+  box-shadow: 0 0 0 3px var(--text_col);
+  background-color: var(--background_col);
+}
+
+nav{
+  width: 100%;
+  border: 1px solid #666;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: no-wrap;
+}
+
+nav input{ display: none; }
+
+nav label{
+  padding: 5px 10px;
+  border-right: 2px solid var(--text_col);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+nav label:last-of-type{ border-right: 0; }
+
+nav label:hover{
+  background-color: var(--highlight-col);
+  color: var(--background_col);
+}
+
+nav input:checked + label{
+  background-color: var(--highlight-col);
+  color: var(--background_col);
 }
