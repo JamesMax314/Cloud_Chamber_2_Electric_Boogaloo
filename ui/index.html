@@ -84,21 +84,56 @@
 	</div>
 
     <div id="dev_console_box">
-        <ul>
-            <input type="checkbox" id="collapse"/> 
-            <label for="collapse"></label>    
-            <li><div class="athena-request-tags bg-secondary">
-                <span class="athena-request-tag">
-                    <button type="button">Fast</button>
-                </span>
-                <span class="athena-request-tag">
-                    <button type="button">Normal</button>
-                </span>
-                <span class="athena-request-tag">
-                    <button type="button">Fancy</button>
-                </span>
-               </div></li>
-          </ul>
+        <style>
+            .dev_console_button:hover {
+                background-color: rgb(200, 89, 89);
+            }
+
+            .dev_console_button:active {
+                background-color: rgb(200, 150, 150);
+            }
+
+            .content {
+                display: block;
+            }
+
+            .horizontal {
+                display: inline-block;
+            }
+
+            .vertical {
+                display: block;
+            }
+
+        </style>
+        <button class="dev_console_button">SETTINGS</button>
+        <div class="content">
+            <div class="vertical">
+                <div class="horizontal">
+                    <p>Graphics<p>
+                </div>
+                <div class="horizontal">
+                    <button>Low</button>
+                </div>
+                <div class="horizontal">
+                    <button>Medium</button>
+                </div>
+                <div class="horizontal">
+                    <button>High</button>
+                </div>
+            </div>
+
+            <div class="vertical">
+                <div class="horizontal">
+                    <p>Graphics Settings<p>
+                </div>
+                <div class="horizontal">
+                    <button>High</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="dev_console.js"></script>
     </div>
 
     </body>
