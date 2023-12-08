@@ -16,7 +16,7 @@ body {
 }
 
 #header {
-    color: --text_col;
+    color: var(--text_col);
     text-align: center;
 }
 
@@ -38,7 +38,8 @@ body {
     z-index: 2;
     border-radius: 10px;
     padding: 10px;
-    height: 300px
+    height: 300px;
+    margin-bottom: 10px;
 }
 
 #trackerBoxHeader {
@@ -85,7 +86,7 @@ body {
     position: fixed;
     bottom: 10px;
     right: 10px;
-    width: 80px;
+    width: 180px;
 }
 
 #FPSBox {
@@ -148,7 +149,7 @@ ul{
   border: none;
   font-weight: bold;
   font-size: 20px;
-  border-radius: 2px;
+  /* border-radius: 2px; */
   height: 34px;
   width: 120px;
   transition: background-color 0.1s;
@@ -165,7 +166,7 @@ ul{
   background-color: var(--secondary_col);
   color: var(--text_col);
   max-height: 0;
-  border-radius:5px; 
+  border-radius: 0px 5px 5px 5px; 
   overflow: hidden;
   transition: max-height 0.2s ease-out;
 }
@@ -177,6 +178,7 @@ ul{
 .border-div {
   box-shadow: 0 0 0 3px var(--text_col);
   background-color: var(--background_col);
+  padding: 0px 10px;
 }
 
 nav{
@@ -208,4 +210,55 @@ nav label:hover{
 nav input:checked + label{
   background-color: var(--highlight-col);
   color: var(--background_col);
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 15px;
+  border-radius: 5px;   
+  background: var(--secondary_col);
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%; 
+  background: var(--text_col);
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: var(--text_col);
+  cursor: pointer;
+}
+
+.toggle-button {
+  background-color: var(--secondary_col);
+  color: var(--text_col);
+  border: none;
+  font-weight: bold;
+  font-size: 20px;
+  border-radius: 2px;
+}
+
+.toggle-button:hover, .dev_console_button:active {
+  background-color: var(--highlight-col);
+  color: var(--background_col);
+}
+
+.container {
+  padding: 10px;
+  background-color: var(--secondary_col);
+  color: var(--text_col);
+  border-radius: 5px 5px 5px 5px; 
 }

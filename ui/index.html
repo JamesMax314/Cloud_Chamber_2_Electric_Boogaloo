@@ -59,13 +59,17 @@
 	    	    	<tr class="TrackTableData" onclick="selectRow(9)" > <th></th> <th></th> </tr>
 	    	    </table>
 	    	</div>
-            </div>    
-
-	    <div id="infoBox">
+            </div>
+        
+        <div class="container">
 		<h2 id="infoBoxHeader">Info</h2>
+        <div class="border-div">
+	    <div id="infoBox">
 		<p id="infoText">Select a track for information about that particle!</p>
 
 	    </div> 
+        </div>
+        </div>
 	    
 	    <script> 
 		function selectRow(info){
@@ -74,13 +78,6 @@
 
 	    </script>
 
-	</div>
-
-    <div id="floating_fps">
-	    <div id="FPSBox">
-	    	<h2 id="FPSBoxHeadder">FPS</h2>
-	    	<h1 id="FPSVal">00</h1>
-	    </div> 
 	</div>
 
     <div id="dev_console_box">
@@ -124,10 +121,27 @@
 
                 <div class="vertical">
                     <div class="horizontal">
-                        <p>Graphics Settings<p>
+                        <h3>Speed<h3>
                     </div>
                     <div class="horizontal">
-                        <button>High</button>
+                        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                    </div>
+                    <div class="horizontal">
+                        <nav>
+                            <input type="radio" id="p1" name="p"/>
+                            <label for="p1">&#x23f8</label>
+                            
+                            <input type="radio" id="p2" name="p"/>
+                            <label for="p2">&#9654</label>
+                        </nav>
+                    </div>
+                </div>
+                <div class="vertical">
+                    <div class="horizontal">
+                        <h3>Movement<h3>
+                    </div>
+                    <div class="horizontal">
+                        <button class="toggle-button">FREE MOVE</button>
                     </div>
                 </div>
             </div>
@@ -136,6 +150,19 @@
 
         <script src="dev_console.js"></script>
     </div>
+
+    <div id="floating_fps">
+	    <div id="FPSBox">
+            <div class="border-div">
+            <div class="horizontal">
+	    	<h1 id="FPSBoxHeadder">FPS:</h1>
+            </div>
+            <div class="horizontal">
+	    	<h1 id="FPSVal">00</h1>
+            </div>
+            </div>
+	    </div> 
+	</div>
 
     </body>
 </html>
