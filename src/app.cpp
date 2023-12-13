@@ -135,6 +135,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 void app::App::init()
 {
+    m_ui = ui::Ui();
+
     const char* vertexShaderFile = "../shaders/triangleVert.glsl";
     const char* fragmentShaderFile = "../shaders/triangleFrag.glsl";
 

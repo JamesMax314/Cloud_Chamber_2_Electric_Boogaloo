@@ -25,12 +25,15 @@
 #include "rays.hpp"
 #include "track.hpp"
 #include "drawables.hpp"
+#include "ui.hpp"
 
 
 namespace app {
     class App {
         public:
         window::Window w;
+        ui::Ui m_ui;
+
         GLuint ParticleBufferA, ParticleBufferB, billboard_vertex_buffer, FBO, textureOut, depthOut;
         const int ParticleCount = 4;
         GLuint vao;
@@ -60,8 +63,8 @@ namespace app {
 
         drawable::Drawable boundingBox;
 
-	std::default_random_engine rand_gen;
-	std::uniform_real_distribution<double> uniform_dist;
+	    std::default_random_engine rand_gen;
+	    std::uniform_real_distribution<double> uniform_dist;
 
         double t = 0;
         int drawFPS = 0;
