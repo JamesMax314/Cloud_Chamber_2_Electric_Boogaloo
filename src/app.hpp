@@ -81,6 +81,7 @@ namespace app {
         void init();
         void initBuffers();
         void mainLoop();
+        void updateStep();
 
 
     };

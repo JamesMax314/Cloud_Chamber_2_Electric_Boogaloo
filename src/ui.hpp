@@ -24,15 +24,19 @@ namespace ui
 
         void poll_graphics_setting();
         void poll_free_move();
+        void poll_play_pause();
 
         void set_graphics_setting(int setting);
         int get_graphics_setting();
 
         int get_free_move_setting();
 
+        int get_play_pause_setting();
+
         private:
         int graphics_setting;
         int free_move_setting;
+        int pause_play_setting;
 
     };
 } // namespace ui
