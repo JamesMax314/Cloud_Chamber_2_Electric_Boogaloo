@@ -211,6 +211,9 @@ void app::App::init()
 
 void app::App::mainLoop()
 {
+    // Check for Ui state
+    m_ui.poll_all();
+
 	reference_time = now;
 	now = emscripten_performance_now()/1000;
     //Generate new track
@@ -233,22 +236,24 @@ void app::App::mainLoop()
 
     float dt = 1;
 
-    // Move camera
-    if (fb != 0) {
-        cam.move(0.0f, 0.0f, fb*motionSpeed*dt);
-    }
-    if (lr != 0) {
-        cam.move(lr*motionSpeed*dt, 0.0f, 0.0f);
-    }
-    if (ud != 0) {
-        cam.move(0.0f, -ud*motionSpeed*dt, 0.0f);
-    }
+    if (m_ui.get_free_move_setting() == 1) {
+        // Move camera
+        if (fb != 0) {
+            cam.move(0.0f, 0.0f, fb*motionSpeed*dt);
+        }
+        if (lr != 0) {
+            cam.move(lr*motionSpeed*dt, 0.0f, 0.0f);
+        }
+        if (ud != 0) {
+            cam.move(0.0f, -ud*motionSpeed*dt, 0.0f);
+        }
 
-    // Rotate Camera
-    if (deltaX != 0.0 || deltaY != 0.0) {
-        cam.rotate(deltaX, deltaY);
-        deltaX = 0;
-        deltaY = 0;
+        // Rotate Camera
+        if (deltaX != 0.0 || deltaY != 0.0) {
+            cam.rotate(deltaX, deltaY);
+            deltaX = 0;
+            deltaY = 0;
+        }
     }
 
     // Compute the current view and perspective matrices
@@ -314,12 +319,13 @@ void app::App::mainLoop()
         now = emscripten_performance_now() / 1000;
         EM_ASM(document.getElementById("FPSVal").innerHTML = $0;, (int)(10/(now-t)));
         t = now;
+        // printf("Graphics Setting %u \n", m_ui.get_graphics_setting());
     }
 
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        printf("Error %u \n", error);
-    }
+    // GLenum error = glGetError();
+    // if (error != GL_NO_ERROR) {
+    //     printf("Error %u \n", error);
+    // }
 
     drawFPS++;
 }

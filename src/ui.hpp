@@ -2,6 +2,7 @@
 
 #include <emscripten/emscripten.h>
 #include <iostream>
+#include <thread>
 
 namespace ui
 {
@@ -9,11 +10,29 @@ namespace ui
     #define GRAPHICS_MEDIUM 1;
     #define GRAPHICS_HIGH 2;
 
+    #define PAUSE 0;
+    #define PLAY 1;
+
+    #define FREEMOVE_OFF 0;
+    #define FREEMOVE_ON 1;
+
     class Ui {
         public:
         Ui();
 
+        void poll_all();
+
+        void poll_graphics_setting();
+        void poll_free_move();
+
+        void set_graphics_setting(int setting);
+        int get_graphics_setting();
+
+        int get_free_move_setting();
+
         private:
         int graphics_setting;
+        int free_move_setting;
+
     };
 } // namespace ui

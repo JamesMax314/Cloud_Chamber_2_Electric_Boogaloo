@@ -107,13 +107,13 @@
                     </div>
                     <div class="horizontal">
                         <nav id="navGraphics">
-                            <input type="radio" id="x1" name="x" value="0"/>
+                            <input type="radio" id="x1" name="graphics" value="0" checked/>
                             <label for="x1">LOW</label>
                             
-                            <input type="radio" id="x2" name="x" value="1"/>
+                            <input type="radio" id="x2" name="graphics" value="1"/>
                             <label for="x2">MEDIUM</label>
                             
-                            <input type="radio" id="x3" name="x" value="2"/>
+                            <input type="radio" id="x3" name="graphics" value="2"/>
                             <label for="x3">HIGH</label>
                         </nav>
                     </div>
@@ -141,8 +141,18 @@
                         <h3>Movement<h3>
                     </div>
                     <div class="horizontal">
-                        <button class="toggle-button">FREE MOVE</button>
+                        <button class="toggle-button" id="button_free_move" value="0" onclick="toggleFreeMove()">FREE MOVE</button>
                     </div>
+                    <script>
+                        function toggleFreeMove() {
+                            var button_free_move = document.getElementById('button_free_move');
+                            if (button_free_move.value == "0") {
+                                button_free_move.value = "1";
+                            } else { 
+                                button_free_move.value = "0";
+                            }
+                        }
+                    </script>
                 </div>
             </div>
             </div>
