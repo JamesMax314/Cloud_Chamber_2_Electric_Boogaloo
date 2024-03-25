@@ -3,6 +3,7 @@
     <head>
         <title>Cloud chamber 2</title>
         <link rel="stylesheet" href="style.css" type="text/css" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
     </head>
     <body>
         <div id="header">
@@ -41,7 +42,6 @@
         </div>
 
 
-
 	<div id="floating_wrapper">
 	    <div id="trackerBox">
 	    	<h2 id="trackerBoxHeader">Particles</h2>
@@ -60,13 +60,17 @@
 	    	    	<tr class="TrackTableData" onclick="selectRow(9)" > <th></th> <th></th> </tr>
 	    	    </table>
 	    	</div>
-            </div>    
-
-	    <div id="infoBox">
+            </div>
+        
+        <div class="container">
 		<h2 id="infoBoxHeader">Info</h2>
+        <div class="border-div">
+	    <div id="infoBox">
 		<p id="infoText">Select a track for information about that particle!</p>
 
 	    </div> 
+        </div>
+        </div>
 	    
 	    <script> 
 		function selectRow(info){
@@ -77,12 +81,98 @@
 
 	</div>
 
+    <div id="dev_console_box">
+        <style>
+
+
+            .content {
+                display: block;
+            }
+
+            .horizontal {
+                display: inline-block;
+            }
+
+            .vertical {
+                display: block;
+            }
+
+        </style>
+        <button class="dev_console_button">SETTINGS</button>
+        <div class="content">
+            <div class="padding">
+            <div class="border-div">
+                <div class="vertical">
+                    <div class="horizontal">
+                        <h3>Graphics<h3>
+                    </div>
+                    <div class="horizontal">
+                        <nav id="navGraphics">
+                            <input type="radio" id="x1" name="graphics" value="0" checked/>
+                            <label for="x1">LOW</label>
+                            
+                            <input type="radio" id="x2" name="graphics" value="1"/>
+                            <label for="x2">MEDIUM</label>
+                            
+                            <input type="radio" id="x3" name="graphics" value="2"/>
+                            <label for="x3">HIGH</label>
+                        </nav>
+                    </div>
+                </div>
+
+                <div class="vertical">
+                    <div class="horizontal">
+                        <h3>Speed<h3>
+                    </div>
+                    <div class="horizontal">
+                        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                    </div>
+                    <div class="horizontal">
+                        <nav>
+                            <input type="radio" id="p1" name="pause_play" value="0"/>
+                            <label for="p1">&#x23f8</label>
+                            
+                            <input type="radio" id="p2" name="pause_play" value="1" checked/>
+                            <label for="p2">&#9654</label>
+                        </nav>
+                    </div>
+                </div>
+                <div class="vertical">
+                    <div class="horizontal">
+                        <h3>Movement<h3>
+                    </div>
+                    <div class="horizontal">
+                        <button class="toggle-button" id="button_free_move" value="0" onclick="toggleFreeMove()">FREE MOVE</button>
+                    </div>
+                    <script>
+                        function toggleFreeMove() {
+                            var button_free_move = document.getElementById('button_free_move');
+                            if (button_free_move.value == "0") {
+                                button_free_move.value = "1";
+                            } else { 
+                                button_free_move.value = "0";
+                            }
+                        }
+                    </script>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <script src="dev_console.js"></script>
+    </div>
+
     <div id="floating_fps">
 	    <div id="FPSBox">
-	    	<h2 id="FPSBoxHeadder">FPS</h2>
+            <div class="border-div">
+            <div class="horizontal">
+	    	<h1 id="FPSBoxHeadder">FPS:</h1>
+            </div>
+            <div class="horizontal">
 	    	<h1 id="FPSVal">00</h1>
+            </div>
+            </div>
 	    </div> 
-
 	</div>
 
     </body>

@@ -1158,8 +1158,11 @@ function dbg(text) {
 
 var ASM_CONSTS = {
   94692: ($0) => { document.getElementById("FPSVal").innerHTML = $0; },  
- 94742: () => { return document.getElementById("canvas").width },  
- 94791: () => { return document.getElementById("canvas").height }
+ 94742: () => { var selected_setting = document.querySelector('input[name="graphics"]:checked').value; return selected_setting; },  
+ 94858: () => { var button_free_move = document.getElementById('button_free_move'); var selected_setting = button_free_move.value; return selected_setting; },  
+ 95002: () => { var selected_setting = document.querySelector('input[name="pause_play"]:checked').value; return selected_setting; },  
+ 95120: () => { return document.getElementById("canvas").width },  
+ 95169: () => { return document.getElementById("canvas").height }
 };
 
 
@@ -6564,12 +6567,6 @@ var ASM_CONSTS = {
       size && GLctx.getBufferSubData(target, offset, HEAPU8, data, size);
     };
 
-  var _glGetError = () => {
-      var error = GLctx.getError() || GL.lastError;
-      GL.lastError = 0/*GL_NO_ERROR*/;
-      return error;
-    };
-
   var readI53FromI64 = (ptr) => {
       return HEAPU32[((ptr)>>2)] + HEAP32[(((ptr)+(4))>>2)] * 4294967296;
     };
@@ -8595,6 +8592,7 @@ var ASM_CONSTS = {
 
 
 
+
   var FS_unlink = (path) => FS.unlink(path);
 
   var FSNode = /** @constructor */ function(parent, name, mode, rdev) {
@@ -8919,8 +8917,6 @@ var wasmImports = {
   /** @export */
   glGetBufferSubData: _glGetBufferSubData,
   /** @export */
-  glGetError: _glGetError,
-  /** @export */
   glGetIntegerv: _glGetIntegerv,
   /** @export */
   glGetProgramInfoLog: _glGetProgramInfoLog,
@@ -9055,6 +9051,7 @@ Module['removeRunDependency'] = removeRunDependency;
 Module['FS_createPath'] = FS.createPath;
 Module['FS_createLazyFile'] = FS.createLazyFile;
 Module['FS_createDevice'] = FS.createDevice;
+Module['setValue'] = setValue;
 Module['FS_createPreloadedFile'] = FS.createPreloadedFile;
 Module['FS_createDataFile'] = FS.createDataFile;
 Module['FS_unlink'] = FS.unlink;
@@ -9309,7 +9306,6 @@ var unexportedSymbols = [
   'wasmTable',
   'freeTableIndexes',
   'functionsInTableMap',
-  'setValue',
   'getValue',
   'PATH',
   'PATH_FS',

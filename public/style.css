@@ -1,19 +1,27 @@
+:root {
+  --background_col: #36213E;
+  --secondary_col: #554971;
+  --text_col: #70B77E;
+  --highlight-col: #CF5C36;
+  --red: #ff0000; 
+  --black: #000000;
+}
+
 html * {
     font-family: Arial, sans-serif;
 }
 
 body {
-    background-color: #36213E;
-
+    background-color: var(--background_col);
 }
 
 #header {
-    color: #70B77E;
+    color: var(--text_col);
     text-align: center;
 }
 
 #canvas{
-    background-color: #36213E;
+    background-color: var(--background_col);
 
 }
 
@@ -25,12 +33,13 @@ body {
 }
 
 #trackerBox {
-    color: #70B77E;
-    background-color: #554971;
+    color: var(--text_col);
+    background-color: var(--secondary_col);
     z-index: 2;
     border-radius: 10px;
     padding: 10px;
-    height: 300px
+    height: 300px;
+    margin-bottom: 10px;
 }
 
 #trackerBoxHeader {
@@ -51,18 +60,18 @@ body {
 }
 
 .TrackTableData {
-    background-color: #36213E;
+    background-color: var(--background_col);
     height: 20px;
 }
 
 .TrackTableData:hover {
-    background-color: #CF5C36; 
-    color: #36213E;
+    background-color: var(--highlight-col); 
+    color: var(--background_col);
 }
 
 #infoBox {
-    color: #70B77E;
-    background-color: #554971;
+    color: var(--text_col);
+    background-color: var(--background_col);
     z-index: 2;
     border-radius: 10px;
     padding: 10px;
@@ -77,14 +86,179 @@ body {
     position: fixed;
     bottom: 10px;
     right: 10px;
-    width: 80px;
+    width: 180px;
 }
 
 #FPSBox {
-    color: #70B77E;
-    background-color: #554971;
+    color: var(--text_col);
+    background-color: var(--secondary_col);
     z-index: 2;
     border-radius: 10px;
     padding: 10px;
     margin-top: 10px;
+}
+
+#dev_console_box {
+    position: fixed;
+    top: 100px;
+    left: 10px;
+    width: 320px;
+}
+
+ul{
+    list-style:none;  
+    margin:0;
+    padding:0;
+    width:320px;
+    box-shadow:0 0 3px rgba(100,100,100,.9),
+               0 0 0 5px rgba(100,100,100,.3);
+    border-radius:5px;  
+    margin:20px;  
+  }
+  ul li{
+    display:block;
+    height:20px;  
+    background:rgb(79, 135, 123);
+    padding:10px;
+    color:white;
+    border-top:1px solid rgba(255,255,255,.1);  
+  }
+  ul li:last-child{
+    border-bottom-left-radius:4px;
+    border-bottom-right-radius:4px;
+  }
+
+  input[type="checkbox"]{
+    visibility:hidden;
+    position:absolute;
+  }
+
+  #collapse:checked ~ li{
+    display:none;
+    margin-top:0; 
+  }
+  #collapse:checked + label:before{
+    position:relative;
+    /* right:calc(-160px); */
+    opacity:1;
+  }
+
+.dev_console_button {
+  background-color: var(--secondary_col);
+  color: var(--text_col);
+  border: none;
+  font-weight: bold;
+  font-size: 20px;
+  /* border-radius: 2px; */
+  height: 34px;
+  width: 120px;
+  transition: background-color 0.1s;
+}
+
+.dev_console_button:hover, .dev_console_button:active {
+  background-color: var(--highlight-col);
+  color: var(--background_col);
+}
+
+/* Style the collapsible content. Note: hidden by default */
+.content {
+  padding: 0px 0px;
+  background-color: var(--secondary_col);
+  color: var(--text_col);
+  max-height: 0;
+  border-radius: 0px 5px 5px 5px; 
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+.padding {
+  padding: 10px 10px;
+}
+
+.border-div {
+  box-shadow: 0 0 0 3px var(--text_col);
+  background-color: var(--background_col);
+  padding: 0px 10px;
+}
+
+nav{
+  width: 100%;
+  border: 1px solid #666;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: no-wrap;
+}
+
+nav input{ display: none; }
+
+nav label{
+  padding: 5px 10px;
+  border-right: 2px solid var(--text_col);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+nav label:last-of-type{ border-right: 0; }
+
+nav label:hover{
+  background-color: var(--highlight-col);
+  color: var(--background_col);
+}
+
+nav input:checked + label{
+  background-color: var(--highlight-col);
+  color: var(--background_col);
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 15px;
+  border-radius: 5px;   
+  background: var(--secondary_col);
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%; 
+  background: var(--text_col);
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: var(--text_col);
+  cursor: pointer;
+}
+
+.toggle-button {
+  background-color: var(--secondary_col);
+  color: var(--text_col);
+  border: none;
+  font-weight: bold;
+  font-size: 20px;
+  border-radius: 2px;
+}
+
+.toggle-button:hover, .dev_console_button:active {
+  background-color: var(--highlight-col);
+  color: var(--background_col);
+}
+
+.container {
+  padding: 10px;
+  background-color: var(--secondary_col);
+  color: var(--text_col);
+  border-radius: 5px 5px 5px 5px; 
 }
