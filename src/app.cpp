@@ -135,6 +135,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 void app::App::init()
 {
+    m_ui = ui::Ui();
+
     const char* vertexShaderFile = "../shaders/triangleVert.glsl";
     const char* fragmentShaderFile = "../shaders/triangleFrag.glsl";
 
@@ -209,44 +211,51 @@ void app::App::init()
 
 void app::App::mainLoop()
 {
+    // Check for Ui state
+    m_ui.poll_all();
+
 	reference_time = now;
 	now = emscripten_performance_now()/1000;
-    //Generate new track
     
-    double p = uniform_dist(rand_gen);
- 
-    if(p < 0.004){
-		std::cout<<"Track created"<<std::endl;
-		std::vector<simulation::Position> origin = utils::genRandomPoints(1);
-		track::Track new_track(glm::vec3(0.0));
-    	std::vector<glm::vec3> temp_track_verts = new_track.get_vertices();
-		track_sim.addVerts(temp_track_verts);
-		printf("newVerts size = %u \n", track_sim.newVerts.size());
-    }
+    if (m_ui.get_play_pause_setting() == 1) {
+        //Generate new track
+        double p = uniform_dist(rand_gen);
+    
+        if(p < 0.004){
+            std::cout<<"Track created"<<std::endl;
+            std::vector<simulation::Position> origin = utils::genRandomPoints(1);
+            track::Track new_track(glm::vec3(0.0));
+            std::vector<glm::vec3> temp_track_verts = new_track.get_vertices();
+            track_sim.addVerts(temp_track_verts);
+            printf("newVerts size = %u \n", track_sim.newVerts.size());
+        }
 
-    sim.update(w);
-    track_sim.update(w);
+        sim.update(w);
+        track_sim.update(w);
+    }
 
     glClear(GL_COLOR_BUFFER_BIT);
 
     float dt = 1;
 
-    // Move camera
-    if (fb != 0) {
-        cam.move(0.0f, 0.0f, fb*motionSpeed*dt);
-    }
-    if (lr != 0) {
-        cam.move(lr*motionSpeed*dt, 0.0f, 0.0f);
-    }
-    if (ud != 0) {
-        cam.move(0.0f, -ud*motionSpeed*dt, 0.0f);
-    }
+    if (m_ui.get_free_move_setting() == 1) {
+        // Move camera
+        if (fb != 0) {
+            cam.move(0.0f, 0.0f, fb*motionSpeed*dt);
+        }
+        if (lr != 0) {
+            cam.move(lr*motionSpeed*dt, 0.0f, 0.0f);
+        }
+        if (ud != 0) {
+            cam.move(0.0f, -ud*motionSpeed*dt, 0.0f);
+        }
 
-    // Rotate Camera
-    if (deltaX != 0.0 || deltaY != 0.0) {
-        cam.rotate(deltaX, deltaY);
-        deltaX = 0;
-        deltaY = 0;
+        // Rotate Camera
+        if (deltaX != 0.0 || deltaY != 0.0) {
+            cam.rotate(deltaX, deltaY);
+            deltaX = 0;
+            deltaY = 0;
+        }
     }
 
     // Compute the current view and perspective matrices
@@ -258,8 +267,12 @@ void app::App::mainLoop()
     float fovRad = glm::radians(45.0f);
     glm::mat4 projection = glm::perspective(fovRad, aspectRatio, nearClip, farClip);
 
-    time += 0.001;
-	float dT = now-reference_time;
+    float dT = 0;
+
+    if (m_ui.get_play_pause_setting() == 1) {
+        time += 0.001;
+        dT = now-reference_time;
+    }
 
     sim.mCompShader->setUniform("dT", dT);
     track_sim.mCompShader->setUniform("time", time);
@@ -284,6 +297,28 @@ void app::App::mainLoop()
     ray_marcher.mRenderShader->setUniformVec("lightPos", lightPos);
     ray_marcher.mRenderShader->setUniformVec("lightColour", lightColour);
 
+    updateStep();
+
+    glfwPollEvents();
+
+    if(drawFPS % 10 == 0)
+    {
+        now = emscripten_performance_now() / 1000;
+        EM_ASM(document.getElementById("FPSVal").innerHTML = $0;, (int)(10/(now-t)));
+        t = now;
+        // printf("Graphics Setting %u \n", m_ui.get_graphics_setting());
+    }
+
+    // GLenum error = glGetError();
+    // if (error != GL_NO_ERROR) {
+    //     printf("Error %u \n", error);
+    // }
+
+    drawFPS++;
+}
+
+void app::App::updateStep()
+{
     frameBufferBackBubbles.activate();
     frameBufferBackBubbles.clear();
     sim.draw(w);
@@ -297,19 +332,4 @@ void app::App::mainLoop()
 
 
 	w.swapBuffers();
-    glfwPollEvents();
-
-    if(drawFPS % 10 == 0)
-    {
-        now = emscripten_performance_now() / 1000;
-        EM_ASM(document.getElementById("FPSVal").innerHTML = $0;, (int)(10/(now-t)));
-        t = now;
-    }
-
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        printf("Error %u \n", error);
-    }
-
-    drawFPS++;
 }
