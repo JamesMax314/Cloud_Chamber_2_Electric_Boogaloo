@@ -1,0 +1,90 @@
+html * {
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #36213E;
+
+}
+
+#header {
+    color: #70B77E;
+    text-align: center;
+}
+
+#canvas{
+    background-color: #36213E;
+
+}
+
+#floating_wrapper {
+    position: fixed;
+    top: 100px;
+    right: 10px;
+    width: 200px;
+}
+
+#trackerBox {
+    color: #70B77E;
+    background-color: #554971;
+    z-index: 2;
+    border-radius: 10px;
+    padding: 10px;
+    height: 300px
+}
+
+#trackerBoxHeader {
+    text-align: center;
+}
+
+#TrackTable {
+    width:100%;
+    border: 3px solid;
+    border-collapse: collapse;
+    text-align: center;
+    empty-cells: show;
+}
+
+#TrackTableHeader {
+    border: 1px solid;
+    padding: 10px;
+}
+
+.TrackTableData {
+    background-color: #36213E;
+    height: 20px;
+}
+
+.TrackTableData:hover {
+    background-color: #CF5C36; 
+    color: #36213E;
+}
+
+#infoBox {
+    color: #70B77E;
+    background-color: #554971;
+    z-index: 2;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+#infoBoxHeader {
+    text-align: center;
+}
+
+#floating_fps {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 80px;
+}
+
+#FPSBox {
+    color: #70B77E;
+    background-color: #554971;
+    z-index: 2;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+}
